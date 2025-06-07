@@ -1,0 +1,155 @@
+{
+  "Logging": {
+    "Servers": [
+      {
+        "Hostname": "127.0.0.1",
+        "Port": 514,
+        "RandomizePorts": false,
+        "MinimumPort": 65000,
+        "MaximumPort": 65535
+      }
+    ],
+    "LogDirectory": "./logs/",
+    "LogFilename": "./logs/./logs/./ollamaflow.log",
+    "ConsoleLogging": true,
+    "EnableColors": true,
+    "MinimumSeverity": 0
+  },
+  "Frontends": [
+    {
+      "Identifier": "frontend",
+      "Name": "Default Ollama frontend",
+      "Hostname": "localhost",
+      "TimeoutMs": 60000,
+      "LoadBalancing": "RoundRobin",
+      "BlockHttp10": true,
+      "LogRequestFull": false,
+      "LogRequestBody": false,
+      "LogResponseBody": false,
+      "MaxRequestBodySize": 536870912,
+      "Backends": [
+        "backend1",
+        "backend2",
+        "backend3",
+        "backend4"
+      ],
+      "RequiredModels": [
+        "all-minilm"
+      ],
+      "LastIndex": 2
+    }
+  ],
+  "Backends": [
+    {
+      "Identifier": "backend1",
+      "Name": "backend1",
+      "Hostname": "localhost",
+      "Port": 11435,
+      "Ssl": false,
+      "ModelRefreshIntervalMs": 30000,
+      "HealthCheckIntervalMs": 5000,
+      "UnhealthyThreshold": 2,
+      "HealthyThreshold": 2,
+      "HealthCheckMethod": {
+        "Method": "HEAD"
+      },
+      "HealthCheckUrl": "/",
+      "LogRequestBody": false,
+      "LogResponseBody": false
+    },
+    {
+      "Identifier": "backend2",
+      "Name": "backend2",
+      "Hostname": "localhost",
+      "Port": 11436,
+      "Ssl": false,
+      "ModelRefreshIntervalMs": 30000,
+      "HealthCheckIntervalMs": 5000,
+      "UnhealthyThreshold": 2,
+      "HealthyThreshold": 2,
+      "HealthCheckMethod": {
+        "Method": "HEAD"
+      },
+      "HealthCheckUrl": "/",
+      "LogRequestBody": false,
+      "LogResponseBody": false
+    },
+    {
+      "Identifier": "backend3",
+      "Name": "backend3",
+      "Hostname": "localhost",
+      "Port": 11437,
+      "Ssl": false,
+      "ModelRefreshIntervalMs": 30000,
+      "HealthCheckIntervalMs": 5000,
+      "UnhealthyThreshold": 2,
+      "HealthyThreshold": 2,
+      "HealthCheckMethod": {
+        "Method": "HEAD"
+      },
+      "HealthCheckUrl": "/",
+      "LogRequestBody": false,
+      "LogResponseBody": false
+    },
+    {
+      "Identifier": "backend4",
+      "Name": "backend4",
+      "Hostname": "localhost",
+      "Port": 11438,
+      "Ssl": false,
+      "ModelRefreshIntervalMs": 30000,
+      "HealthCheckIntervalMs": 5000,
+      "UnhealthyThreshold": 2,
+      "HealthyThreshold": 2,
+      "HealthCheckMethod": {
+        "Method": "HEAD"
+      },
+      "HealthCheckUrl": "/",
+      "LogRequestBody": false,
+      "LogResponseBody": false
+    }
+  ],
+  "Webserver": {
+    "Hostname": "localhost",
+    "Port": 43411,
+    "Prefix": "http://localhost:43411/",
+    "IO": {
+      "StreamBufferSize": 65536,
+      "MaxRequests": 1024,
+      "ReadTimeoutMs": 10000,
+      "MaxIncomingHeadersSize": 65536,
+      "EnableKeepAlive": false
+    },
+    "Ssl": {
+      "Enable": false,
+      "MutuallyAuthenticate": false,
+      "AcceptInvalidAcertificates": true
+    },
+    "Headers": {
+      "IncludeContentLength": true,
+      "DefaultHeaders": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "OPTIONS, HEAD, GET, PUT, POST, DELETE, PATCH",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Expose-Headers": "",
+        "Accept": "*/*",
+        "Accept-Language": "en-US, en",
+        "Accept-Charset": "ISO-8859-1, utf-8",
+        "Cache-Control": "no-cache",
+        "Connection": "close",
+        "Host": "localhost:43411"
+      }
+    },
+    "AccessControl": {
+      "DenyList": {},
+      "PermitList": {},
+      "Mode": "DefaultPermit"
+    },
+    "Debug": {
+      "AccessControl": false,
+      "Routing": false,
+      "Requests": false,
+      "Responses": false
+    }
+  }
+}

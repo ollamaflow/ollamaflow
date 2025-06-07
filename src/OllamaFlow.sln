@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35514.174
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OllamaFlow.Core", "OllamaFlow.Core\OllamaFlow.Core.csproj", "{88D5BCF6-4BBE-457C-BB1B-B7D3961DABD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OllamaFlow.Server", "OllamaFlow.Server\OllamaFlow.Server.csproj", "{1A018475-C41F-4159-844E-644D3A5D8F76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{842B437D-6CD0-47F0-B4ED-39D096BB11DC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88D5BCF6-4BBE-457C-BB1B-B7D3961DABD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88D5BCF6-4BBE-457C-BB1B-B7D3961DABD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88D5BCF6-4BBE-457C-BB1B-B7D3961DABD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88D5BCF6-4BBE-457C-BB1B-B7D3961DABD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A018475-C41F-4159-844E-644D3A5D8F76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A018475-C41F-4159-844E-644D3A5D8F76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A018475-C41F-4159-844E-644D3A5D8F76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A018475-C41F-4159-844E-644D3A5D8F76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{842B437D-6CD0-47F0-B4ED-39D096BB11DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{842B437D-6CD0-47F0-B4ED-39D096BB11DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{842B437D-6CD0-47F0-B4ED-39D096BB11DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{842B437D-6CD0-47F0-B4ED-39D096BB11DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36B2F977-E56F-4458-827D-1446DA75964B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36B2F977-E56F-4458-827D-1446DA75964B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36B2F977-E56F-4458-827D-1446DA75964B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36B2F977-E56F-4458-827D-1446DA75964B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

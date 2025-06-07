@@ -1,0 +1,19 @@
+services:
+
+  #
+  # OllamaFlow
+  # See https://hub.docker.com/r/jchristn/ollamaflow
+  # and https://github.com/jchristn/OllamaFlow
+  #
+
+  ollamaflow:
+    container_name: 'ollamaflow'
+    image: 'jchristn/ollamaflow:v1.0.0'
+    network_mode: 'host'
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./ollamaflow.json:/app/ollamaflow.json
+      - ./logs/:/app/logs/
+    healthcheck:
+      test: curl --fail http://localhost:43411

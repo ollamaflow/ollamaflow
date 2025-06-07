@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  ollama1:
+    image: ollama/ollama
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama1:/root/.ollama
+    
+  ollama2:
+    image: ollama/ollama
+    ports:
+      - "11436:11434"
+    volumes:
+      - ollama2:/root/.ollama
+    
+  ollama3:
+    image: ollama/ollama
+    ports:
+      - "11437:11434"
+    volumes:
+      - ollama3:/root/.ollama
+    
+  ollama4:
+    image: ollama/ollama
+    ports:
+      - "11438:11434"
+    volumes:
+      - ollama4:/root/.ollama
+
+volumes:
+  ollama1:
+  ollama2:
+  ollama3:
+  ollama4:

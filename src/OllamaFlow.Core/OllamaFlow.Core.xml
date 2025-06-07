@@ -1,0 +1,810 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OllamaFlow.Core</name>
+    </assembly>
+    <members>
+        <member name="T:OllamaFlow.Core.ApiErrorEnum">
+            <summary>
+            API error codes.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthenticationFailed">
+            <summary>
+            Authentication failed.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthorizationFailed">
+            <summary>
+            Authorization failed.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadGateway">
+            <summary>
+            Bad gateway.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadRequest">
+            <summary>
+            Bad request.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.Conflict">
+            <summary>
+            Conflict.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.DeserializationError">
+            <summary>
+            DeserializationError.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.Inactive">
+            <summary>
+            Inactive.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.InternalError">
+            <summary>
+            Internal error.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.InvalidRange">
+            <summary>
+            Invalid range.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.InUse">
+            <summary>
+            In use.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotEmpty">
+            <summary>
+            Not empty.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotFound">
+            <summary>
+            Not found.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.TokenExpired">
+            <summary>
+            Token expired.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.TooLarge">
+            <summary>
+            Request too large.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.UnsupportedHttpVersion">
+            <summary>
+            Unsupported HTTP version.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.ApiErrorResponse">
+            <summary>
+            API error response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Error">
+            <summary>
+            Error.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Message">
+            <summary>
+            Human-readable message.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.StatusCode">
+            <summary>
+            HTTP status code.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Context">
+            <summary>
+            Additional contextual information.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Description">
+            <summary>
+            Description.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor(OllamaFlow.Core.ApiErrorEnum,System.Object,System.String)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="error">Error code.</param>
+            <param name="context">Context.</param>
+            <param name="description">Description.</param>
+            
+        </member>
+        <member name="T:OllamaFlow.Core.Constants">
+            <summary>
+            Constants.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.Logo">
+            <summary>
+            Logo.
+            See patorjk.com font Ogre.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.SettingsFile">
+            <summary>
+            Settings file.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.HtmlHomepage">
+            <summary>
+            Default HTML homepage.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.LogFilename">
+            <summary>
+            Log filename.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.LogDirectory">
+            <summary>
+            Log directory.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.BinaryContentType">
+            <summary>
+            Binary content type.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.JsonContentType">
+            <summary>
+            JSON content type.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.HtmlContentType">
+            <summary>
+            HTML content type.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.PngContentType">
+            <summary>
+            PNG content type.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.TextContentType">
+            <summary>
+            Text content type.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.FaviconFilename">
+            <summary>
+            Favicon filename.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.FaviconContentType">
+            <summary>
+            Favicon content type.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.DefaultGUID">
+            <summary>
+            Default GUID.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.ForwardedForHeader">
+            <summary>
+            Forwarded for header, generally x-forwarded-for.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.RequestIdHeader">
+            <summary>
+            Request ID header.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.BackendServerHeader">
+            <summary>
+            Backend server ID header.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.EndpointGroup">
+            <summary>
+            Endpoint group.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EndpointGroup.ParameterizedUrls">
+            <summary>
+            Key is the upper-case HTTP method.
+            Value is a list of parameterized URLs to match, e.g. /{version}/foo/bar/{id}.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.EndpointGroup.#ctor">
+            <summary>
+            Endpoint group.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Helpers.RequestTypeEnum">
+            <summary>
+            Represents the different types of requests that can be proxied to Ollama.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.Root">
+            <summary>
+            Root endpoint request.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.ValidateConnectivity">
+            <summary>
+            Health check or connectivity validation request.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.Unknown">
+            <summary>
+            Unknown or unrecognized request type.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.PullModel">
+            <summary>
+            Pull a model from the registry.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.PushModel">
+            <summary>
+            Push a model to the registry.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.CreateModel">
+            <summary>
+            Create a model from a Modelfile.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.CopyModel">
+            <summary>
+            Copy a model.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.DeleteModel">
+            <summary>
+            Delete a model.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.ListModels">
+            <summary>
+            List available models.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.ListRunningModels">
+            <summary>
+            List currently running models.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.ShowModelInformation">
+            <summary>
+            Show detailed information about a model.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.CreateBlob">
+            <summary>
+            Create or retrieve model blobs.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.CheckBlob">
+            <summary>
+            Check if a blob exists.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.GenerateCompletion">
+            <summary>
+            Generate a completion (non-chat).
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.GenerateChatCompletion">
+            <summary>
+            Generate a chat completion.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.GenerateEmbeddings">
+            <summary>
+            Generate embeddings for a single input.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAIChatCompletions">
+            <summary>
+            OpenAI-compatible chat completions endpoint.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAICompletions">
+            <summary>
+            OpenAI-compatible completions endpoint.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAIEmbeddings">
+            <summary>
+            OpenAI-compatible embeddings endpoint.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAIListModels">
+            <summary>
+            OpenAI-compatible models list endpoint.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAIRetrieveModel">
+            <summary>
+            OpenAI-compatible model retrieval endpoint.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.LoadBalancingMode">
+            <summary>
+            Load balancing mode.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.LoadBalancingMode.Random">
+            <summary>
+            Random.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.LoadBalancingMode.RoundRobin">
+            <summary>
+            Round robin.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.OllamaBackend">
+            <summary>
+            Origin server.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.Identifier">
+            <summary>
+            Unique identifier for this origin server.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.Name">
+            <summary>
+            Name for this origin server.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.Hostname">
+            <summary>
+            Hostname.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.Port">
+            <summary>
+            TCP port.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.Ssl">
+            <summary>
+            Enable or disable SSL.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.ModelRefreshIntervalMs">
+            <summary>
+            Interval at which the list of available models is refreshed. 
+            Default is 30 seconds (30000).  Minimum is 1 second (1000).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.HealthCheckIntervalMs">
+            <summary>
+            Interval at which health is checked against this server.
+            Default is 5 seconds (5000).  Minimum is 1 second (1000).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.UnhealthyThreshold">
+            <summary>
+            Number of consecutive failed health checks before marking a server as unhealthy.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.HealthyThreshold">
+            <summary>
+            Number of consecutive successful health checks before marking a server as healthy.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.HealthCheckMethod">
+            <summary>
+            HTTP method to use when performing a healthcheck.
+            Default is GET.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.HealthCheckUrl">
+            <summary>
+            URL to use when performing a healthcheck.
+            Default is /.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.LogRequestBody">
+            <summary>
+            True to log the request body.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.LogResponseBody">
+            <summary>
+            True to log the response body.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.UrlPrefix">
+            <summary>
+            URL prefix.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.OllamaFlowCallbacks">
+            <summary>
+            OllamaFlow callbacks.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowCallbacks.#ctor">
+            <summary>
+            OllamaFlow callbacks.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.OllamaFlowDaemon">
+            <summary>
+            OllamaFlow Daemon.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowDaemon.Callbacks">
+            <summary>
+            OllamaFlow callbacks.  Attach handlers to these methods to integrate your application logic into OllamaFlow.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.#ctor(OllamaFlow.Core.OllamaFlowSettings)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="settings">Settings.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.Dispose(System.Boolean)">
+            <summary>
+            Dispose.
+            </summary>
+            <param name="disposing">Disposing.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.Dispose">
+            <summary>
+            Dispose.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.OllamaFlowSettings">
+            <summary>
+            Settings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Logging">
+            <summary>
+            Logging settings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Frontends">
+            <summary>
+            Ollama frontend endpoints, i.e. virtual servers exposed by OllamaFlow.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Backends">
+            <summary>
+            Ollama backend endpoints, i.e. Ollama servers.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Webserver">
+            <summary>
+            Webserver settings.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowSettings.#ctor">
+            <summary>
+            Instantiate.
+            </summary> 
+        </member>
+        <member name="T:OllamaFlow.Core.OllamaFrontend">
+            <summary>
+            API endpoint.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.Identifier">
+            <summary>
+            Unique identifier for this API endpoint.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.Name">
+            <summary>
+            Name for this API endpoint.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.Hostname">
+            <summary>
+            Hostname associated with this frontend.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.TimeoutMs">
+            <summary>
+            Number of milliseconds to wait before considering the request to be timed out.
+            Default is 60 seconds.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.LoadBalancing">
+            <summary>
+            Load-balancing mode.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.BlockHttp10">
+            <summary>
+            True to terminate HTTP/1.0 requests.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.LogRequestFull">
+            <summary>
+            True to enable logging of the full request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.LogRequestBody">
+            <summary>
+            True to log the request body.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.LogResponseBody">
+            <summary>
+            True to log the response body.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.MaxRequestBodySize">
+            <summary>
+            Maximum request body size.  Default is 512MB.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.Backends">
+            <summary>
+            Ollama backend server identifiers.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.RequiredModels">
+            <summary>
+            List of models that should be present on each mapped backend Ollama server.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.LastIndex">
+            <summary>
+            Last-used index.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFrontend.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.GatewayService">
+            <summary>
+            Gateway service.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,SerializationHelper.Serializer)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="callbacks">Callbacks.</param>
+            <param name="logging">Logging.</param>
+            <param name="serializer">Serializer.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.Dispose(System.Boolean)">
+            <summary>
+            Dispose.
+            </summary>
+            <param name="disposing">Disposing.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.Dispose">
+            <summary>
+            Dispose.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.InitializeRoutes(WatsonWebserver.Core.WebserverBase)">
+            <summary>
+            Initialize routes.
+            </summary>
+            <param name="webserver">Webserver.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.OptionsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Route for handling OPTIONS requests.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.PreRoutingHandler(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Pre-routing handler.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.PostRoutingHandler(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Post-routing handler.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.AuthenticateRequest(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Authenticate request.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.DefaultRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Default request handler.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.HealthCheckService">
+            <summary>
+            Health check service.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,SerializationHelper.Serializer)">
+            <summary>
+            Health check service.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="logging">Logging.</param>
+            <param name="serializer">Serializer.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.Dispose(System.Boolean)">
+            <summary>
+            Dispose.
+            </summary>
+            <param name="disposing">Disposing.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.Dispose">
+            <summary>
+            Dispose.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.ModelDiscoveryService">
+            <summary>
+            Model discovery service.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelDiscoveryService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,SerializationHelper.Serializer)">
+            <summary>
+            Model discovery service.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="logging">Logging.</param>
+            <param name="serializer">Serializer.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelDiscoveryService.Dispose(System.Boolean)">
+            <summary>
+            Dispose.
+            </summary>
+            <param name="disposing">Disposing.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelDiscoveryService.Dispose">
+            <summary>
+            Dispose.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.ModelSynchronizationService">
+            <summary>
+            Model synchronization service.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,SerializationHelper.Serializer)">
+            <summary>
+            Model synchronization service.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="logging">Logging.</param>
+            <param name="serializer">Serializer.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.Dispose(System.Boolean)">
+            <summary>
+            Dispose.
+            </summary>
+            <param name="disposing">Disposing.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.Dispose">
+            <summary>
+            Dispose.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Settings.LoggingSettings">
+            <summary>
+            Logging settings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.LoggingSettings.Servers">
+            <summary>
+            List of syslog servers.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.LoggingSettings.LogDirectory">
+            <summary>
+            Log directory.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.LoggingSettings.LogFilename">
+            <summary>
+            Log filename.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.LoggingSettings.ConsoleLogging">
+            <summary>
+            Enable or disable console logging.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.LoggingSettings.EnableColors">
+            <summary>
+            Enable colors in logging.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.LoggingSettings.MinimumSeverity">
+            <summary>
+            Minimum severity.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Settings.LoggingSettings.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Settings.SyslogServer">
+            <summary>
+            Syslog server settings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.SyslogServer.Hostname">
+            <summary>
+            Hostname.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.SyslogServer.Port">
+            <summary>
+            Port.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.SyslogServer.RandomizePorts">
+            <summary>
+            Boolean to indicate whether or not randomized port numbers should be used.
+            If false, the value in 'Port' will be used.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.SyslogServer.MinimumPort">
+            <summary>
+            Minimum port.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.SyslogServer.MaximumPort">
+            <summary>
+            Maximum port.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Settings.SyslogServer.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Settings.SyslogServer.#ctor(System.String,System.Int32)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="hostname">Hostname.</param>
+            <param name="port">Port.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Settings.SyslogServer.#ctor(System.String,System.Int32,System.Int32)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="hostname">Hostname.</param>
+            <param name="minPort">Minimum port number.</param>
+            <param name="maxPort">Maximum port number.</param>
+        </member>
+    </members>
+</doc>

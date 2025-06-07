@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OllamaFlow.Server</name>
+    </assembly>
+    <members>
+        <member name="T:OllamaFlow.Server.Program">
+            <summary>
+            OllamaFlow server.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Server.Program.Main(System.String[])">
+            <summary>
+            Entry point.
+            </summary>
+            <param name="args">Command line arguments.</param>
+            <returns>Task.</returns>
+        </member>
+    </members>
+</doc>
