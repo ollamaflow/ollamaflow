@@ -17,6 +17,7 @@
     using UrlMatcher;
     using WatsonWebserver;
     using WatsonWebserver.Core;
+    using System.Threading;
 
     /// <summary>
     /// Gateway service.
@@ -263,6 +264,21 @@
                     return;
                 }
 
+                int totalRequests =
+                    Volatile.Read(ref backend.ActiveRequests) +
+                    Volatile.Read(ref backend.PendingRequests);
+
+                if (totalRequests > backend.RateLimitRequestsThreshold)
+                {
+                    _Logging.Warn(_Header + "too many active requests for backend " + backend.Identifier + ", sending 429 response to request from " + ctx.Request.Source.IpAddress);
+                    ctx.Response.StatusCode = 429;
+                    ctx.Response.ContentType = Constants.JsonContentType;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.SlowDown)));
+                    return;
+                }
+
+                Interlocked.Increment(ref backend.PendingRequests);
+
                 bool responseReceived = await ProxyRequest(
                     requestGuid,
                     ctx,
@@ -451,6 +467,8 @@
                     #region Enter-Semaphore
 
                     await backend.Semaphore.WaitAsync().ConfigureAwait(false);
+                    Interlocked.Increment(ref backend.ActiveRequests);
+                    Interlocked.Decrement(ref backend.PendingRequests);
 
                     #endregion
 
@@ -656,6 +674,7 @@
                     if (resp != null) resp.Dispose();
 
                     backend.Semaphore.Release();
+                    Interlocked.Decrement(ref backend.ActiveRequests);
                 }
 
                 #endregion

@@ -55,6 +55,7 @@
       },
       "HealthCheckUrl": "/",
       "MaxParallelRequests": 4,
+      "RateLimitRequestsThreshold": 10,
       "LogRequestBody": false,
       "LogResponseBody": false
     },
@@ -73,6 +74,7 @@
       },
       "HealthCheckUrl": "/",
       "MaxParallelRequests": 4,
+      "RateLimitRequestsThreshold": 10,
       "LogRequestBody": false,
       "LogResponseBody": false
     },
@@ -91,6 +93,7 @@
       },
       "HealthCheckUrl": "/",
       "MaxParallelRequests": 4,
+      "RateLimitRequestsThreshold": 10,
       "LogRequestBody": false,
       "LogResponseBody": false
     },
@@ -109,6 +112,7 @@
       },
       "HealthCheckUrl": "/",
       "MaxParallelRequests": 4,
+      "RateLimitRequestsThreshold": 10,
       "LogRequestBody": false,
       "LogResponseBody": false
     }

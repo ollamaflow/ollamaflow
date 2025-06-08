@@ -180,6 +180,22 @@
         }
 
         /// <summary>
+        /// Threshold at which 429 rate limit responses are sent.
+        /// </summary>
+        public int RateLimitRequestsThreshold
+        {
+            get
+            {
+                return _RateLimitRequestsThreshold;
+            }
+            set
+            {
+                if (value < 1) throw new ArgumentOutOfRangeException(nameof(RateLimitRequestsThreshold));
+                _RateLimitRequestsThreshold = value;
+            }
+        }
+
+        /// <summary>
         /// True to log the request body.
         /// </summary>
         public bool LogRequestBody { get; set; } = false;
@@ -210,6 +226,8 @@
         internal int HealthCheckFailure = 0;
         internal bool Healthy = false;
         internal bool ModelsDiscovered = false;
+        internal int ActiveRequests = 0;
+        internal int PendingRequests = 0;
         internal List<string> Models
         {
             get
@@ -246,6 +264,7 @@
         private int _UnhealthyThreshold = 2;
         private int _HealthyThreshold = 2;
         private int _MaxParallelRequests = 4;
+        private int _RateLimitRequestsThreshold = 10;
         private HttpMethod _HealthCheckMethod = HttpMethod.Get;
         private string _HealthCheckUrl = "/";
         private List<string> _Models = new List<string>();

@@ -69,6 +69,11 @@
             Not found.
             </summary>
         </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.SlowDown">
+            <summary>
+            Slow down.
+            </summary>
+        </member>
         <member name="F:OllamaFlow.Core.ApiErrorEnum.TokenExpired">
             <summary>
             Token expired.
@@ -422,6 +427,11 @@
         <member name="P:OllamaFlow.Core.OllamaBackend.MaxParallelRequests">
             <summary>
             Maximum number of parallel requests to this backend.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.RateLimitRequestsThreshold">
+            <summary>
+            Threshold at which 429 rate limit responses are sent.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.LogRequestBody">

@@ -69,6 +69,11 @@
         [EnumMember(Value = "NotFound")]
         NotFound,
         /// <summary>
+        /// Slow down.
+        /// </summary>
+        [EnumMember(Value = "SlowDown")]
+        SlowDown,
+        /// <summary>
         /// Token expired.
         /// </summary>
         [EnumMember(Value = "TokenExpired")]
