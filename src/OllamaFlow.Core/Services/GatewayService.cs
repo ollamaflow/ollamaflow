@@ -448,7 +448,13 @@
 
                 try
                 {
-                    #region Build-Request-and-Add-Headers
+                    #region Enter-Semaphore
+
+                    await backend.Semaphore.WaitAsync().ConfigureAwait(false);
+
+                    #endregion
+
+                    #region Build-Request-and-Send
 
                     using (RestRequest req = new RestRequest(url, ConvertHttpMethod(ctx.Request.Method)))
                     {
@@ -478,8 +484,6 @@
                                 req.Headers.Add("Host", backend.Hostname + ":" + backend.Port.ToString());
                             }
                         }
-
-                        #endregion
 
                         #region Log-Request-Body
 
@@ -650,7 +654,11 @@
                         + "(" + ts.TotalMs + "ms)");
 
                     if (resp != null) resp.Dispose();
+
+                    backend.Semaphore.Release();
                 }
+
+                #endregion
             }
         }
 

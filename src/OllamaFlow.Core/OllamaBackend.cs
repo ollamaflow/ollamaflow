@@ -6,6 +6,7 @@
     using System.Net.Http;   
     using System.Text;
     using System.Text.Json.Serialization;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -163,6 +164,22 @@
         }
 
         /// <summary>
+        /// Maximum number of parallel requests to this backend.
+        /// </summary>
+        public int MaxParallelRequests
+        {
+            get
+            {
+                return _MaxParallelRequests;
+            }
+            set
+            {
+                if (value < 1) throw new ArgumentOutOfRangeException(nameof(MaxParallelRequests));
+                _MaxParallelRequests = value;
+            }
+        }
+
+        /// <summary>
         /// True to log the request body.
         /// </summary>
         public bool LogRequestBody { get; set; } = false;
@@ -205,7 +222,19 @@
                 _Models = value;
             }
         }
-        
+        internal SemaphoreSlim Semaphore
+        {
+            get
+            {
+                if (_Semaphore == null) _Semaphore = new SemaphoreSlim(_MaxParallelRequests, _MaxParallelRequests);
+                return _Semaphore;
+            }
+            set
+            {
+                _Semaphore = value;
+            }
+        }
+
         #endregion
 
         #region Private-Members
@@ -216,13 +245,23 @@
         private int _HealthCheckIntervalMs = 5000;
         private int _UnhealthyThreshold = 2;
         private int _HealthyThreshold = 2;
+        private int _MaxParallelRequests = 4;
         private HttpMethod _HealthCheckMethod = HttpMethod.Get;
         private string _HealthCheckUrl = "/";
         private List<string> _Models = new List<string>();
+        private SemaphoreSlim _Semaphore = null;
 
         #endregion
 
         #region Constructors-and-Factories
+
+        /// <summary>
+        /// Ollama backend.
+        /// </summary>
+        public OllamaBackend()
+        {
+
+        }
 
         #endregion
 

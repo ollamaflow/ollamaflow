@@ -50,6 +50,7 @@
         "Method": "HEAD"
       },
       "HealthCheckUrl": "/",
+      "MaxParallelRequests": 4,
       "LogRequestBody": false,
       "LogResponseBody": false,
       "UrlPrefix": "http://localhost:11434"

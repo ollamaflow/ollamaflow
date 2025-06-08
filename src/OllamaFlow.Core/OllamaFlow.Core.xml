@@ -419,6 +419,11 @@
             Default is /.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.MaxParallelRequests">
+            <summary>
+            Maximum number of parallel requests to this backend.
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.LogRequestBody">
             <summary>
             True to log the request body.
@@ -432,6 +437,11 @@
         <member name="P:OllamaFlow.Core.OllamaBackend.UrlPrefix">
             <summary>
             URL prefix.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaBackend.#ctor">
+            <summary>
+            Ollama backend.
             </summary>
         </member>
         <member name="T:OllamaFlow.Core.OllamaFlowCallbacks">
