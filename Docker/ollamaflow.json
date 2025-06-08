@@ -51,6 +51,7 @@
       },
       "HealthCheckUrl": "/",
       "MaxParallelRequests": 4,
+      "RateLimitRequestsThreshold": 10,
       "LogRequestBody": false,
       "LogResponseBody": false,
       "UrlPrefix": "http://localhost:11434"
