@@ -91,6 +91,8 @@
                         return 400;
                     case ApiErrorEnum.NotFound:
                         return 404;
+                    case ApiErrorEnum.SlowDown:
+                        return 429;
                     case ApiErrorEnum.TokenExpired:
                         return 401;
                     case ApiErrorEnum.TooLarge:

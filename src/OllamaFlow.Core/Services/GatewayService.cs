@@ -5,8 +5,10 @@
     using System.Collections.Specialized;
     using System.IO;
     using System.Linq;
+    using System.Net.Sockets;
     using System.Reflection;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using RestWrapper;
     using SerializationHelper;
@@ -17,7 +19,6 @@
     using UrlMatcher;
     using WatsonWebserver;
     using WatsonWebserver.Core;
-    using System.Threading;
 
     /// <summary>
     /// Gateway service.
@@ -339,13 +340,13 @@
             try
             {
                 Uri uri = new Uri(ctx.Request.Url.Full);
-                _Logging.Debug(_Header + "locating frontend for host " + uri.Host);
+                // _Logging.Debug(_Header + "locating frontend for host " + uri.Host);
 
                 foreach (OllamaFrontend ep in _Settings.Frontends)
                 {
                     if (ep.Hostname.Equals("*"))
                     {
-                        _Logging.Debug(_Header + "catch-all host found in Ollama frontend " + ep.Identifier);
+                        // _Logging.Debug(_Header + "catch-all host found in Ollama frontend " + ep.Identifier);
                         return ep;
                     }
 
@@ -648,12 +649,34 @@
                         #endregion
                     }
                 }
+                catch (System.Net.Http.HttpRequestException hre)
+                {
+                    _Logging.Warn(
+                        _Header
+                        + "exception proxying request to backend " + backend.Identifier
+                        + " for endpoint " + frontend.Identifier
+                        + " for request " + requestGuid.ToString()
+                        + ": " + hre.Message);
+
+                    return false;
+                }
+                catch (SocketException se)
+                {
+                    _Logging.Warn(
+                        _Header
+                        + "exception proxying request to backend " + backend.Identifier
+                        + " for endpoint " + frontend.Identifier
+                        + " for request " + requestGuid.ToString()
+                        + ": " + se.Message);
+
+                    return false;
+                }
                 catch (Exception e)
                 {
                     _Logging.Warn(
                         _Header
-                        + "exception proxying request to " + backend.Identifier
-                        + " for API endpoint " + frontend.Identifier
+                        + "exception proxying request to backend " + backend.Identifier
+                        + " for endpoint " + frontend.Identifier
                         + " for request " + requestGuid.ToString()
                         + Environment.NewLine
                         + e.ToString());

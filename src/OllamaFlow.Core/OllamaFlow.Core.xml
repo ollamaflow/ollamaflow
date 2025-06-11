@@ -424,6 +424,11 @@
             Default is /.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.Healthy">
+            <summary>
+            Boolean indicating if the backend is healthy.
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.MaxParallelRequests">
             <summary>
             Maximum number of parallel requests to this backend.

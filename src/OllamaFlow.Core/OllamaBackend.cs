@@ -164,6 +164,12 @@
         }
 
         /// <summary>
+        /// Boolean indicating if the backend is healthy.
+        /// </summary>
+        [JsonIgnore]
+        public bool Healthy { get; internal set; } = false;
+
+        /// <summary>
         /// Maximum number of parallel requests to this backend.
         /// </summary>
         public int MaxParallelRequests
@@ -224,7 +230,6 @@
         internal readonly object Lock = new object();
         internal int HealthCheckSuccess = 0;
         internal int HealthCheckFailure = 0;
-        internal bool Healthy = false;
         internal bool ModelsDiscovered = false;
         internal int ActiveRequests = 0;
         internal int PendingRequests = 0;
