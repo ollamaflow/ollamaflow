@@ -584,10 +584,14 @@
                             {
                                 if (!ctx.Response.ChunkedTransfer)
                                 {
+                                    ctx.Response.ChunkedTransfer = false;
+
                                     await ctx.Response.Send(resp.DataAsBytes);
                                 }
                                 else
                                 {
+                                    ctx.Response.ChunkedTransfer = true;
+
                                     if (resp.DataAsBytes.Length > 0)
                                     {
                                         for (int i = 0; i < resp.DataAsBytes.Length; i += BUFFER_SIZE)
