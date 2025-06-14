@@ -10,10 +10,10 @@
       }
     ],
     "LogDirectory": "./logs/",
-    "LogFilename": "./ollamaflow.log",
+    "LogFilename": "ollamaflow.log",
     "ConsoleLogging": true,
     "EnableColors": true,
-    "MinimumSeverity": 1
+    "MinimumSeverity": 0
   },
   "Frontends": [
     {
@@ -28,7 +28,10 @@
       "LogResponseBody": false,
       "MaxRequestBodySize": 536870912,
       "Backends": [
-        "backend1"
+        "backend1",
+        "backend2",
+        "backend3",
+        "backend4"
       ],
       "RequiredModels": [
         "all-minilm"
@@ -38,9 +41,9 @@
   "Backends": [
     {
       "Identifier": "backend1",
-      "Name": "Default Ollama backend",
+      "Name": "backend1",
       "Hostname": "localhost",
-      "Port": 11434,
+      "Port": 11435,
       "Ssl": false,
       "ModelRefreshIntervalMs": 30000,
       "HealthCheckIntervalMs": 5000,
@@ -53,8 +56,64 @@
       "MaxParallelRequests": 4,
       "RateLimitRequestsThreshold": 10,
       "LogRequestBody": false,
-      "LogResponseBody": false,
-      "UrlPrefix": "http://localhost:11434"
+      "LogResponseBody": false
+    },
+    {
+      "Identifier": "backend2",
+      "Name": "backend2",
+      "Hostname": "localhost",
+      "Port": 11436,
+      "Ssl": false,
+      "ModelRefreshIntervalMs": 30000,
+      "HealthCheckIntervalMs": 5000,
+      "UnhealthyThreshold": 2,
+      "HealthyThreshold": 2,
+      "HealthCheckMethod": {
+        "Method": "HEAD"
+      },
+      "HealthCheckUrl": "/",
+      "MaxParallelRequests": 4,
+      "RateLimitRequestsThreshold": 10,
+      "LogRequestBody": false,
+      "LogResponseBody": false
+    },
+    {
+      "Identifier": "backend3",
+      "Name": "backend3",
+      "Hostname": "localhost",
+      "Port": 11437,
+      "Ssl": false,
+      "ModelRefreshIntervalMs": 30000,
+      "HealthCheckIntervalMs": 5000,
+      "UnhealthyThreshold": 2,
+      "HealthyThreshold": 2,
+      "HealthCheckMethod": {
+        "Method": "HEAD"
+      },
+      "HealthCheckUrl": "/",
+      "MaxParallelRequests": 4,
+      "RateLimitRequestsThreshold": 10,
+      "LogRequestBody": false,
+      "LogResponseBody": false
+    },
+    {
+      "Identifier": "backend4",
+      "Name": "backend4",
+      "Hostname": "localhost",
+      "Port": 11438,
+      "Ssl": false,
+      "ModelRefreshIntervalMs": 30000,
+      "HealthCheckIntervalMs": 5000,
+      "UnhealthyThreshold": 2,
+      "HealthyThreshold": 2,
+      "HealthCheckMethod": {
+        "Method": "HEAD"
+      },
+      "HealthCheckUrl": "/",
+      "MaxParallelRequests": 4,
+      "RateLimitRequestsThreshold": 10,
+      "LogRequestBody": false,
+      "LogResponseBody": false
     }
   ],
   "Webserver": {
@@ -85,7 +144,7 @@
         "Accept-Charset": "ISO-8859-1, utf-8",
         "Cache-Control": "no-cache",
         "Connection": "close",
-        "Host": "localhost:8000"
+        "Host": "localhost:43411"
       }
     },
     "AccessControl": {

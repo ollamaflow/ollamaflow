@@ -1,0 +1,428 @@
+2025-06-11 20:47:50 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend2 backend2 localhost:11436
+2025-06-11 20:47:50 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend4 backend4 localhost:11438
+2025-06-11 20:47:50 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend3 backend3 localhost:11437
+2025-06-11 20:47:50 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend2 backend2 localhost:11436
+2025-06-11 20:47:50 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend2 backend2 localhost:11436
+2025-06-11 20:47:50 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend1 backend1 localhost:11435
+2025-06-11 20:47:50 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend3 backend3 localhost:11437
+2025-06-11 20:47:50 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend4 backend4 localhost:11438
+2025-06-11 20:47:50 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend1 backend1 localhost:11435
+2025-06-11 20:47:50 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend1
+2025-06-11 20:47:50 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend3 backend3 localhost:11437
+2025-06-11 20:47:50 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend4 backend4 localhost:11438
+2025-06-11 20:47:50 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend2
+2025-06-11 20:47:50 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend3
+2025-06-11 20:47:50 docker-desktop Info [OllamaFlowDaemon] webserver started on http://localhost:43411
+2025-06-11 20:47:50 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend1 backend1 localhost:11435
+2025-06-11 20:47:50 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend4
+2025-06-11 20:47:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:47:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:47:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:47:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:47:51 docker-desktop Info [OllamaFlowDaemon] OllamaFlow started using process ID 1
+2025-06-11 20:47:54 docker-desktop Info [HealthCheckService] backend backend4 is now healthy
+2025-06-11 20:47:54 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:47:54 docker-desktop Info [HealthCheckService] backend backend1 is now healthy
+2025-06-11 20:47:54 docker-desktop Info [HealthCheckService] backend backend2 is now healthy
+2025-06-11 20:47:54 docker-desktop Info [HealthCheckService] backend backend3 is now healthy
+2025-06-11 20:47:54 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:47:54 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:47:54 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:47:59 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:47:59 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:47:59 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:47:59 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:48:22 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend3 backend3 localhost:11437
+2025-06-11 20:48:22 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend2 backend2 localhost:11436
+2025-06-11 20:48:22 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend1 backend1 localhost:11435
+2025-06-11 20:48:22 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend3 backend3 localhost:11437
+2025-06-11 20:48:22 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend1 backend1 localhost:11435
+2025-06-11 20:48:22 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend4 backend4 localhost:11438
+2025-06-11 20:48:22 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend3 backend3 localhost:11437
+2025-06-11 20:48:22 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend2 backend2 localhost:11436
+2025-06-11 20:48:22 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend4 backend4 localhost:11438
+2025-06-11 20:48:22 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend1 backend1 localhost:11435
+2025-06-11 20:48:22 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend4 backend4 localhost:11438
+2025-06-11 20:48:22 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend2 backend2 localhost:11436
+2025-06-11 20:48:21 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend3
+2025-06-11 20:48:21 docker-desktop Info [OllamaFlowDaemon] webserver started on http://localhost:43411
+2025-06-11 20:48:21 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend1
+2025-06-11 20:48:21 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend4
+2025-06-11 20:48:21 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend2
+2025-06-11 20:48:21 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:48:21 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:48:21 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:48:21 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:48:21 docker-desktop Info [OllamaFlowDaemon] OllamaFlow started using process ID 1
+2025-06-11 20:48:26 docker-desktop Info [HealthCheckService] backend backend3 is now healthy
+2025-06-11 20:48:26 docker-desktop Info [HealthCheckService] backend backend2 is now healthy
+2025-06-11 20:48:26 docker-desktop Info [HealthCheckService] backend backend4 is now healthy
+2025-06-11 20:48:26 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:48:26 docker-desktop Info [HealthCheckService] backend backend1 is now healthy
+2025-06-11 20:48:26 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:48:26 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:48:26 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:48:31 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:48:31 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:48:31 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:48:31 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:48:36 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:48:36 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:48:36 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:48:36 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:48:41 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:48:41 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:48:41 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:48:41 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:48:46 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:48:46 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:48:46 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:48:46 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:48:50 docker-desktop Debug [ModelDiscoveryService] discovered 0 models on backend backend3
+2025-06-11 20:48:50 docker-desktop Debug [ModelDiscoveryService] discovered 0 models on backend backend1
+2025-06-11 20:48:50 docker-desktop Debug [ModelDiscoveryService] discovered 0 models on backend backend4
+2025-06-11 20:48:50 docker-desktop Debug [ModelDiscoveryService] discovered 0 models on backend backend2
+2025-06-11 20:48:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:48:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:48:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:48:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:48:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:48:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:48:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:48:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:10 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:10 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:10 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:10 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:15 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:15 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:15 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:15 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:19 docker-desktop Info [ModelSynchronizationService] found 1 missing required models on backend backend4: all-minilm
+2025-06-11 20:49:19 docker-desktop Info [ModelSynchronizationService] found 1 missing required models on backend backend3: all-minilm
+2025-06-11 20:49:19 docker-desktop Info [ModelSynchronizationService] found 1 missing required models on backend backend2: all-minilm
+2025-06-11 20:49:19 docker-desktop Info [ModelSynchronizationService] starting pull of model all-minilm on backend backend4
+2025-06-11 20:49:19 docker-desktop Info [ModelSynchronizationService] starting pull of model all-minilm on backend backend3
+2025-06-11 20:49:19 docker-desktop Info [ModelSynchronizationService] found 1 missing required models on backend backend1: all-minilm
+2025-06-11 20:49:19 docker-desktop Info [ModelSynchronizationService] starting pull of model all-minilm on backend backend2
+2025-06-11 20:49:19 docker-desktop Info [ModelSynchronizationService] starting pull of model all-minilm on backend backend1
+2025-06-11 20:49:19 docker-desktop Debug [ModelDiscoveryService] discovered 0 models on backend backend3
+2025-06-11 20:49:19 docker-desktop Debug [ModelDiscoveryService] discovered 0 models on backend backend4
+2025-06-11 20:49:19 docker-desktop Debug [ModelDiscoveryService] discovered 0 models on backend backend1
+2025-06-11 20:49:19 docker-desktop Debug [ModelDiscoveryService] discovered 0 models on backend backend2
+2025-06-11 20:49:19 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:19 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:19 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:19 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:24 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:24 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:24 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:24 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:29 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:29 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:29 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:29 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 10%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 20%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 30%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 40%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 50%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 60%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 70%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 80%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 90%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend2: 100%
+2025-06-11 20:49:32 docker-desktop Info [ModelSynchronizationService] successfully pulled model all-minilm on backend backend2
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 10%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 10%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 20%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 20%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 31%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 30%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 40%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 40%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 50%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 10%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 50%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 60%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 20%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 60%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 70%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 30%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 70%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 80%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 41%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 80%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 91%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 50%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 90%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend4: 100%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 60%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend3: 100%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] successfully pulled model all-minilm on backend backend4
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 70%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] successfully pulled model all-minilm on backend backend3
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 80%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 90%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] pull progress for model all-minilm on backend backend1: 100%
+2025-06-11 20:49:33 docker-desktop Info [ModelSynchronizationService] successfully pulled model all-minilm on backend backend1
+2025-06-11 20:49:34 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:34 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:34 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:34 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:39 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:39 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:39 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:39 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:44 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:44 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:44 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:44 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:48 docker-desktop Debug [ModelDiscoveryService] discovered 1 models on backend backend3
+2025-06-11 20:49:48 docker-desktop Debug [ModelDiscoveryService] discovered 1 models on backend backend1
+2025-06-11 20:49:48 docker-desktop Debug [ModelDiscoveryService] discovered 1 models on backend backend2
+2025-06-11 20:49:48 docker-desktop Debug [ModelDiscoveryService] discovered 1 models on backend backend4
+2025-06-11 20:49:48 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:48 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:48 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:48 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:53 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:53 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:53 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:49:53 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:58 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:49:58 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:49:58 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:49:58 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:50:03 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:50:03 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:50:03 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:50:03 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:50:08 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:50:08 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:50:08 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:50:08 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:50:13 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:50:13 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:50:13 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:50:13 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:50:17 docker-desktop Debug [ModelDiscoveryService] discovered 1 models on backend backend3
+2025-06-11 20:50:17 docker-desktop Debug [ModelDiscoveryService] discovered 1 models on backend backend2
+2025-06-11 20:50:17 docker-desktop Debug [ModelDiscoveryService] discovered 1 models on backend backend1
+2025-06-11 20:50:17 docker-desktop Debug [ModelDiscoveryService] discovered 1 models on backend backend4
+2025-06-11 20:50:17 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:50:17 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:50:17 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:50:17 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:50:22 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:50:22 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:50:22 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:50:22 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:50:27 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:50:27 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:50:27 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:50:27 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:50:30 docker-desktop Debug [ModelSynchronizationService] all required models present on backend backend2
+2025-06-11 20:50:31 docker-desktop Debug [ModelSynchronizationService] all required models present on backend backend4
+2025-06-11 20:50:31 docker-desktop Debug [ModelSynchronizationService] all required models present on backend backend3
+2025-06-11 20:50:31 docker-desktop Debug [ModelSynchronizationService] all required models present on backend backend1
+2025-06-11 20:50:32 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:50:32 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:50:32 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 20:50:32 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:50:37 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 20:50:37 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 20:50:37 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 20:50:37 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:15:55 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend3 backend3 localhost:11437
+2025-06-11 21:15:55 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend3 backend3 localhost:11437
+2025-06-11 21:15:55 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend2 backend2 localhost:11436
+2025-06-11 21:15:55 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend1 backend1 localhost:11435
+2025-06-11 21:15:55 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend4 backend4 localhost:11438
+2025-06-11 21:15:55 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend1 backend1 localhost:11435
+2025-06-11 21:15:55 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend1 backend1 localhost:11435
+2025-06-11 21:15:55 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend4 backend4 localhost:11438
+2025-06-11 21:15:55 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend3 backend3 localhost:11437
+2025-06-11 21:15:55 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend2 backend2 localhost:11436
+2025-06-11 21:15:55 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend4 backend4 localhost:11438
+2025-06-11 21:15:55 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend2 backend2 localhost:11436
+2025-06-11 21:15:55 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend3
+2025-06-11 21:15:55 docker-desktop Info [OllamaFlowDaemon] webserver started on http://localhost:43411
+2025-06-11 21:15:55 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend1
+2025-06-11 21:15:55 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend2
+2025-06-11 21:15:55 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend4
+2025-06-11 21:15:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:15:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:15:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:15:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:15:55 docker-desktop Info [OllamaFlowDaemon] OllamaFlow started using process ID 1
+2025-06-11 21:16:00 docker-desktop Info [HealthCheckService] backend backend4 is now healthy
+2025-06-11 21:16:00 docker-desktop Info [HealthCheckService] backend backend2 is now healthy
+2025-06-11 21:16:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:16:00 docker-desktop Info [HealthCheckService] backend backend3 is now healthy
+2025-06-11 21:16:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:16:00 docker-desktop Info [HealthCheckService] backend backend1 is now healthy
+2025-06-11 21:16:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:16:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:16:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:16:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:16:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:16:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:16:41 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend4 backend4 localhost:11438
+2025-06-11 21:16:41 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend1 backend1 localhost:11435
+2025-06-11 21:16:41 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend3 backend3 localhost:11437
+2025-06-11 21:16:41 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend4 backend4 localhost:11438
+2025-06-11 21:16:41 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend1 backend1 localhost:11435
+2025-06-11 21:16:41 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend3 backend3 localhost:11437
+2025-06-11 21:16:41 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend2 backend2 localhost:11436
+2025-06-11 21:16:41 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend1 backend1 localhost:11435
+2025-06-11 21:16:41 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend2 backend2 localhost:11436
+2025-06-11 21:16:41 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend4 backend4 localhost:11438
+2025-06-11 21:16:41 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend2 backend2 localhost:11436
+2025-06-11 21:16:41 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend3 backend3 localhost:11437
+2025-06-11 21:16:41 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend4
+2025-06-11 21:16:41 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend1
+2025-06-11 21:16:41 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend3
+2025-06-11 21:16:41 docker-desktop Info [OllamaFlowDaemon] webserver started on http://localhost:43411
+2025-06-11 21:16:41 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend2
+2025-06-11 21:16:41 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:16:41 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:16:41 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:16:41 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:16:41 docker-desktop Info [OllamaFlowDaemon] OllamaFlow started using process ID 1
+2025-06-11 21:16:45 docker-desktop Info [HealthCheckService] backend backend1 is now healthy
+2025-06-11 21:16:45 docker-desktop Info [HealthCheckService] backend backend4 is now healthy
+2025-06-11 21:16:45 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:16:45 docker-desktop Info [HealthCheckService] backend backend2 is now healthy
+2025-06-11 21:16:45 docker-desktop Info [HealthCheckService] backend backend3 is now healthy
+2025-06-11 21:16:45 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:16:45 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:16:45 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:16:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:16:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:16:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:16:50 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:16:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:16:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:16:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:16:55 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:17:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:17:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:17:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:17:00 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:17:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:17:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:17:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:17:05 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:17:54 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend1 backend1 localhost:11435
+2025-06-11 21:17:54 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend4 backend4 localhost:11438
+2025-06-11 21:17:54 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend3 backend3 localhost:11437
+2025-06-11 21:17:54 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend3 backend3 localhost:11437
+2025-06-11 21:17:54 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend2 backend2 localhost:11436
+2025-06-11 21:17:54 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend4 backend4 localhost:11438
+2025-06-11 21:17:54 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend4 backend4 localhost:11438
+2025-06-11 21:17:54 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend2 backend2 localhost:11436
+2025-06-11 21:17:54 docker-desktop Debug [ModelDiscoveryService] starting model discovery task for backend backend2 backend2 localhost:11436
+2025-06-11 21:17:54 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend1 backend1 localhost:11435
+2025-06-11 21:17:54 docker-desktop Debug [HealthCheckService] starting healthcheck task for backend backend1 backend1 localhost:11435
+2025-06-11 21:17:54 docker-desktop Debug [ModelSynchronizationService] starting model synchronization task for backend backend3 backend3 localhost:11437
+2025-06-11 21:17:54 docker-desktop Info [OllamaFlowDaemon] webserver started on http://localhost:43411
+2025-06-11 21:17:54 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend1
+2025-06-11 21:17:54 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend3
+2025-06-11 21:17:54 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend4
+2025-06-11 21:17:54 docker-desktop Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend2
+2025-06-11 21:17:54 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:17:54 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:17:54 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:17:54 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:17:54 docker-desktop Info [OllamaFlowDaemon] OllamaFlow started using process ID 1
+2025-06-11 21:17:59 docker-desktop Info [HealthCheckService] backend backend3 is now healthy
+2025-06-11 21:17:59 docker-desktop Info [HealthCheckService] backend backend2 is now healthy
+2025-06-11 21:17:59 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:17:59 docker-desktop Info [HealthCheckService] backend backend4 is now healthy
+2025-06-11 21:17:59 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:17:59 docker-desktop Info [HealthCheckService] backend backend1 is now healthy
+2025-06-11 21:17:59 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:17:59 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:18:04 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:18:04 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:18:04 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:18:04 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:18:09 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:18:09 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:18:09 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:18:09 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:18:13 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend3 backend3 http://localhost:11437/
+2025-06-11 21:18:13 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend2 backend2 http://localhost:11436/
+2025-06-11 21:18:13 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend1 backend1 http://localhost:11435/
+2025-06-11 21:18:13 docker-desktop Debug [HealthCheckService] health check succeeded for backend backend4 backend4 http://localhost:11438/
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelDiscoveryService] starting model discovery task for backend backend2 backend2 localhost:11436
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelSynchronizationService] starting model synchronization task for backend backend4 backend4 localhost:11438
+2025-06-11 21:18:33 8736e9bb0f1f Debug [HealthCheckService] starting healthcheck task for backend backend4 backend4 localhost:11438
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelDiscoveryService] starting model discovery task for backend backend3 backend3 localhost:11437
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelDiscoveryService] starting model discovery task for backend backend1 backend1 localhost:11435
+2025-06-11 21:18:33 8736e9bb0f1f Debug [HealthCheckService] starting healthcheck task for backend backend2 backend2 localhost:11436
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelDiscoveryService] starting model discovery task for backend backend4 backend4 localhost:11438
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelSynchronizationService] starting model synchronization task for backend backend3 backend3 localhost:11437
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelSynchronizationService] starting model synchronization task for backend backend2 backend2 localhost:11436
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelSynchronizationService] starting model synchronization task for backend backend1 backend1 localhost:11435
+2025-06-11 21:18:33 8736e9bb0f1f Debug [HealthCheckService] starting healthcheck task for backend backend3 backend3 localhost:11437
+2025-06-11 21:18:33 8736e9bb0f1f Debug [HealthCheckService] starting healthcheck task for backend backend1 backend1 localhost:11435
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend2
+2025-06-11 21:18:33 8736e9bb0f1f Info [OllamaFlowDaemon] webserver started on http://localhost:43411
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend3
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend1
+2025-06-11 21:18:33 8736e9bb0f1f Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend4
+2025-06-11 21:18:33 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)
+2025-06-11 21:18:33 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:18:34 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:18:34 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:18:34 8736e9bb0f1f Info [OllamaFlowDaemon] OllamaFlow started using process ID 1
+2025-06-11 21:18:39 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)
+2025-06-11 21:18:39 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:18:39 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:18:39 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:18:42 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)
+2025-06-11 21:18:42 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:18:42 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:18:42 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:18:47 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)
+2025-06-11 21:18:47 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:18:47 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:18:47 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:18:52 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)
+2025-06-11 21:18:52 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:18:52 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:18:53 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:18:57 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)
+2025-06-11 21:18:57 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:18:58 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:18:58 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:19:02 8736e9bb0f1f Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend2
+2025-06-11 21:19:02 8736e9bb0f1f Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend1
+2025-06-11 21:19:02 8736e9bb0f1f Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend3
+2025-06-11 21:19:02 8736e9bb0f1f Debug [ModelDiscoveryService] skipping model discovery for unhealthy backend backend4
+2025-06-11 21:19:02 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)
+2025-06-11 21:19:02 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:19:03 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:19:03 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:19:08 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:19:08 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:19:08 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:19:08 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)
+2025-06-11 21:19:11 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:19:11 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:19:11 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:19:11 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)
+2025-06-11 21:19:16 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend3 backend3 http://localhost:11437/: Connection refused (localhost:11437)
+2025-06-11 21:19:16 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend1 backend1 http://localhost:11435/: Connection refused (localhost:11435)
+2025-06-11 21:19:16 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend2 backend2 http://localhost:11436/: Connection refused (localhost:11436)
+2025-06-11 21:19:16 8736e9bb0f1f Debug [HealthCheckService] health check failed for backend backend4 backend4 http://localhost:11438/: Connection refused (localhost:11438)

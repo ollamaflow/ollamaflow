@@ -10,7 +10,7 @@
       }
     ],
     "LogDirectory": "./logs/",
-    "LogFilename": "./ollamaflow.log",
+    "LogFilename": "ollamaflow.log",
     "ConsoleLogging": true,
     "EnableColors": true,
     "MinimumSeverity": 1
