@@ -2,7 +2,7 @@
 
 # OllamaFlow
 
-OllamaFlow is a lightweight intelligent load-balancer for Ollama.  OllamaFlow will distribute requests received on a virtual frontend to mapped backend Ollama servers based on their health and availability.  OllamaFlow will ensure that backend Ollama servers behind a virtual frontend are kept up to date with a list of required models.
+OllamaFlow is a lightweight intelligent load-balancer and model synchronizer for Ollama.  OllamaFlow will distribute requests received on a virtual frontend to mapped backend Ollama servers based on their health and availability.  OllamaFlow will ensure that backend Ollama servers behind a virtual frontend are kept up to date with a list of required models.
 
 ## Help, Feedback, Contribute
 
@@ -39,6 +39,10 @@ Loading from settings file ./ollamaflow.json
 2025-06-07 15:42:18 laptop Debug [ModelDiscoveryService] starting model discovery task for backend backend1 backend1 localhost:11435
 2025-06-07 15:42:18 laptop Debug [ModelSynchronizationService] starting model synchronization task for backend backend3 backend3 localhost:11437
 ```
+
+## Administrative APIs
+
+A series of administrative APIs for managing frontend and backend objects is available.  Refer to the Postman collection in the repository.
 
 ## Docker
 
