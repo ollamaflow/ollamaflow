@@ -149,6 +149,11 @@
             Settings file.
             </summary>
         </member>
+        <member name="F:OllamaFlow.Core.Constants.DatabaseFilename">
+            <summary>
+            Database filename.
+            </summary>
+        </member>
         <member name="F:OllamaFlow.Core.Constants.HtmlHomepage">
             <summary>
             Default HTML homepage.
@@ -219,6 +224,372 @@
             Backend server ID header.
             </summary>
         </member>
+        <member name="T:OllamaFlow.Core.Database.DatabaseDriverBase">
+            <summary>
+            Base class for database driver.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Database.DatabaseDriverBase._Header">
+            <summary>
+            Logging header
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Database.DatabaseDriverBase._Logging">
+            <summary>
+            Logging module.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Database.DatabaseDriverBase._Serializer">
+            <summary>
+            Serializer.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.DatabaseDriverBase.Frontend">
+            <summary>
+            Frontend methods.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.DatabaseDriverBase.Backend">
+            <summary>
+            Backend methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.DatabaseDriverBase.#ctor(SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer)">
+            <summary>
+            Base class for database driver.
+            </summary>
+            <param name="logging">Logging module.</param>
+            <param name="serializer">Serializer.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.DatabaseDriverBase.InitializeRepository">
+            <summary>
+            Initialize the repository.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Database.Interfaces.IBackendMethods">
+            <summary>
+            Interface for backend methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.Create(OllamaFlow.Core.OllamaBackend)">
+            <summary>
+            Create.
+            </summary>
+            <param name="obj">Record.</param>
+            <returns>Record.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.OllamaBackend})">
+            <summary>
+            Create multiple records.
+            </summary>
+            <param name="objs">Records.</param>
+            <returns>Records.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.ReadAll(OllamaFlow.Core.EnumerationOrderEnum)">
+            <summary>
+            Read all records.
+            </summary>
+            <param name="order">Enumeration order.</param>
+            <returns>Records.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.ReadByIdentifiers(System.Collections.Generic.List{System.String})">
+            <summary>
+            Read objects by identifiers.
+            </summary>
+            <param name="ids">Identifiers.</param>
+            <returns>Objects.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.Enumerate(OllamaFlow.Core.EnumerationRequest)">
+            <summary>
+            Enumerate objects.
+            </summary>
+            <param name="query">Enumeration query.</param>
+            <returns>Enumeration result containing a page of objects.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.GetRecordCount(OllamaFlow.Core.EnumerationOrderEnum,System.String)">
+            <summary>
+            Get the record count.  Optionally supply a continuation token to indicate that only records from that continuation token (identifier) should be counted.
+            </summary>
+            <param name="order">Enumeration order.</param>
+            <param name="continuationToken">Continuation token.</param>
+            <returns>Number of records.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.Update(OllamaFlow.Core.OllamaBackend)">
+            <summary>
+            Update a record.
+            </summary>
+            <param name="obj">Record.</param>
+            <returns>Record.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.DeleteByIdentifier(System.String)">
+            <summary>
+            Delete a record.
+            </summary>
+            <param name="id">Identifier.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.DeleteMany(System.Collections.Generic.List{System.String})">
+            <summary>
+            Delete records.
+            </summary>
+            <param name="ids">Identifiers.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.ExistsByGuidIdentifier(System.String)">
+            <summary>
+            Check if a record exists by identifier.
+            </summary>
+            <param name="id">Identifier.</param>
+            <returns>True if exists.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.IsLinked(System.String)">
+            <summary>
+            Check if a record is linked to another record.
+            </summary>
+            <param name="id">Identifier.</param>
+            <returns>True if linked.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Database.Interfaces.IFrontendMethods">
+            <summary>
+            Interface for frontend methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.Create(OllamaFlow.Core.OllamaFrontend)">
+            <summary>
+            Create.
+            </summary>
+            <param name="obj">Record.</param>
+            <returns>Record.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.OllamaFrontend})">
+            <summary>
+            Create multiple records.
+            </summary>
+            <param name="objs">Records.</param>
+            <returns>Records.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.ReadAll(OllamaFlow.Core.EnumerationOrderEnum)">
+            <summary>
+            Read all records.
+            </summary>
+            <param name="order">Enumeration order.</param>
+            <returns>Records.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.ReadByIdentifiers(System.Collections.Generic.List{System.String})">
+            <summary>
+            Read objects by identifiers.
+            </summary>
+            <param name="ids">Identifiers.</param>
+            <returns>Objects.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.Enumerate(OllamaFlow.Core.EnumerationRequest)">
+            <summary>
+            Enumerate objects.
+            </summary>
+            <param name="query">Enumeration query.</param>
+            <returns>Enumeration result containing a page of objects.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.GetRecordCount(OllamaFlow.Core.EnumerationOrderEnum,System.String)">
+            <summary>
+            Get the record count.  Optionally supply a continuation token to indicate that only records from that continuation token (identifier) should be counted.
+            </summary>
+            <param name="order">Enumeration order.</param>
+            <param name="continuationToken">Continuation token.</param>
+            <returns>Number of records.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.Update(OllamaFlow.Core.OllamaFrontend)">
+            <summary>
+            Update a record.
+            </summary>
+            <param name="obj">Record.</param>
+            <returns>Record.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.DeleteByGuid(System.String)">
+            <summary>
+            Delete a record.
+            </summary>
+            <param name="id">Identifier.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.DeleteMany(System.Collections.Generic.List{System.String})">
+            <summary>
+            Delete records.
+            </summary>
+            <param name="ids">Identifiers.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.ExistsByIdentifier(System.String)">
+            <summary>
+            Check if a record exists by identifier.
+            </summary>
+            <param name="id">Identifier.</param>
+            <returns>True if exists.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods">
+            <summary>
+            Backend methods.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.Frontend">
+            <summary>
+            Frontend methods.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.Backend">
+            <summary>
+            Backend methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.#ctor(OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver)">
+            <summary>
+            Backend methods.
+            </summary>
+            <param name="repo">Database driver.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.Create(OllamaFlow.Core.OllamaBackend)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.OllamaBackend})">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.ReadAll(OllamaFlow.Core.EnumerationOrderEnum)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.ReadByIdentifiers(System.Collections.Generic.List{System.String})">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.Enumerate(OllamaFlow.Core.EnumerationRequest)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.GetRecordCount(OllamaFlow.Core.EnumerationOrderEnum,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.Update(OllamaFlow.Core.OllamaBackend)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.DeleteByIdentifier(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.DeleteMany(System.Collections.Generic.List{System.String})">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.ExistsByGuidIdentifier(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.IsLinked(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods">
+            <summary>
+            Frontend methods.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.Frontend">
+            <summary>
+            Frontend methods.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.Backend">
+            <summary>
+            Backend methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.#ctor(OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver)">
+            <summary>
+            Frontend methods.
+            </summary>
+            <param name="repo">Database driver.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.Create(OllamaFlow.Core.OllamaFrontend)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.OllamaFrontend})">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.ReadAll(OllamaFlow.Core.EnumerationOrderEnum)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.ReadByIdentifiers(System.Collections.Generic.List{System.String})">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.Enumerate(OllamaFlow.Core.EnumerationRequest)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.GetRecordCount(OllamaFlow.Core.EnumerationOrderEnum,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.Update(OllamaFlow.Core.OllamaFrontend)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.DeleteByGuid(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.DeleteMany(System.Collections.Generic.List{System.String})">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.ExistsByIdentifier(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver">
+            <summary>
+            Sqlite database driver.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.Filename">
+            <summary>
+            Sqlite database filename.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.MaxStatementLength">
+            <summary>
+            Maximum supported statement length.
+            Default for Sqlite is 1,000,000,000 (see https://www.sqlite.org/limits.html).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.SelectBatchSize">
+            <summary>
+            Number of records to retrieve for object list retrieval.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.TimestampFormat">
+            <summary>
+            Timestamp format.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.Frontend">
+            <summary>
+            Frontend methods.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.Backend">
+            <summary>
+            Backend methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,System.String)">
+            <summary>
+            Sqlite database driver.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="logging">Logging.</param>
+            <param name="serializer">Serializer.</param>
+            <param name="filename">Database filename.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.InitializeRepository">
+            <inheritdoc />
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.Dispose(System.Boolean)">
+            <summary>
+            Protected implementation of Dispose pattern.
+            </summary>
+            <param name="disposing">True if disposing managed resources.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.Finalize">
+            <summary>
+            Finalizer for SqliteDatabaseDriver.
+            </summary>
+        </member>
         <member name="T:OllamaFlow.Core.EndpointGroup">
             <summary>
             Endpoint group.
@@ -233,6 +604,111 @@
         <member name="M:OllamaFlow.Core.EndpointGroup.#ctor">
             <summary>
             Endpoint group.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.EnumerationOrderEnum">
+            <summary>
+            Enumeration order. 
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedAscending">
+            <summary>
+            Created ascending.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedDescending">
+            <summary>
+            Created descending.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierAscending">
+            <summary>
+            Identifier ascending.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierDescending">
+            <summary>
+            Identifier descending.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.EnumerationRequest">
+            <summary>
+            Object used to request enumeration.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.Ordering">
+            <summary>
+            Order by.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.MaxResults">
+            <summary>
+            Maximum number of results to retrieve.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.Skip">
+            <summary>
+            The number of records to skip.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.ContinuationToken">
+            <summary>
+            Continuation token.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.EnumerationRequest.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.EnumerationResult`1">
+            <summary>
+            Object returned as the result of an enumeration.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.Success">
+            <summary>
+            Indicates if the statistics operation was successful.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.Timestamp">
+            <summary>
+            Start and end timestamps.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.MaxResults">
+            <summary>
+            Maximum number of results to retrieve.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.ContinuationToken">
+            <summary>
+            Continuation token.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.EndOfResults">
+            <summary>
+            Boolean indicating end of results.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.TotalRecords">
+            <summary>
+            Total number of records.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.RecordsRemaining">
+            <summary>
+            Number of candidate records remaining in the enumeration.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.Objects">
+            <summary>
+            Objects.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.EnumerationResult`1.#ctor">
+            <summary>
+            Instantiates the object.
             </summary>
         </member>
         <member name="T:OllamaFlow.Core.Helpers.RequestTypeEnum">
@@ -365,6 +841,11 @@
             Origin server.
             </summary>
         </member>
+        <member name="F:OllamaFlow.Core.OllamaBackend.Serializer">
+            <summary>
+            Serializer.
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.Identifier">
             <summary>
             Unique identifier for this origin server.
@@ -390,26 +871,16 @@
             Enable or disable SSL.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.ModelRefreshIntervalMs">
-            <summary>
-            Interval at which the list of available models is refreshed. 
-            Default is 30 seconds (30000).  Minimum is 1 second (1000).
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.HealthCheckIntervalMs">
-            <summary>
-            Interval at which health is checked against this server.
-            Default is 5 seconds (5000).  Minimum is 1 second (1000).
-            </summary>
-        </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.UnhealthyThreshold">
             <summary>
             Number of consecutive failed health checks before marking a server as unhealthy.
+            Default is 2.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.HealthyThreshold">
             <summary>
             Number of consecutive successful health checks before marking a server as healthy.
+            Default is 2.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.HealthCheckMethod">
@@ -424,34 +895,51 @@
             Default is /.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.Healthy">
-            <summary>
-            Boolean indicating if the backend is healthy.
-            </summary>
-        </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.MaxParallelRequests">
             <summary>
             Maximum number of parallel requests to this backend.
+            Default is 4.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.RateLimitRequestsThreshold">
             <summary>
             Threshold at which 429 rate limit responses are sent.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.LogRequestBody">
-            <summary>
-            True to log the request body.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.LogResponseBody">
-            <summary>
-            True to log the response body.
+            Default is 10.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.OllamaBackend.UrlPrefix">
             <summary>
             URL prefix.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.LogRequestFull">
+            <summary>
+            Boolean indicating if the full request should be logged.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.LogRequestBody">
+            <summary>
+            Boolean indicating if the request body should be logged.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.LogResponseBody">
+            <summary>
+            Boolean indicating if the response body should be logged.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.Active">
+            <summary>
+            Boolean indicating if the object is active or not.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.CreatedUtc">
+            <summary>
+            Creation timestamp, in UTC time.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.LastUpdateUtc">
+            <summary>
+            Last update timestamp, in UTC time.
             </summary>
         </member>
         <member name="M:OllamaFlow.Core.OllamaBackend.#ctor">
@@ -479,22 +967,23 @@
             OllamaFlow callbacks.  Attach handlers to these methods to integrate your application logic into OllamaFlow.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.#ctor(OllamaFlow.Core.OllamaFlowSettings)">
+        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.#ctor(OllamaFlow.Core.OllamaFlowSettings,System.Threading.CancellationTokenSource)">
             <summary>
             Instantiate.
             </summary>
             <param name="settings">Settings.</param>
+            <param name="tokenSource">Cancellation token source.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.Dispose">
+            <summary>
+            Dispose.
+            </summary>
         </member>
         <member name="M:OllamaFlow.Core.OllamaFlowDaemon.Dispose(System.Boolean)">
             <summary>
             Dispose.
             </summary>
             <param name="disposing">Disposing.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.Dispose">
-            <summary>
-            Dispose.
-            </summary>
         </member>
         <member name="T:OllamaFlow.Core.OllamaFlowSettings">
             <summary>
@@ -506,20 +995,20 @@
             Logging settings.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Frontends">
-            <summary>
-            Ollama frontend endpoints, i.e. virtual servers exposed by OllamaFlow.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Backends">
-            <summary>
-            Ollama backend endpoints, i.e. Ollama servers.
-            </summary>
-        </member>
         <member name="P:OllamaFlow.Core.OllamaFlowSettings.Webserver">
             <summary>
             Webserver settings.
             </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.DatabaseFilename">
+            <summary>
+            Database filename.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.AdminBearerTokens">
+            <summary>
+            Administrator bearer tokens.
+            </summary> 
         </member>
         <member name="M:OllamaFlow.Core.OllamaFlowSettings.#ctor">
             <summary>
@@ -529,6 +1018,11 @@
         <member name="T:OllamaFlow.Core.OllamaFrontend">
             <summary>
             API endpoint.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.OllamaFrontend.Serializer">
+            <summary>
+            Serializer.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.OllamaFrontend.Identifier">
@@ -544,6 +1038,7 @@
         <member name="P:OllamaFlow.Core.OllamaFrontend.Hostname">
             <summary>
             Hostname associated with this frontend.
+            Use * to specify that this frontend is a catch-all.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.OllamaFrontend.TimeoutMs">
@@ -555,26 +1050,12 @@
         <member name="P:OllamaFlow.Core.OllamaFrontend.LoadBalancing">
             <summary>
             Load-balancing mode.
+            Default is RoundRobin.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.OllamaFrontend.BlockHttp10">
             <summary>
             True to terminate HTTP/1.0 requests.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.LogRequestFull">
-            <summary>
-            True to enable logging of the full request.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.LogRequestBody">
-            <summary>
-            True to log the request body.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.LogResponseBody">
-            <summary>
-            True to log the response body.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.OllamaFrontend.MaxRequestBodySize">
@@ -587,14 +1068,51 @@
             Ollama backend server identifiers.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.BackendsString">
+            <summary>
+            String containing JSON-serialized list of backend identifiers.
+            Used by the database layer.
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.OllamaFrontend.RequiredModels">
             <summary>
             List of models that should be present on each mapped backend Ollama server.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.LastIndex">
+        <member name="P:OllamaFlow.Core.OllamaFrontend.RequiredModelsString">
             <summary>
-            Last-used index.
+            String containing JSON-serialized list of required models.
+            Used by the database layer.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.LogRequestFull">
+            <summary>
+            Boolean indicating if the full request should be logged.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.LogRequestBody">
+            <summary>
+            Boolean indicating if the request body should be logged.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.LogResponseBody">
+            <summary>
+            Boolean indicating if the response body should be logged.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.Active">
+            <summary>
+            Boolean indicating if the object is active or not.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.CreatedUtc">
+            <summary>
+            Creation timestamp, in UTC time.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.LastUpdateUtc">
+            <summary>
+            Last update timestamp, in UTC time.
             </summary>
         </member>
         <member name="M:OllamaFlow.Core.OllamaFrontend.#ctor">
@@ -602,12 +1120,260 @@
             Instantiate.
             </summary>
         </member>
+        <member name="T:OllamaFlow.Core.Serialization.ISerializer">
+            <summary>
+            Serializer interface.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Serialization.ISerializer.CopyObject``1(``0)">
+            <summary>
+            Copy an object.
+            </summary>
+            <typeparam name="T">Type.</typeparam>
+            <param name="obj">Object.</param>
+            <returns>Copied object.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Serialization.ISerializer.SerializeJson(System.Object,System.Boolean)">
+            <summary>
+            Serialize an object to JSON.
+            </summary>
+            <param name="obj">Object.</param>
+            <param name="pretty">Enable or disable pretty formatting.</param>
+            <returns></returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Serialization.ISerializer.DeserializeJson``1(System.String)">
+            <summary>
+            Deserialize an object to JSON.
+            </summary>
+            <typeparam name="T">Type.</typeparam>
+            <param name="json">JSON.</param>
+            <returns>Instance.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Serialization.Serializer">
+            <summary>
+            Serialization.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Serialization.Serializer.CopyObject``1(``0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Core.Serialization.Serializer.DeserializeJson``1(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Core.Serialization.Serializer.SerializeJson(System.Object,System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.BackendService">
+            <summary>
+            Backend service.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Database.DatabaseDriverBase,System.Threading.CancellationTokenSource)">
+            <summary>
+            Backend service.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="logging">Logging module.</param>
+            <param name="database">Database driver.</param>
+            <param name="tokenSource">Cancellation token source.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.Create(OllamaFlow.Core.OllamaBackend)">
+            <summary>
+            Create a new backend.
+            </summary>
+            <param name="backend">Backend to create.</param>
+            <returns>Created backend.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.CreateMany(System.Collections.Generic.IEnumerable{OllamaFlow.Core.OllamaBackend})">
+            <summary>
+            Create multiple backends.
+            </summary>
+            <param name="backends">Backends to create.</param>
+            <returns>Created backends.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.GetByIdentifier(System.String)">
+            <summary>
+            Get a backend by identifier.
+            </summary>
+            <param name="identifier">Backend identifier.</param>
+            <returns>Backend if found, null otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.GetByIdentifiers(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Get multiple backends by identifiers.
+            </summary>
+            <param name="identifiers">Backend identifiers.</param>
+            <returns>Backends.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.GetAll(OllamaFlow.Core.EnumerationOrderEnum)">
+            <summary>
+            Get all backends.
+            </summary>
+            <param name="order">Sort order.</param>
+            <returns>All backends.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.GetPage(OllamaFlow.Core.EnumerationRequest)">
+            <summary>
+            Get a page of backends.
+            </summary>
+            <param name="request">Enumeration request.</param>
+            <returns>Enumeration result.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.Update(OllamaFlow.Core.OllamaBackend)">
+            <summary>
+            Update a backend.
+            </summary>
+            <param name="backend">Backend to update.</param>
+            <returns>Updated backend.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.Delete(System.String,System.Boolean)">
+            <summary>
+            Delete a backend by identifier.
+            </summary>
+            <param name="identifier">Backend identifier.</param>
+            <param name="force">Force deletion even if linked to frontends.</param>
+            <returns>True if deleted, false if linked and not forced.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.DeleteMany(System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
+            <summary>
+            Delete multiple backends by identifiers.
+            </summary>
+            <param name="identifiers">Backend identifiers.</param>
+            <param name="force">Force deletion even if linked to frontends.</param>
+            <returns>Identifiers that were successfully deleted.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.Exists(System.String)">
+            <summary>
+            Check if a backend exists.
+            </summary>
+            <param name="identifier">Backend identifier.</param>
+            <returns>True if exists.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.IsLinked(System.String)">
+            <summary>
+            Check if a backend is linked to any frontends.
+            </summary>
+            <param name="identifier">Backend identifier.</param>
+            <returns>True if linked.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.GetCount(OllamaFlow.Core.EnumerationOrderEnum,System.String)">
+            <summary>
+            Get the total count of backends.
+            </summary>
+            <param name="order">Sort order.</param>
+            <param name="continuationToken">Continuation token.</param>
+            <returns>Total count.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.BackendService.GetByFrontendIdentifier(System.String)">
+            <summary>
+            Get backends for a specific frontend.
+            </summary>
+            <param name="frontendIdentifier">Frontend identifier.</param>
+            <returns>Backends associated with the frontend.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.FrontendService">
+            <summary>
+            Frontend service.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Database.DatabaseDriverBase,System.Threading.CancellationTokenSource)">
+            <summary>
+            Frontend service.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="logging">Logging module.</param>
+            <param name="database">Database driver.</param>
+            <param name="tokenSource">Cancellation token source.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.Create(OllamaFlow.Core.OllamaFrontend)">
+            <summary>
+            Create a new frontend.
+            </summary>
+            <param name="frontend">Frontend to create.</param>
+            <returns>Created frontend.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.CreateMany(System.Collections.Generic.IEnumerable{OllamaFlow.Core.OllamaFrontend})">
+            <summary>
+            Create multiple frontends.
+            </summary>
+            <param name="frontends">Frontends to create.</param>
+            <returns>Created frontends.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.GetByIdentifier(System.String)">
+            <summary>
+            Get a frontend by identifier.
+            </summary>
+            <param name="identifier">Frontend identifier.</param>
+            <returns>Frontend if found, null otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.GetByIdentifiers(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Get multiple frontends by identifiers.
+            </summary>
+            <param name="identifiers">Frontend identifiers.</param>
+            <returns>Frontends.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.GetAll(OllamaFlow.Core.EnumerationOrderEnum)">
+            <summary>
+            Get all frontends.
+            </summary>
+            <param name="order">Sort order.</param>
+            <returns>All frontends.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.GetPage(OllamaFlow.Core.EnumerationRequest)">
+            <summary>
+            Get a page of frontends.
+            </summary>
+            <param name="request">Enumeration request.</param>
+            <returns>Enumeration result.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.Update(OllamaFlow.Core.OllamaFrontend)">
+            <summary>
+            Update a frontend.
+            </summary>
+            <param name="frontend">Frontend to update.</param>
+            <returns>Updated frontend.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.Delete(System.String)">
+            <summary>
+            Delete a frontend by identifier.
+            </summary>
+            <param name="identifier">Frontend identifier.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.DeleteMany(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Delete multiple frontends by identifiers.
+            </summary>
+            <param name="identifiers">Frontend identifiers.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.Exists(System.String)">
+            <summary>
+            Check if a frontend exists.
+            </summary>
+            <param name="identifier">Frontend identifier.</param>
+            <returns>True if exists.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.GetCount(OllamaFlow.Core.EnumerationOrderEnum,System.String)">
+            <summary>
+            Get the total count of frontends.
+            </summary>
+            <param name="order">Sort order.</param>
+            <param name="continuationToken">Continuation token.</param>
+            <returns>Total count.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.FrontendService.GetByBackendIdentifier(System.String)">
+            <summary>
+            Get frontends by backend identifier.
+            </summary>
+            <param name="backendIdentifier">Backend identifier.</param>
+            <returns>Frontends that reference the backend.</returns>
+        </member>
         <member name="T:OllamaFlow.Core.Services.GatewayService">
             <summary>
             Gateway service.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,SerializationHelper.Serializer)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,System.Threading.CancellationTokenSource)">
             <summary>
             Instantiate.
             </summary>
@@ -615,6 +1381,10 @@
             <param name="callbacks">Callbacks.</param>
             <param name="logging">Logging.</param>
             <param name="serializer">Serializer.</param>
+            <param name="frontend">Frontend service.</param>
+            <param name="backend">Backend service.</param>
+            <param name="healthCheck">Healthcheck service.</param>
+            <param name="tokenSource">Cancellation token source.</param>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.Dispose(System.Boolean)">
             <summary>
@@ -654,11 +1424,12 @@
             <param name="ctx">HTTP context.</param>
             <returns>Task.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.AuthenticateRequest(WatsonWebserver.Core.HttpContextBase)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.ExceptionRoute(WatsonWebserver.Core.HttpContextBase,System.Exception)">
             <summary>
-            Authenticate request.
+            Exception route.
             </summary>
             <param name="ctx">HTTP context.</param>
+            <param name="e">Exception.</param>
             <returns>Task.</returns>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.DefaultRoute(WatsonWebserver.Core.HttpContextBase)">
@@ -673,13 +1444,33 @@
             Health check service.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,SerializationHelper.Serializer)">
+        <member name="P:OllamaFlow.Core.Services.HealthCheckService.IntervalMs">
+            <summary>
+            Interval, in milliseconds.
+            Default is 5000.
+            Minimum is 1000.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.HealthCheckService.Frontends">
+            <summary>
+            Retrieve the list of frontends in memory.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.HealthCheckService.Backends">
+            <summary>
+            Retrieve the list of backends in memory.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,System.Threading.CancellationTokenSource)">
             <summary>
             Health check service.
             </summary>
             <param name="settings">Settings.</param>
             <param name="logging">Logging.</param>
             <param name="serializer">Serializer.</param>
+            <param name="frontend">Frontend service.</param>
+            <param name="backend">Backend service.</param>
+            <param name="tokenSource">Cancellation token source.</param>
         </member>
         <member name="M:OllamaFlow.Core.Services.HealthCheckService.Dispose(System.Boolean)">
             <summary>
@@ -692,18 +1483,36 @@
             Dispose.
             </summary>
         </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.GetNextBackend(OllamaFlow.Core.OllamaFrontend)">
+            <summary>
+            Retrieve the next backend that should be used for a request to a given frontend.
+            </summary>
+            <param name="frontend">Frontend.</param>
+            <returns>Backend.</returns>
+        </member>
         <member name="T:OllamaFlow.Core.Services.ModelDiscoveryService">
             <summary>
             Model discovery service.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelDiscoveryService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,SerializationHelper.Serializer)">
+        <member name="P:OllamaFlow.Core.Services.ModelDiscoveryService.IntervalMs">
+            <summary>
+            Interval, in milliseconds.
+            Default is 30000.
+            Minimum is 5000.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelDiscoveryService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,System.Threading.CancellationTokenSource)">
             <summary>
             Model discovery service.
             </summary>
             <param name="settings">Settings.</param>
             <param name="logging">Logging.</param>
             <param name="serializer">Serializer.</param>
+            <param name="frontend">Frontend service.</param>
+            <param name="backend">Backend service.</param>
+            <param name="healthCheck">Healthcheck service.</param>
+            <param name="tokenSource">Cancellation token source.</param>
         </member>
         <member name="M:OllamaFlow.Core.Services.ModelDiscoveryService.Dispose(System.Boolean)">
             <summary>
@@ -721,13 +1530,30 @@
             Model synchronization service.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,SerializationHelper.Serializer)">
+        <member name="P:OllamaFlow.Core.Services.ModelSynchronizationService.IntervalMs">
+            <summary>
+            Interval, in milliseconds.
+            Default is 30000.
+            Minimum is 5000.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.ModelSynchronizationService.MaxConcurrentDownloadsPerBackend">
+            <summary>
+            Maximum concurrent downloads per backend.
+            Default is 3.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,System.Threading.CancellationTokenSource)">
             <summary>
             Model synchronization service.
             </summary>
             <param name="settings">Settings.</param>
             <param name="logging">Logging.</param>
             <param name="serializer">Serializer.</param>
+            <param name="frontend">Frontend service.</param>
+            <param name="backend">Backend service.</param>
+            <param name="healthCheck">Healthcheck service.</param>
+            <param name="tokenSource">Cancellation token source.</param>
         </member>
         <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.Dispose(System.Boolean)">
             <summary>
@@ -743,6 +1569,11 @@
         <member name="T:OllamaFlow.Core.Settings.LoggingSettings">
             <summary>
             Logging settings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.LoggingSettings.Enable">
+            <summary>
+            Enable or disable logging.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Settings.LoggingSettings.Servers">
@@ -773,6 +1604,16 @@
         <member name="P:OllamaFlow.Core.Settings.LoggingSettings.MinimumSeverity">
             <summary>
             Minimum severity.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.LoggingSettings.LogQueries">
+            <summary>
+            Enable or disable logging of queries.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Settings.LoggingSettings.LogResults">
+            <summary>
+            Enable or disable logging of results.
             </summary>
         </member>
         <member name="M:OllamaFlow.Core.Settings.LoggingSettings.#ctor">

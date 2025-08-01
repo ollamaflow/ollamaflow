@@ -32,38 +32,6 @@
         }
 
         /// <summary>
-        /// Ollama frontend endpoints, i.e. virtual servers exposed by OllamaFlow.
-        /// </summary>
-        public List<OllamaFrontend> Frontends
-        {
-            get
-            {
-                return _Frontends;
-            }
-            set
-            {
-                if (value == null) value = new List<OllamaFrontend>();
-                _Frontends = value;
-            }
-        }
-
-        /// <summary>
-        /// Ollama backend endpoints, i.e. Ollama servers.
-        /// </summary>
-        public List<OllamaBackend> Backends
-        {
-            get
-            {
-                return _Backends;
-            }
-            set
-            {
-                if (value == null) value = new List<OllamaBackend>();
-                _Backends = value;
-            }
-        }
-
-        /// <summary>
         /// Webserver settings.
         /// </summary>
         public WebserverSettings Webserver
@@ -79,14 +47,46 @@
             }
         }
 
+        /// <summary>
+        /// Database filename.
+        /// </summary>
+        public string DatabaseFilename
+        {
+            get
+            {
+                return _DatabaseFilename;
+            }
+            set
+            {
+                if (String.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(DatabaseFilename));
+                _DatabaseFilename = value;
+            }
+        }
+
+        /// <summary>
+        /// Administrator bearer tokens.
+        /// </summary> 
+        public List<string> AdminBearerTokens
+        {
+            get
+            {
+                return _AdminBearerTokens;
+            }
+            set
+            {
+                if (value == null) value = new List<string>();
+                _AdminBearerTokens = value;
+            }
+        }
+
         #endregion
 
         #region Private-Members
 
         private LoggingSettings _Logging = new LoggingSettings();
-        private List<OllamaFrontend> _Frontends = new List<OllamaFrontend>();
-        private List<OllamaBackend> _Backends = new List<OllamaBackend>();
         private WebserverSettings _Webserver = new WebserverSettings();
+        private List<string> _AdminBearerTokens = new List<string>();
+        private string _DatabaseFilename = Constants.DatabaseFilename;
 
         #endregion
 

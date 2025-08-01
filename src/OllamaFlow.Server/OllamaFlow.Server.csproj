@@ -22,6 +22,12 @@
 	  <None Update="assets\favicon.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="clean.sh">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="clean.bat">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Dockerbuild.bat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

@@ -1,12 +1,13 @@
 ﻿namespace OllamaFlow.Core
 {
+    using OllamaFlow.Core.Serialization;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Text.Json.Serialization;
     using System.Threading.Tasks;
-    using WatsonWebserver.Core;
+    using Watson.ORM.Core;
 
     /// <summary>
     /// API endpoint.
@@ -14,6 +15,12 @@
     public class OllamaFrontend
     {
         #region Public-Members
+
+        /// <summary>
+        /// Serializer.
+        /// </summary>
+        [JsonIgnore]
+        public static Serializer Serializer = new Serializer();
 
         /// <summary>
         /// Unique identifier for this API endpoint.
@@ -27,6 +34,7 @@
 
         /// <summary>
         /// Hostname associated with this frontend.
+        /// Use * to specify that this frontend is a catch-all.
         /// </summary>
         public string Hostname
         {
@@ -60,28 +68,14 @@
 
         /// <summary>
         /// Load-balancing mode.
+        /// Default is RoundRobin.
         /// </summary>
         public LoadBalancingMode LoadBalancing { get; set; } = LoadBalancingMode.RoundRobin;
 
         /// <summary>
         /// True to terminate HTTP/1.0 requests.
         /// </summary>
-        public bool BlockHttp10 { get; set; } = false;
-
-        /// <summary>
-        /// True to enable logging of the full request.
-        /// </summary>
-        public bool LogRequestFull { get; set; } = false;
-
-        /// <summary>
-        /// True to log the request body.
-        /// </summary>
-        public bool LogRequestBody { get; set; } = false;
-
-        /// <summary>
-        /// True to log the response body.
-        /// </summary>
-        public bool LogResponseBody { get; set; } = false;
+        public bool BlockHttp10 { get; set; } = true;
 
         /// <summary>
         /// Maximum request body size.  Default is 512MB.
@@ -111,7 +105,27 @@
             set
             {
                 if (value == null) value = new List<string>();
+                _BackendsString = Serializer.SerializeJson(value, false);
                 _Backends = value;
+            }
+        }
+
+        /// <summary>
+        /// String containing JSON-serialized list of backend identifiers.
+        /// Used by the database layer.
+        /// </summary>
+        [JsonIgnore]
+        public string BackendsString
+        {
+            get
+            {
+                return _BackendsString;
+            }
+            set
+            {
+                if (String.IsNullOrEmpty(value)) value = "[]";
+                _BackendsString = value;
+                _Backends = Serializer.DeserializeJson<List<string>>(value);
             }
         }
 
@@ -127,32 +141,66 @@
             set
             {
                 if (value == null) value = new List<string>();
+                _RequiredModelsString = Serializer.SerializeJson(value, false);
                 _RequiredModels = value;
             }
         }
 
         /// <summary>
-        /// Last-used index.
+        /// String containing JSON-serialized list of required models.
+        /// Used by the database layer.
         /// </summary>
         [JsonIgnore]
-        public int LastIndex
+        public string RequiredModelsString
         {
             get
             {
-                return _LastIndex;
+                return _RequiredModelsString;
             }
             set
             {
-                if (value < 0 || value > (_Backends.Count - 1)) throw new ArgumentOutOfRangeException(nameof(LastIndex));
-                _LastIndex = value;
+                if (String.IsNullOrEmpty(value)) value = "[]";
+                _RequiredModelsString = value;
+                _RequiredModels = Serializer.DeserializeJson<List<string>>(value);
             }
         }
+
+        /// <summary>
+        /// Boolean indicating if the full request should be logged.
+        /// </summary>
+        public bool LogRequestFull { get; set; } = false;
+
+        /// <summary>
+        /// Boolean indicating if the request body should be logged.
+        /// </summary>
+        public bool LogRequestBody { get; set; } = false;
+
+        /// <summary>
+        /// Boolean indicating if the response body should be logged.
+        /// </summary>
+        public bool LogResponseBody { get; set; } = false;
+
+        /// <summary>
+        /// Boolean indicating if the object is active or not.
+        /// </summary>
+        public bool Active { get; set; } = true;
+
+        /// <summary>
+        /// Creation timestamp, in UTC time.
+        /// </summary>
+        public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// Last update timestamp, in UTC time.
+        /// </summary>
+        public DateTime LastUpdateUtc { get; set; } = DateTime.UtcNow;
 
         #endregion
 
         #region Internal-Members
 
         internal readonly object Lock = new object();
+        internal int LastBackendIndex = 0;
 
         #endregion
 
@@ -162,8 +210,9 @@
         private int _TimeoutMs = 60000;
         private int _MaxRequestBodySize = (512 * 1024 * 1024);
         private List<string> _Backends = new List<string>();
+        private string _BackendsString = "[]";
         private List<string> _RequiredModels = new List<string>();
-        private int _LastIndex = 0;
+        private string _RequiredModelsString = "[]";
 
         #endregion
 

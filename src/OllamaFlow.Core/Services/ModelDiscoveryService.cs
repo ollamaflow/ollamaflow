@@ -5,20 +5,20 @@
     using System.Collections.Specialized;
     using System.IO;
     using System.Linq;
+    using System.Net.Http;
     using System.Reflection;
     using System.Text;
+    using System.Text.Json;
+    using System.Threading;
     using System.Threading.Tasks;
     using RestWrapper;
-    using SerializationHelper;
     using OllamaFlow.Core;
+    using OllamaFlow.Core.Serialization;
     using SyslogLogging;
     using Timestamps;
     using UrlMatcher;
     using WatsonWebserver;
     using WatsonWebserver.Core;
-    using System.Threading;
-    using System.Net.Http;
-    using System.Text.Json;
 
     /// <summary>
     /// Model discovery service.
@@ -28,6 +28,24 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
         #region Public-Members
+
+        /// <summary>
+        /// Interval, in milliseconds.
+        /// Default is 30000.
+        /// Minimum is 5000.
+        /// </summary>
+        public int IntervalMs
+        {
+            get
+            {
+                return _IntervalMs;
+            }
+            set
+            {
+                if (value < 5000) throw new ArgumentOutOfRangeException(nameof(IntervalMs));
+                _IntervalMs = value;
+            }
+        }
 
         #endregion
 
@@ -40,8 +58,14 @@
         private Random _Random = new Random(Guid.NewGuid().GetHashCode());
         private bool _IsDisposed = false;
 
+        private FrontendService _FrontendService = null;
+        private BackendService _BackendService = null;
+        private HealthCheckService _HealthCheckService = null;
+
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
-        private Dictionary<string, Task> _ModelDiscoveryTasks = new Dictionary<string, Task>();
+        private Task _ModelDiscoveryTask = null;
+
+        private int _IntervalMs = 30000;
 
         #endregion
 
@@ -53,21 +77,29 @@
         /// <param name="settings">Settings.</param>
         /// <param name="logging">Logging.</param>
         /// <param name="serializer">Serializer.</param>
+        /// <param name="frontend">Frontend service.</param>
+        /// <param name="backend">Backend service.</param>
+        /// <param name="healthCheck">Healthcheck service.</param>
+        /// <param name="tokenSource">Cancellation token source.</param>
         public ModelDiscoveryService(
             OllamaFlowSettings settings,
             LoggingModule logging,
-            Serializer serializer)
+            Serializer serializer,
+            FrontendService frontend,
+            BackendService backend, 
+            HealthCheckService healthCheck,
+            CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _Logging = logging ?? throw new ArgumentNullException(nameof(logging));
             _Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _FrontendService = frontend ?? throw new ArgumentNullException(nameof(frontend));
+            _BackendService = backend ?? throw new ArgumentNullException(nameof(backend));
+            _HealthCheckService = healthCheck ?? throw new ArgumentNullException(nameof(healthCheck));
+            _TokenSource = tokenSource ?? throw new ArgumentNullException(nameof(tokenSource));
+            _ModelDiscoveryTask = Task.Run(() => ModelDiscoveryTask(_TokenSource.Token), _TokenSource.Token);
 
-            foreach (OllamaBackend backend in _Settings.Backends)
-            {
-                _ModelDiscoveryTasks.Add(
-                    backend.Identifier,
-                    Task.Run(() => ModelDiscoveryTask(backend, _TokenSource.Token), _TokenSource.Token));
-            }
+            _Logging.Debug(_Header + "initialized");
         }
 
         #endregion
@@ -107,10 +139,55 @@
 
         #region Private-Methods
 
+        private async Task ModelDiscoveryTask(CancellationToken token = default)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    await Task.Delay(_IntervalMs, token);
+
+                    #region Get-Backends
+
+                    List<OllamaBackend> backends = _HealthCheckService.Backends;
+                    List<Task> tasks = new List<Task>();
+
+                    #endregion
+
+                    #region Process-Backends
+
+                    if (backends != null && backends.Count > 0)
+                    {
+                        foreach (OllamaBackend backend in backends)
+                        {
+                            if (!backend.Active) continue;
+                            tasks.Add(Task.Run(() => ModelDiscoveryTask(backend, token = default)));
+                        }
+
+                        Task.WaitAll(tasks.ToArray());
+                    }
+
+                    #endregion
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (Exception e)
+                {
+                    _Logging.Error(_Header + "model discovery task exception:" + Environment.NewLine + e.ToString());
+                }
+            }
+
+            _Logging.Debug(_Header + "model discovery task terminated");
+        }
+
         private async Task ModelDiscoveryTask(OllamaBackend backend, CancellationToken token = default)
         {
-            bool firstRun = true;
-
             _Logging.Debug(
                 _Header +
                 "starting model discovery task for backend " +
@@ -122,103 +199,83 @@
             {
                 client.Timeout = TimeSpan.FromSeconds(5);
 
-                while (!token.IsCancellationRequested)
+                try
                 {
-                    try
+                    // Get the list of models from /api/tags
+                    HttpResponseMessage response = await client.GetAsync(discoveryUrl, token);
+
+                    if (response.IsSuccessStatusCode)
                     {
-                        if (!firstRun) await Task.Delay(backend.ModelRefreshIntervalMs, token);
-                        else firstRun = false;
+                        string responseBody = await response.Content.ReadAsStringAsync();
 
-                        bool isHealthy = false;
-                        lock (backend.Lock)
+                        // Parse the JSON response
+                        using (JsonDocument document = JsonDocument.Parse(responseBody))
                         {
-                            isHealthy = backend.Healthy;
-                        }
+                            List<string> models = new List<string>();
 
-                        if (!isHealthy)
-                        {
-                            _Logging.Debug(_Header + "skipping model discovery for unhealthy backend " + backend.Identifier);
-                            continue;
-                        }
-
-                        // Get the list of models from /api/tags
-                        HttpResponseMessage response = await client.GetAsync(discoveryUrl, token);
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            string responseBody = await response.Content.ReadAsStringAsync();
-
-                            // Parse the JSON response
-                            using (JsonDocument document = JsonDocument.Parse(responseBody))
+                            if (document.RootElement.TryGetProperty("models", out JsonElement modelsElement) &&
+                                modelsElement.ValueKind == JsonValueKind.Array)
                             {
-                                List<string> models = new List<string>();
-
-                                if (document.RootElement.TryGetProperty("models", out JsonElement modelsElement) &&
-                                    modelsElement.ValueKind == JsonValueKind.Array)
+                                foreach (JsonElement modelElement in modelsElement.EnumerateArray())
                                 {
-                                    foreach (JsonElement modelElement in modelsElement.EnumerateArray())
+                                    if (modelElement.TryGetProperty("name", out JsonElement nameElement))
                                     {
-                                        if (modelElement.TryGetProperty("name", out JsonElement nameElement))
+                                        string modelName = nameElement.GetString();
+                                        if (!string.IsNullOrEmpty(modelName))
                                         {
-                                            string modelName = nameElement.GetString();
-                                            if (!string.IsNullOrEmpty(modelName))
-                                            {
-                                                models.Add(modelName);
-                                            }
+                                            models.Add(modelName);
                                         }
                                     }
                                 }
-
-                                lock (backend.Lock)
-                                {
-                                    backend.Models = models;
-                                    backend.ModelsDiscovered = true;
-                                    _Logging.Debug(_Header + "discovered " + models.Count + " models on backend " + backend.Identifier);
-                                }
                             }
-                        }
-                        else
-                        {
-                            _Logging.Warn(_Header + "model discovery failed for backend " + backend.Identifier + " with status " + (int)response.StatusCode);
-                            // Don't clear the models list on failure - keep the last known good state
-                        }
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        // Expected when cancellation is requested
-                        if (!token.IsCancellationRequested)
-                        {
-                            _Logging.Debug(_Header + "model discovery timeout for backend " + backend.Identifier);
+
+                            lock (backend.Lock)
+                            {
+                                backend.Models = models;
+                                backend.ModelsDiscovered = true;
+                            }
+
+                            _Logging.Debug(
+                                _Header + 
+                                "discovered " + models.Count + " models on backend " + backend.Identifier + ": " + string.Join(", ", backend.Models));
                         }
                     }
-                    catch (OperationCanceledException)
+                    else
                     {
-                        // Expected when cancellation is requested
-                        if (!token.IsCancellationRequested)
-                        {
-                            _Logging.Debug(_Header + "model discovery timeout for backend " + backend.Identifier);
-                        }
-                    }
-                    catch (HttpRequestException hre)
-                    {
-                        _Logging.Debug(_Header + "model discovery HTTP request exception for backend " + backend.Identifier + ": " + hre.Message);
-                    }
-                    catch (HttpIOException ioe)
-                    {
-                        _Logging.Debug(_Header + "model discovery IO exception for backend " + backend.Identifier + ": " + ioe.Message);
-                    }
-                    catch (Exception e)
-                    {
-                        _Logging.Debug(_Header + "model discovery exception for backend " + backend.Identifier + Environment.NewLine + e.ToString());
-                        // Don't clear the models list on exception - keep the last known good state
+                        _Logging.Warn(_Header + "model discovery failed for backend " + backend.Identifier + " with status " + (int)response.StatusCode);
+                        // Don't clear the models list on failure - keep the last known good state
                     }
                 }
+                catch (TaskCanceledException)
+                {
+                    // Expected when cancellation is requested
+                    if (!token.IsCancellationRequested)
+                    {
+                        _Logging.Debug(_Header + "model discovery timeout for backend " + backend.Identifier);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Expected when cancellation is requested
+                    if (!token.IsCancellationRequested)
+                    {
+                        _Logging.Debug(_Header + "model discovery timeout for backend " + backend.Identifier);
+                    }
+                }
+                catch (HttpRequestException hre)
+                {
+                    _Logging.Debug(_Header + "model discovery HTTP request exception for backend " + backend.Identifier + ": " + hre.Message);
+                }
+                catch (HttpIOException ioe)
+                {
+                    _Logging.Debug(_Header + "model discovery IO exception for backend " + backend.Identifier + ": " + ioe.Message);
+                }
+                catch (Exception e)
+                {
+                    _Logging.Debug(_Header + "model discovery exception for backend " + backend.Identifier + Environment.NewLine + e.ToString());
+                    // Don't clear the models list on exception - keep the last known good state
+                }
             }
-
-            _Logging.Debug(
-                _Header +
-                "stopping model discovery task for backend " +
-                backend.Identifier + " " + backend.Name + " " + backend.Hostname + ":" + backend.Port);
         }
 
         #endregion

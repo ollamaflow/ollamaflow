@@ -9,11 +9,13 @@ services:
   ollamaflow:
     container_name: 'ollamaflow'
     image: 'jchristn/ollamaflow:v1.0.0'
-    network_mode: 'host'
+    ports:
+      - "43411:43411"
     stdin_open: true
     tty: true
     volumes:
       - ./ollamaflow.json:/app/ollamaflow.json
+      - ./ollamaflow.db:/app/ollamaflow.db
       - ./logs/:/app/logs/
     healthcheck:
       test: curl --fail http://localhost:43411

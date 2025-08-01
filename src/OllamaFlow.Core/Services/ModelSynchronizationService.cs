@@ -5,20 +5,59 @@
     using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
+    using System.Net.Http;
     using System.Text;
+    using System.Text.Json;
+    using System.Threading;
     using System.Threading.Tasks;
     using OllamaFlow.Core;
+    using OllamaFlow.Core.Serialization;
     using SyslogLogging;
-    using SerializationHelper;
-    using System.Threading;
-    using System.Net.Http;
-    using System.Text.Json;
 
     /// <summary>
     /// Model synchronization service.
     /// </summary>
     public class ModelSynchronizationService : IDisposable
     {
+        #region Public-Members
+
+        /// <summary>
+        /// Interval, in milliseconds.
+        /// Default is 30000.
+        /// Minimum is 5000.
+        /// </summary>
+        public int IntervalMs
+        {
+            get
+            {
+                return _IntervalMs;
+            }
+            set
+            {
+                if (value < 5000) throw new ArgumentOutOfRangeException(nameof(IntervalMs));
+                _IntervalMs = value;
+            }
+        }
+
+        /// <summary>
+        /// Maximum concurrent downloads per backend.
+        /// Default is 3.
+        /// </summary>
+        public int MaxConcurrentDownloadsPerBackend
+        {
+            get
+            {
+                return _MaxConcurrentDownloadsPerBackend;
+            }
+            set
+            {
+                if (value < 1) throw new ArgumentOutOfRangeException(nameof(MaxConcurrentDownloadsPerBackend));
+                _MaxConcurrentDownloadsPerBackend = value;
+            }
+        }
+
+        #endregion
+
         #region Private-Members
 
         private readonly string _Header = "[ModelSynchronizationService] ";
@@ -27,15 +66,23 @@
         private Serializer _Serializer = null;
         private bool _IsDisposed = false;
 
-        private CancellationTokenSource _TokenSource = new CancellationTokenSource();
-        private Dictionary<string, Task> _SynchronizationTasks = new Dictionary<string, Task>();
+        private FrontendService _FrontendService = null;
+        private BackendService _BackendService = null;
+        private HealthCheckService _HealthCheckService = null;
 
-        // Track active pulls to avoid duplicates: backendId -> modelName -> isPulling
+        private CancellationTokenSource _TokenSource = new CancellationTokenSource();
+        private Task _SynchronizationTask = null;
+
+        // Track active pulls per backend
         private ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> _ActivePulls =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>();
 
-        // Interval to check for missing models (default: 60 seconds)
-        private readonly int _SynchronizationIntervalMs = 60000;
+        // Semaphore per backend to limit concurrent downloads
+        private ConcurrentDictionary<string, SemaphoreSlim> _BackendSemaphores =
+            new ConcurrentDictionary<string, SemaphoreSlim>();
+
+        private int _IntervalMs = 30000;
+        private int _MaxConcurrentDownloadsPerBackend = 3;
 
         #endregion
 
@@ -47,24 +94,29 @@
         /// <param name="settings">Settings.</param>
         /// <param name="logging">Logging.</param>
         /// <param name="serializer">Serializer.</param>
+        /// <param name="frontend">Frontend service.</param>
+        /// <param name="backend">Backend service.</param>
+        /// <param name="healthCheck">Healthcheck service.</param>
+        /// <param name="tokenSource">Cancellation token source.</param>
         public ModelSynchronizationService(
             OllamaFlowSettings settings,
             LoggingModule logging,
-            Serializer serializer)
+            Serializer serializer,
+            FrontendService frontend,
+            BackendService backend,
+            HealthCheckService healthCheck,
+            CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _Logging = logging ?? throw new ArgumentNullException(nameof(logging));
             _Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _FrontendService = frontend ?? throw new ArgumentNullException(nameof(frontend));
+            _BackendService = backend ?? throw new ArgumentNullException(nameof(backend));
+            _HealthCheckService = healthCheck ?? throw new ArgumentNullException(nameof(healthCheck));
+            _TokenSource = tokenSource ?? throw new ArgumentNullException(nameof(tokenSource));
+            _SynchronizationTask = Task.Run(() => SynchronizationTask(_TokenSource.Token), _TokenSource.Token);
 
-            // Initialize active pulls tracking and start a task for each backend
-            foreach (OllamaBackend backend in _Settings.Backends)
-            {
-                _ActivePulls[backend.Identifier] = new ConcurrentDictionary<string, bool>();
-
-                _SynchronizationTasks.Add(
-                    backend.Identifier,
-                    Task.Run(() => BackendSynchronizationTask(backend, _TokenSource.Token), _TokenSource.Token));
-            }
+            _Logging.Debug(_Header + "initialized");
         }
 
         #endregion
@@ -85,11 +137,17 @@
 
                     try
                     {
-                        Task.WaitAll(_SynchronizationTasks.Values.ToArray(), TimeSpan.FromSeconds(10));
+                        _SynchronizationTask.Wait(TimeSpan.FromSeconds(10));
                     }
                     catch { }
 
                     _TokenSource?.Dispose();
+
+                    // Dispose all semaphores
+                    foreach (var semaphore in _BackendSemaphores.Values)
+                    {
+                        semaphore?.Dispose();
+                    }
 
                     _Serializer = null;
                     _Logging = null;
@@ -113,86 +171,158 @@
 
         #region Private-Methods
 
-        private async Task BackendSynchronizationTask(OllamaBackend backend, CancellationToken token)
+        private async Task SynchronizationTask(CancellationToken token)
         {
-            _Logging.Debug(_Header + "starting model synchronization task for backend " +
-                backend.Identifier + " " + backend.Name + " " + backend.Hostname + ":" + backend.Port);
-
             while (!token.IsCancellationRequested)
             {
                 try
                 {
-                    await Task.Delay(_SynchronizationIntervalMs, token);
-                    await CheckAndSynchronizeBackendModels(backend, token);
+                    await Task.Delay(_IntervalMs, token);
+
+                    #region Get-Frontends
+
+                    List<OllamaFrontend> frontends = _FrontendService.GetAll().ToList();
+                    if (frontends == null || frontends.Count < 1) continue;
+
+                    #endregion
+
+                    #region Get-Backends
+
+                    List<OllamaBackend> backends = _HealthCheckService.Backends;
+                    if (backends == null || backends.Count < 1) continue;
+
+                    #endregion
+
+                    #region Process-All-Backends-In-Parallel
+
+                    // Build a dictionary of backend -> required models
+                    Dictionary<OllamaBackend, HashSet<string>> backendRequiredModels =
+                        new Dictionary<OllamaBackend, HashSet<string>>();
+
+                    foreach (OllamaBackend backend in backends)
+                    {
+                        HashSet<string> requiredModels = new HashSet<string>();
+
+                        foreach (OllamaFrontend frontend in frontends)
+                        {
+                            if (frontend.Backends.Contains(backend.Identifier))
+                            {
+                                if (frontend.RequiredModels != null && frontend.RequiredModels.Count > 0)
+                                {
+                                    foreach (string model in frontend.RequiredModels)
+                                    {
+                                        requiredModels.Add(model);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (requiredModels.Count > 0)
+                        {
+                            backendRequiredModels[backend] = requiredModels;
+                        }
+                    }
+
+                    // Process all backends in parallel
+                    List<Task> backendTasks = new List<Task>();
+                    foreach (var kvp in backendRequiredModels)
+                    {
+                        Task backendTask = Task.Run(async () =>
+                        {
+                            await CheckAndSynchronizeBackendModels(kvp.Key, kvp.Value.ToList(), token);
+                        }, token);
+
+                        backendTasks.Add(backendTask);
+                    }
+
+                    // Wait for all backend synchronizations to complete
+                    if (backendTasks.Count > 0)
+                    {
+                        await Task.WhenAll(backendTasks);
+                    }
+
+                    #endregion
                 }
                 catch (TaskCanceledException)
                 {
-                    // Expected when cancellation is requested
+                    break;
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
                 }
                 catch (Exception e)
                 {
-                    _Logging.Error(_Header + "synchronization task error for backend " +
-                        backend.Identifier + ": " + e.ToString());
+                    _Logging.Error(_Header + "synchronization task exception:" + Environment.NewLine + e.ToString());
                 }
             }
 
-            _Logging.Debug(_Header + "stopping model synchronization task for backend " +
-                backend.Identifier + " " + backend.Name + " " + backend.Hostname + ":" + backend.Port);
+            _Logging.Debug(_Header + "synchronization task terminated");
         }
 
-        private async Task CheckAndSynchronizeBackendModels(OllamaBackend backend, CancellationToken token)
+        private async Task CheckAndSynchronizeBackendModels(OllamaBackend backend, List<string> models, CancellationToken token)
         {
-            // Build set of required models for this backend
-            HashSet<string> requiredModels = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (OllamaFrontend frontend in _Settings.Frontends)
-            {
-                if (frontend.Backends.Contains(backend.Identifier))
-                {
-                    foreach (string model in frontend.RequiredModels)
-                    {
-                        requiredModels.Add(model);
-                    }
-                }
-            }
-
-            if (requiredModels.Count == 0)
+            if (models == null || models.Count < 1)
             {
                 _Logging.Debug(_Header + "no required models for backend " + backend.Identifier);
                 return;
             }
 
-            // Check if backend is healthy and models have been discovered
-            bool isHealthy = false;
-            bool modelsDiscovered = false;
-            List<string> currentModels = null;
-
-            lock (backend.Lock)
-            {
-                isHealthy = backend.Healthy;
-                modelsDiscovered = backend.ModelsDiscovered;
-                currentModels = new List<string>(backend.Models);
-            }
-
-            if (!isHealthy)
+            if (!backend.Healthy)
             {
                 _Logging.Debug(_Header + "skipping model synchronization for unhealthy backend " + backend.Identifier);
                 return;
             }
 
-            if (!modelsDiscovered)
+            if (!backend.ModelsDiscovered)
             {
                 _Logging.Debug(_Header + "skipping model synchronization for backend " + backend.Identifier + ", local models not yet discovered");
                 return;
             }
 
-            // Find missing models
-            HashSet<string> currentBaseModels = new HashSet<string>(
-                currentModels.Select(m => m.Contains(':') ? m.Substring(0, m.IndexOf(':')) : m),
-                StringComparer.OrdinalIgnoreCase
-            );
+            // Ensure semaphore exists for this backend
+            var semaphore = _BackendSemaphores.GetOrAdd(backend.Identifier,
+                _ => new SemaphoreSlim(_MaxConcurrentDownloadsPerBackend, _MaxConcurrentDownloadsPerBackend));
 
-            List<string> missing = requiredModels.Where(m => !currentBaseModels.Contains(m)).ToList();
+            // Create a normalized set of current models (full names with tags)
+            HashSet<string> currentModels = new HashSet<string>(backend.Models, StringComparer.OrdinalIgnoreCase);
+
+            // Find missing models by checking both exact matches and base model matches
+            List<string> missing = new List<string>();
+
+            foreach (string requiredModel in models)
+            {
+                bool found = false;
+
+                // Check for exact match first
+                if (currentModels.Contains(requiredModel))
+                {
+                    found = true;
+                }
+                else
+                {
+                    // If the required model has a tag, check for exact match only
+                    if (requiredModel.Contains(':'))
+                    {
+                        found = currentModels.Contains(requiredModel);
+                    }
+                    else
+                    {
+                        // If no tag specified, check if any version of this model exists
+                        string requiredBase = requiredModel;
+                        found = currentModels.Any(m =>
+                        {
+                            string currentBase = m.Contains(':') ? m.Substring(0, m.IndexOf(':')) : m;
+                            return currentBase.Equals(requiredBase, StringComparison.OrdinalIgnoreCase);
+                        });
+                    }
+                }
+
+                if (!found)
+                {
+                    missing.Add(requiredModel);
+                }
+            }
 
             if (missing.Count == 0)
             {
@@ -200,11 +330,17 @@
                 return;
             }
 
-            _Logging.Info(_Header + "found " + missing.Count + " missing required models on backend " +
-                backend.Identifier + ": " + string.Join(", ", missing));
+            _Logging.Info(_Header + "found " + missing.Count + " missing required models on backend " + backend.Identifier + ": " + string.Join(", ", missing));
 
-            // Pull missing models
+            // Ensure active pulls dictionary exists for this backend
+            if (!_ActivePulls.ContainsKey(backend.Identifier))
+            {
+                _ActivePulls[backend.Identifier] = new ConcurrentDictionary<string, bool>();
+            }
+
+            // Pull missing models with controlled concurrency
             List<Task> pullTasks = new List<Task>();
+
             foreach (string model in missing)
             {
                 if (token.IsCancellationRequested) break;
@@ -217,12 +353,20 @@
                     continue;
                 }
 
-                // Start pull task
-                Task pullTask = PullModelAsync(backend, model, token)
-                    .ContinueWith(t =>
+                // Create pull task with semaphore control
+                Task pullTask = Task.Run(async () =>
+                {
+                    await semaphore.WaitAsync(token);
+                    try
                     {
+                        await PullModelAsync(backend, model, token);
+                    }
+                    finally
+                    {
+                        semaphore.Release();
                         _ActivePulls[backend.Identifier].TryRemove(baseModelName, out _);
-                    }, TaskScheduler.Default);
+                    }
+                }, token);
 
                 pullTasks.Add(pullTask);
             }

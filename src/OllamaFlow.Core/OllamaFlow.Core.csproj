@@ -47,10 +47,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="ExpressionTree" Version="1.1.2" />
 	  <PackageReference Include="RestWrapper" Version="3.1.5" />
-	  <PackageReference Include="SerializationHelper" Version="2.0.3" />
 	  <PackageReference Include="SyslogLogging" Version="2.0.8" />
-	  <PackageReference Include="Watson" Version="6.3.9" />
+	  <PackageReference Include="Watson" Version="6.3.10" />
+	  <PackageReference Include="WatsonORM.Sqlite" Version="3.0.14" />
 	</ItemGroup>
 
 </Project>

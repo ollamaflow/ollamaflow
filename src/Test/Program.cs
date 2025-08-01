@@ -1,16 +1,16 @@
 ﻿namespace Test
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
     using System.IO;
-    using System.Linq;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using OllamaFlow.Core;
+    using OllamaFlow.Core.Database.Sqlite;
+    using OllamaFlow.Core.Serialization;
     using RestWrapper;
-    using SerializationHelper;
+    using SyslogLogging;
     using WatsonWebserver;
     using WatsonWebserver.Core;
 
@@ -20,6 +20,7 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 
+        private static CancellationTokenSource _TokenSource = new CancellationTokenSource();
         private static OllamaFlowSettings _Settings = null;
         private static Serializer _Serializer = new Serializer();
         private static LoadBalancingMode _LoadBalancingMode = LoadBalancingMode.RoundRobin;
@@ -40,11 +41,12 @@
             Console.WriteLine("");
             Console.WriteLine("Use typical Ollama requests, but use server port 43411");
             InitializeSettings();
+            InitializeDatabase();
             InitializeBackends();
 
             string url;
 
-            using (OllamaFlowDaemon ollamaFlow = new OllamaFlowDaemon(_Settings))
+            using (OllamaFlowDaemon ollamaFlow = new OllamaFlowDaemon(_Settings, _TokenSource))
             {
                 using (_Server1 = new Webserver(_Server1Settings, Server1Route))
                 {
@@ -68,7 +70,7 @@
                                 Console.WriteLine("");
                                 Console.WriteLine("Request " + i);
 
-                                url = "http://localhost:8000/test";
+                                url = "http://localhost:8000/";
 
                                 using (RestRequest req = new RestRequest(url))
                                 {
@@ -94,22 +96,26 @@
         {
             _Settings = new OllamaFlowSettings();
             _Settings.Logging.MinimumSeverity = 0;
+            File.WriteAllBytes("./ollamaflow.json", Encoding.UTF8.GetBytes(_Serializer.SerializeJson(_Settings, true)));
+        }
 
-            _Settings.Frontends.Add(new OllamaFrontend
+        private static void InitializeDatabase()
+        {
+            if (File.Exists(Constants.DatabaseFilename)) File.Delete(Constants.DatabaseFilename);
+
+            SqliteDatabaseDriver driver = new SqliteDatabaseDriver(_Settings, new LoggingModule(), _Serializer, _Settings.DatabaseFilename);
+            driver.InitializeRepository();
+
+            driver.Frontend.Create(new OllamaFrontend
             {
                 Identifier = "virtual-ollama",
                 Name = "Virtual Ollama",
                 Hostname = "localhost",
                 LoadBalancing = _LoadBalancingMode,
-                Backends = new List<string>
-                {
-                    "ollama1",
-                    "ollama2",
-                    "ollama3"
-                }
+                Backends = new List<string> { "ollama1", "ollama2", "ollama3" }
             });
 
-            _Settings.Backends.Add(new OllamaBackend
+            driver.Backend.Create(new OllamaBackend
             {
                 Identifier = "ollama1",
                 Name = "Ollama 1",
@@ -118,7 +124,7 @@
                 Ssl = false
             });
 
-            _Settings.Backends.Add(new OllamaBackend
+            driver.Backend.Create(new OllamaBackend
             {
                 Identifier = "ollama2",
                 Name = "Ollama 2",
@@ -127,7 +133,7 @@
                 Ssl = false
             });
 
-            _Settings.Backends.Add(new OllamaBackend
+            driver.Backend.Create(new OllamaBackend
             {
                 Identifier = "ollama3",
                 Name = "Ollama 3",
@@ -135,8 +141,6 @@
                 Port = 8003,
                 Ssl = false
             });
-
-            File.WriteAllBytes("./ollamaflow.json", Encoding.UTF8.GetBytes(_Serializer.SerializeJson(_Settings, true)));
         }
 
         private static void InitializeBackends()

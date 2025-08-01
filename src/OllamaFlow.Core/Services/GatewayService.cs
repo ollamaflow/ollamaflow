@@ -6,19 +6,20 @@
     using System.IO;
     using System.Linq;
     using System.Net.Sockets;
-    using System.Reflection;
     using System.Text;
+    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
     using RestWrapper;
-    using SerializationHelper;
     using OllamaFlow.Core;
     using OllamaFlow.Core.Helpers;
+    using OllamaFlow.Core.Serialization;
     using SyslogLogging;
     using Timestamps;
     using UrlMatcher;
     using WatsonWebserver;
     using WatsonWebserver.Core;
+    using System.Data.Common;
 
     /// <summary>
     /// Gateway service.
@@ -39,7 +40,12 @@
         private LoggingModule _Logging = null;
         private Serializer _Serializer = null;
         private Random _Random = new Random(Guid.NewGuid().GetHashCode());
+        private CancellationTokenSource _TokenSource = new CancellationTokenSource();
         private bool _IsDisposed = false;
+
+        private FrontendService _FrontendService = null;
+        private BackendService _BackendService = null;
+        private HealthCheckService _HealthCheck = null;
 
         private const int BUFFER_SIZE = 65536;
 
@@ -54,16 +60,30 @@
         /// <param name="callbacks">Callbacks.</param>
         /// <param name="logging">Logging.</param>
         /// <param name="serializer">Serializer.</param>
+        /// <param name="frontend">Frontend service.</param>
+        /// <param name="backend">Backend service.</param>
+        /// <param name="healthCheck">Healthcheck service.</param>
+        /// <param name="tokenSource">Cancellation token source.</param>
         public GatewayService(
             OllamaFlowSettings settings,
             OllamaFlowCallbacks callbacks,
             LoggingModule logging,
-            Serializer serializer)
+            Serializer serializer,
+            FrontendService frontend,
+            BackendService backend,
+            HealthCheckService healthCheck,
+            CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _Callbacks = callbacks ?? throw new ArgumentNullException(nameof(callbacks));
             _Logging = logging ?? throw new ArgumentNullException(nameof(logging));
             _Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _TokenSource = tokenSource ?? throw new ArgumentNullException(nameof(tokenSource));
+            _FrontendService = frontend ?? throw new ArgumentNullException(nameof(frontend));
+            _BackendService = backend ?? throw new ArgumentNullException(nameof(backend));
+            _HealthCheck = healthCheck ?? throw new ArgumentNullException(nameof(healthCheck));
+
+            _Logging.Debug(_Header + "initialized");
         }
 
         #endregion
@@ -105,10 +125,22 @@
         /// <param name="webserver">Webserver.</param>
         public void InitializeRoutes(WebserverBase webserver)
         {
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/", GetRootRoute);
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.HEAD, "/", HeadRootRoute);
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/favicon.ico", GetFaviconRoute);
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.HEAD, "/favicon.ico", HeadFaviconRoute);
+            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/", GetRootRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.HEAD, "/", HeadRootRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/favicon.ico", GetFaviconRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.HEAD, "/favicon.ico", HeadFaviconRoute, ExceptionRoute);
+
+            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/v1.0/frontends", GetFrontendsRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/frontends/{identifier}", GetFrontendRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.DELETE, "/v1.0/frontends/{identifier}", DeleteFrontendRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/frontends", CreateFrontendRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/frontends/{identifier}", UpdateFrontendRoute, ExceptionRoute);
+
+            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/v1.0/backends", GetBackendsRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/backends/{identifier}", GetBackendRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.DELETE, "/v1.0/backends/{identifier}", DeleteBackendRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends", CreateBackendRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends/{identifier}", UpdateBackendRoute, ExceptionRoute);
         }
 
         /// <summary>
@@ -169,6 +201,7 @@
         /// <returns>Task.</returns>
         public async Task PreRoutingHandler(HttpContextBase ctx)
         {
+            ctx.Response.ContentType = Constants.JsonContentType;
         }
 
         /// <summary>
@@ -178,15 +211,48 @@
         /// <returns>Task.</returns>
         public async Task PostRoutingHandler(HttpContextBase ctx)
         {
+            ctx.Timestamp.End = DateTime.UtcNow;
+
+            _Logging.Debug(
+                _Header +
+                ctx.Request.Source.IpAddress + " " +
+                ctx.Request.Method.ToString() + " " + ctx.Request.Url.RawWithQuery + ": " +
+                ctx.Response.StatusCode +
+                " (" + ctx.Timestamp.TotalMs.Value.ToString("F2") + "ms)");
         }
 
         /// <summary>
-        /// Authenticate request.
+        /// Exception route.
         /// </summary>
         /// <param name="ctx">HTTP context.</param>
+        /// <param name="e">Exception.</param>
         /// <returns>Task.</returns>
-        public async Task AuthenticateRequest(HttpContextBase ctx)
+        public async Task ExceptionRoute(HttpContextBase ctx, Exception e)
         {
+            _Logging.Warn(_Header + "exception of type " + e.GetType().Name + " encountered:" + Environment.NewLine + e.ToString());
+
+            switch (e)
+            {
+                case ArgumentNullException:
+                case ArgumentException:
+                case InvalidOperationException:
+                case JsonException:
+                    ctx.Response.StatusCode = 400;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadRequest, null, e.Message), true));
+                    return;
+                case KeyNotFoundException:
+                    ctx.Response.StatusCode = 404;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.NotFound, null, e.Message), true));
+                    return;
+                case UnauthorizedAccessException:
+                    ctx.Response.StatusCode = 401;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.AuthorizationFailed, null, "You are not authorized to perform this request."), true));
+                    return;
+                default:
+                    ctx.Response.StatusCode = 500;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.InternalError, null, e.Message), true));
+                    return;
+            }
         }
 
         /// <summary>
@@ -197,10 +263,11 @@
         public async Task DefaultRoute(HttpContextBase ctx)
         {
             Guid requestGuid = Guid.NewGuid();
+            ctx.Response.Headers.Add(Constants.RequestIdHeader, requestGuid.ToString());
 
             try
             {
-                OllamaFrontend frontend = GetFrontend(ctx);
+                OllamaFrontend frontend = await GetFrontend(ctx);
                 if (frontend == null)
                 {
                     _Logging.Warn(_Header + "no frontend found for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.Full);
@@ -223,7 +290,6 @@
                             if (!frontend.RequiredModels.Contains(model))
                             {
                                 frontend.RequiredModels.Add(model);
-                                File.WriteAllText(Constants.SettingsFile, _Serializer.SerializeJson(_Settings, true));
                             }
                         }
                     }
@@ -240,13 +306,12 @@
                             if (!frontend.RequiredModels.Contains(model))
                             {
                                 frontend.RequiredModels.Remove(model);
-                                File.WriteAllText(Constants.SettingsFile, _Serializer.SerializeJson(_Settings, true));
                             }
                         }
                     }
                 }
 
-                OllamaBackend backend = GetBackend(frontend);
+                OllamaBackend backend = _HealthCheck.GetNextBackend(frontend);
                 if (backend == null)
                 {
                     _Logging.Warn(_Header + "no backend found for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.RawWithoutQuery);
@@ -335,91 +400,20 @@
             await ctx.Response.Send();
         }
 
-        private OllamaFrontend GetFrontend(HttpContextBase ctx)
+        private async Task<OllamaFrontend> GetFrontend(HttpContextBase ctx)
         {
-            try
+            Uri uri = new Uri(ctx.Request.Url.Full);
+
+            List<OllamaFrontend> frontends = _HealthCheck.Frontends;
+
+            foreach (OllamaFrontend ep in frontends)
             {
-                Uri uri = new Uri(ctx.Request.Url.Full);
-                // _Logging.Debug(_Header + "locating frontend for host " + uri.Host);
-
-                foreach (OllamaFrontend ep in _Settings.Frontends)
-                {
-                    if (ep.Hostname.Equals("*"))
-                    {
-                        // _Logging.Debug(_Header + "catch-all host found in Ollama frontend " + ep.Identifier);
-                        return ep;
-                    }
-
-                    if (ep.Hostname.Equals(uri.Host)) return ep;
-                }
-
-                _Logging.Warn(_Header + "no frontend found for host " + uri.Host);
-                return null;
+                if (ep.Hostname.Equals("*")) return ep;
+                if (ep.Hostname.Equals(uri.Host)) return ep;
             }
-            catch (Exception e)
-            {
-                _Logging.Warn(
-                    _Header + 
-                    "exception attempting to find frontend for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.Full + 
-                    Environment.NewLine + 
-                    e.ToString());
 
-                return null;
-            }
-        }
-
-        private OllamaBackend GetBackend(OllamaFrontend frontend)
-        {
-            if (frontend == null) return null;
-            if (frontend.Backends == null || frontend.Backends.Count < 1) return null;
-
-            OllamaBackend origin = null;
-
-            lock (frontend.Lock)
-            {
-                List<OllamaBackend> healthyBackends = _Settings.Backends
-                    .Where(b => frontend.Backends.Contains(b.Identifier))
-                    .Where(b =>
-                    {
-                        lock (b.Lock)
-                        {
-                            return b.Healthy;
-                        }
-                    })
-                    .ToList();
-
-                if (healthyBackends.Count < 1)
-                {
-                    _Logging.Warn(_Header + "no healthy backends found for frontend " + frontend.Identifier);
-                    return null;
-                }
-                else
-                {
-                    if (frontend.LoadBalancing == LoadBalancingMode.Random)
-                    {
-                        int index = _Random.Next(0, healthyBackends.Count);
-                        frontend.LastIndex = index;
-                        origin = healthyBackends[index];
-                        if (origin != default(OllamaBackend)) return origin;
-                        return null;
-                    }
-                    else if (frontend.LoadBalancing == LoadBalancingMode.RoundRobin)
-                    {
-                        if (frontend.LastIndex >= healthyBackends.Count) frontend.LastIndex = _Random.Next(0, healthyBackends.Count);
-                        origin = healthyBackends[frontend.LastIndex];
-
-                        if ((frontend.LastIndex + 1) > (frontend.Backends.Count - 1)) frontend.LastIndex = 0;
-                        else frontend.LastIndex = frontend.LastIndex + 1;
-
-                        if (origin != default(OllamaBackend)) return origin;
-                        return null;
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Unknown load balancing scheme '" + frontend.LoadBalancing.ToString() + "'.");
-                    }
-                }
-            }
+            _Logging.Warn(_Header + "no frontend found for host " + uri.Host);
+            return null;
         }
 
         private System.Net.Http.HttpMethod ConvertHttpMethod(WatsonWebserver.Core.HttpMethod method)
@@ -481,7 +475,6 @@
                             req.TimeoutMilliseconds = frontend.TimeoutMs;
 
                         req.Headers.Add(Constants.ForwardedForHeader, ctx.Request.Source.IpAddress);
-                        req.Headers.Add(Constants.RequestIdHeader, requestGuid.ToString());
 
                         if (ctx.Request.Headers != null && ctx.Request.Headers.Count > 0)
                         {
@@ -573,7 +566,6 @@
                             ctx.Response.ContentType = resp.ContentType;
                             ctx.Response.Headers = resp.Headers;
                             ctx.Response.Headers.Add(Constants.BackendServerHeader, backend.Identifier);
-                            ctx.Response.Headers.Add(Constants.RequestIdHeader, requestGuid.ToString());
                             ctx.Response.ChunkedTransfer = resp.ChunkedTransferEncoding;
 
                             #endregion
@@ -584,14 +576,10 @@
                             {
                                 if (!ctx.Response.ChunkedTransfer)
                                 {
-                                    ctx.Response.ChunkedTransfer = false;
-
                                     await ctx.Response.Send(resp.DataAsBytes);
                                 }
                                 else
                                 {
-                                    ctx.Response.ChunkedTransfer = true;
-
                                     if (resp.DataAsBytes.Length > 0)
                                     {
                                         for (int i = 0; i < resp.DataAsBytes.Length; i += BUFFER_SIZE)
@@ -706,6 +694,120 @@
 
                 #endregion
             }
+        }
+
+        private bool IsAuthenticated(HttpContextBase ctx)
+        {
+            if (ctx.Request.Authorization != null  && !String.IsNullOrEmpty(ctx.Request.Authorization.BearerToken))
+            {
+                if (_Settings.AdminBearerTokens != null)
+                {
+                    if (_Settings.AdminBearerTokens.Contains(ctx.Request.Authorization.BearerToken)) 
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        private async Task GetFrontendsRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            List<OllamaFrontend> objs = _FrontendService.GetAll().ToList();
+            await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
+        }
+
+        private async Task GetFrontendRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string identifier = ctx.Request.Url.Parameters["identifier"];
+            OllamaFrontend obj = _FrontendService.GetByIdentifier(identifier);
+            if (obj == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+            await ctx.Response.Send(_Serializer.SerializeJson(obj, true));
+        }
+
+        private async Task DeleteFrontendRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string identifier = ctx.Request.Url.Parameters["identifier"];
+            if (!_FrontendService.Exists(identifier)) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+            _FrontendService.Delete(identifier);
+            ctx.Response.StatusCode = 204;
+            await ctx.Response.Send();
+        }
+
+        private async Task CreateFrontendRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            OllamaFrontend obj = _Serializer.DeserializeJson<OllamaFrontend>(ctx.Request.DataAsString);
+            OllamaFrontend existing = _FrontendService.GetByIdentifier(obj.Identifier);
+            if (existing != null) throw new ArgumentException("An object with identifier " + obj.Identifier + " already exists.");
+            OllamaFrontend created = _FrontendService.Create(obj);
+            ctx.Response.StatusCode = 201;
+            await ctx.Response.Send(_Serializer.SerializeJson(created, true));
+        }
+
+        private async Task UpdateFrontendRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string identifier = ctx.Request.Url.Parameters["identifier"];
+            OllamaFrontend original = _FrontendService.GetByIdentifier(identifier);
+            if (original == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+
+            OllamaFrontend updated = _Serializer.DeserializeJson<OllamaFrontend>(ctx.Request.DataAsString);
+            updated.Identifier = identifier;
+            updated = _FrontendService.Update(updated);
+            await ctx.Response.Send(_Serializer.SerializeJson(updated, true));
+        }
+
+        private async Task GetBackendsRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            List<OllamaBackend> objs = _BackendService.GetAll().ToList();
+            await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
+        }
+
+        private async Task GetBackendRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string identifier = ctx.Request.Url.Parameters["identifier"];
+            OllamaBackend obj = _BackendService.GetByIdentifier(identifier);
+            if (obj == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+            await ctx.Response.Send(_Serializer.SerializeJson(obj, true));
+        }
+
+        private async Task DeleteBackendRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string identifier = ctx.Request.Url.Parameters["identifier"];
+            if (!_BackendService.Exists(identifier)) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+            _BackendService.Delete(identifier);
+            ctx.Response.StatusCode = 204;
+            await ctx.Response.Send();
+        }
+
+        private async Task CreateBackendRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            OllamaBackend obj = _Serializer.DeserializeJson<OllamaBackend>(ctx.Request.DataAsString);
+            OllamaBackend existing = _BackendService.GetByIdentifier(obj.Identifier);
+            if (existing != null) throw new ArgumentException("An object with identifier " + obj.Identifier + " already exists.");
+            OllamaBackend created = _BackendService.Create(obj);
+            ctx.Response.StatusCode = 201;
+            await ctx.Response.Send(_Serializer.SerializeJson(created, true));
+        }
+
+        private async Task UpdateBackendRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string identifier = ctx.Request.Url.Parameters["identifier"];
+            OllamaBackend original = _BackendService.GetByIdentifier(identifier);
+            if (original == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+
+            OllamaBackend updated = _Serializer.DeserializeJson<OllamaBackend>(ctx.Request.DataAsString);
+            updated.Identifier = identifier;
+            updated = _BackendService.Update(updated);
+            await ctx.Response.Send(_Serializer.SerializeJson(updated, true));
         }
 
         #endregion

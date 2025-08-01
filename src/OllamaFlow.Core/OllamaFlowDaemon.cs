@@ -3,15 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Reflection;
-    using System.Runtime.Loader;
     using System.Threading;
-    using System.Threading.Tasks;
-    using SerializationHelper;
+    using OllamaFlow.Core.Database;
+    using OllamaFlow.Core.Database.Sqlite;
+    using OllamaFlow.Core.Serialization;
     using OllamaFlow.Core.Services;
     using SyslogLogging;
     using WatsonWebserver;
-    using WatsonWebserver.Core;
 
     /// <summary>
     /// OllamaFlow Daemon.
@@ -47,6 +45,9 @@
         private Serializer _Serializer = new Serializer();
         private LoggingModule _Logging = null;
 
+        private DatabaseDriverBase _Database = null;
+        private FrontendService _FrontendService = null;
+        private BackendService _BackendService = null;
         private HealthCheckService _HealthCheckService = null;
         private ModelDiscoveryService _ModelDiscoveryService = null;
         private ModelSynchronizationService _ModelSynchronizationService = null;
@@ -54,6 +55,8 @@
         private Webserver _Webserver = null;
 
         private bool _IsDisposed = false;
+        private CancellationTokenSource _TokenSource = new CancellationTokenSource();
+        private readonly object _DisposeLock = new object();
 
         #endregion
 
@@ -63,9 +66,11 @@
         /// Instantiate.
         /// </summary>
         /// <param name="settings">Settings.</param>
-        public OllamaFlowDaemon(OllamaFlowSettings settings)
+        /// <param name="tokenSource">Cancellation token source.</param>
+        public OllamaFlowDaemon(OllamaFlowSettings settings, CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _TokenSource = tokenSource ?? new CancellationTokenSource();
 
             InitializeGlobals();
 
@@ -79,37 +84,136 @@
         /// <summary>
         /// Dispose.
         /// </summary>
-        /// <param name="disposing">Disposing.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_IsDisposed)
-            {
-                if (disposing)
-                {
-                    _GatewayService?.Dispose();
-                    _GatewayService = null;
-
-                    _Webserver?.Dispose();
-                    _Webserver = null;
-
-                    _Logging?.Dispose();
-                    _Logging = null;
-
-                    _Serializer = null;
-                    _Settings = null;
-
-                    _IsDisposed = true;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        #endregion
+
+        #region Protected-Methods
+
+        /// <summary>
+        /// Dispose.
+        /// </summary>
+        /// <param name="disposing">Disposing.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            lock (_DisposeLock)
+            {
+                if (_IsDisposed)
+                    return;
+
+                if (disposing)
+                {
+                    try
+                    {
+                        _Logging?.Info(_Header + "disposing OllamaFlow daemon");
+
+                        // Cancel any ongoing operations
+                        if (_TokenSource != null && !_TokenSource.IsCancellationRequested)
+                        {
+                            _TokenSource.Cancel();
+                        }
+
+                        // Dispose services in reverse order of initialization
+                        // This ensures dependencies are properly cleaned up
+
+                        // Stop and dispose webserver first
+                        if (_Webserver != null)
+                        {
+                            try
+                            {
+                                _Webserver.Stop();
+                                _Webserver.Dispose();
+                            }
+                            catch (Exception ex)
+                            {
+                                _Logging?.Warn(_Header + "error stopping webserver: " + ex.Message);
+                            }
+                            finally
+                            {
+                                _Webserver = null;
+                            }
+                        }
+
+                        // Dispose services
+                        DisposeService(ref _GatewayService, "GatewayService");
+                        DisposeService(ref _ModelSynchronizationService, "ModelSynchronizationService");
+                        DisposeService(ref _ModelDiscoveryService, "ModelDiscoveryService");
+                        DisposeService(ref _HealthCheckService, "HealthCheckService");
+                        DisposeService(ref _BackendService, "BackendService");
+                        DisposeService(ref _FrontendService, "FrontendService");
+
+                        // Dispose database
+                        if (_Database != null)
+                        {
+                            try
+                            {
+                                if (_Database is IDisposable disposableDb)
+                                {
+                                    disposableDb.Dispose();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                _Logging?.Warn(_Header + "error disposing database: " + ex.Message);
+                            }
+                            finally
+                            {
+                                _Database = null;
+                            }
+                        }
+
+                        // Dispose token source
+                        if (_TokenSource != null)
+                        {
+                            try
+                            {
+                                _TokenSource.Dispose();
+                            }
+                            catch (Exception ex)
+                            {
+                                _Logging?.Warn(_Header + "error disposing token source: " + ex.Message);
+                            }
+                            finally
+                            {
+                                _TokenSource = null;
+                            }
+                        }
+
+                        // Finally dispose logging
+                        if (_Logging != null)
+                        {
+                            try
+                            {
+                                _Logging.Info(_Header + "OllamaFlow daemon disposed");
+                                _Logging.Dispose();
+                            }
+                            catch
+                            {
+                                // Can't log this error
+                            }
+                            finally
+                            {
+                                _Logging = null;
+                            }
+                        }
+
+                        // Clear other references
+                        _Serializer = null;
+                        _Settings = null;
+                        _Callbacks = null;
+                    }
+                    catch (Exception ex)
+                    {
+                        _Logging?.Error(_Header + "unexpected error during disposal: " + ex.ToString());
+                    }
+                }
+
+                _IsDisposed = true;
+            }
         }
 
         #endregion
@@ -163,36 +267,62 @@
 
             #region Services
 
+            _Logging.Debug(_Header + "initializing database " + _Settings.DatabaseFilename);
+
+            _Database = new SqliteDatabaseDriver(_Settings, _Logging, _Serializer, _Settings.DatabaseFilename);
+            _Database.InitializeRepository();
+
+            _Logging.Debug(_Header + "initializing services");
+
+            _FrontendService = new FrontendService(_Settings, _Logging, _Database, _TokenSource);
+            _BackendService = new BackendService(_Settings, _Logging, _Database, _TokenSource);
+
             _HealthCheckService = new HealthCheckService(
                 _Settings,
                 _Logging,
-                _Serializer);
+                _Serializer,
+                _FrontendService,
+                _BackendService,
+                _TokenSource);
 
             _ModelDiscoveryService = new ModelDiscoveryService(
                 _Settings,
                 _Logging,
-                _Serializer);
+                _Serializer,
+                _FrontendService,
+                _BackendService,
+                _HealthCheckService,
+                _TokenSource);
 
             _ModelSynchronizationService = new ModelSynchronizationService(
                 _Settings,
                 _Logging,
-                _Serializer);
+                _Serializer,
+                _FrontendService,
+                _BackendService,
+                _HealthCheckService,
+                _TokenSource);
 
             _GatewayService = new GatewayService(
-                _Settings, 
-                _Callbacks, 
-                _Logging, 
-                _Serializer);
+                _Settings,
+                _Callbacks,
+                _Logging,
+                _Serializer,
+                _FrontendService,
+                _BackendService,
+                _HealthCheckService,
+                _TokenSource);
 
             #endregion
 
             #region Webserver
 
+            _Logging.Debug(_Header + "initializing webserver");
+
             _Webserver = new Webserver(_Settings.Webserver, _GatewayService.DefaultRoute);
             _Webserver.Routes.Preflight = _GatewayService.OptionsRoute;
             _Webserver.Routes.PreRouting = _GatewayService.PreRoutingHandler;
             _Webserver.Routes.PostRouting = _GatewayService.PostRoutingHandler;
-            _Webserver.Routes.AuthenticateRequest = _GatewayService.AuthenticateRequest;
 
             _GatewayService.InitializeRoutes(_Webserver);
 
@@ -200,12 +330,34 @@
 
             _Logging.Info(
                 _Header +
-                "webserver started on "
+                "initialized webserver on "
                 + (_Settings.Webserver.Ssl.Enable ? "https://" : "http://")
                 + _Settings.Webserver.Hostname
                 + ":" + _Settings.Webserver.Port);
 
             #endregion
+        }
+
+        private void DisposeService<T>(ref T service, string serviceName) where T : class
+        {
+            if (service != null)
+            {
+                try
+                {
+                    if (service is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _Logging?.Warn(_Header + $"error disposing {serviceName}: " + ex.Message);
+                }
+                finally
+                {
+                    service = null;
+                }
+            }
         }
 
         #endregion

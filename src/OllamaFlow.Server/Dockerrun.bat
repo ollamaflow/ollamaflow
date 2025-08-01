@@ -9,16 +9,18 @@ if not exist ollamaflow.json (
 
 REM Items that require persistence
 REM   ollamaflow.json
+REM   ollamaflow.db
 REM   logs/
 
 REM Argument order matters!
 
 docker run ^
-  -p 8000:8000 ^
+  -p 43411:43411 ^
   -t ^
   -i ^
   -e "TERM=xterm-256color" ^
   -v .\ollamaflow.json:/app/ollamaflow.json ^
+  -v .\ollamaflow.db:/app/ollamaflow.db ^
   -v .\logs\:/app/logs/ ^
   jchristn/ollamaflow:%1
 

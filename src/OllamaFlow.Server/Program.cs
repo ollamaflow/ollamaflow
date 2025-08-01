@@ -9,8 +9,9 @@
     using System.Threading;
     using System.Threading.Tasks;
     using OllamaFlow.Core;
+    using OllamaFlow.Core.Database.Sqlite;
     using OllamaFlow.Core.Services;
-    using SerializationHelper;
+    using OllamaFlow.Core.Serialization;
     using SyslogLogging;
     using WatsonWebserver;
     using WatsonWebserver.Core;
@@ -29,6 +30,7 @@
         #region Private-Members
 
         private static string _SoftwareVersion = "v1.0.0";
+        private static CancellationTokenSource _TokenSource = new CancellationTokenSource();
         private static OllamaFlowSettings _Settings = null;
         private static OllamaFlowDaemon _OllamaFlow = null;
         private static Serializer _Serializer = new Serializer();
@@ -47,8 +49,9 @@
             Welcome();
             ParseArguments(args);
             InitializeSettings();
+            InitializeDatabase();
 
-            using (_OllamaFlow = new OllamaFlowDaemon(_Settings))
+            using (_OllamaFlow = new OllamaFlowDaemon(_Settings, _TokenSource))
             {
                 EventWaitHandle waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
                 AssemblyLoadContext.Default.Unloading += (ctx) => waitHandle.Set();
@@ -91,10 +94,6 @@
             {
                 for (int i = 0; i < args.Length; i++)
                 {
-                    if (args[i].StartsWith("--settings="))
-                    {
-                        Constants.SettingsFile = args[i].Substring(11);
-                    }
                 }
             }
         }
@@ -106,51 +105,45 @@
                 Console.WriteLine("Settings file " + Constants.SettingsFile + " does not exist, creating");
                 _Settings = new OllamaFlowSettings();
 
-                _Settings.Frontends.Add(new OllamaFrontend
-                {
-                    Identifier = "frontend",
-                    Name = "Default Ollama frontend",
-                    Hostname = "localhost",
-                    TimeoutMs = 60000,
-                    LoadBalancing = LoadBalancingMode.RoundRobin,
-                    BlockHttp10 = true,
-                    LogRequestFull = false,
-                    LogRequestBody = false,
-                    LogResponseBody = false,
-                    MaxRequestBodySize = (512 * 1024 * 1024),
-                    Backends = new List<string> { "backend1" },
-                    RequiredModels = new List<string> { "all-minilm" }
-                });
-
-                _Settings.Backends.Add(new OllamaBackend
-                {
-                    Identifier = "backend1",
-                    Name = "Default Ollama backend",
-                    Hostname = "localhost",
-                    Port = 11434,
-                    Ssl = false,
-                    ModelRefreshIntervalMs = 60000,
-                    HealthCheckIntervalMs = 5000,
-                    UnhealthyThreshold = 2,
-                    HealthyThreshold = 2,
-                    HealthCheckMethod = System.Net.Http.HttpMethod.Head,
-                    HealthCheckUrl = "/",
-                    LogRequestBody = false,
-                    LogResponseBody = false
-                });
-
                 _Settings.Webserver.Port = 43411;
                 _Settings.Webserver.Ssl.Enable = false;
 
+                _Settings.AdminBearerTokens.Add("ollamaflowadmin");
+
                 File.WriteAllText(Constants.SettingsFile, _Serializer.SerializeJson(_Settings, true));
                 Console.WriteLine("Created settings file " + Constants.SettingsFile + ", please modify and restart OllamaFlow");
-                Console.WriteLine("");
-                Environment.Exit(1);
+                Console.WriteLine();
             }
             else
             {
                 Console.WriteLine("Loading from settings file " + Constants.SettingsFile);
                 _Settings = _Serializer.DeserializeJson<OllamaFlowSettings>(File.ReadAllText(Constants.SettingsFile));
+            }
+        }
+
+        private static void InitializeDatabase()
+        {
+            if (!File.Exists(Constants.DatabaseFilename))
+            {
+                SqliteDatabaseDriver driver = new SqliteDatabaseDriver(_Settings, new LoggingModule(), _Serializer, _Settings.DatabaseFilename);
+                driver.InitializeRepository();
+
+                driver.Frontend.Create(new OllamaFrontend
+                {
+                    Identifier = "frontend1",
+                    Name = "My first virtual Ollama",
+                    Hostname = "*",
+                    Backends = new List<string> { "backend1" }                    
+                });
+
+                driver.Backend.Create(new OllamaBackend
+                {
+                    Identifier = "backend1",
+                    Name = "My localhost Ollama instance",
+                    Hostname = "localhost",
+                    Port = 11434,
+                    Ssl = false
+                });
             }
         }
 

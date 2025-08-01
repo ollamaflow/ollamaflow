@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using OllamaFlow.Core.Settings;
+    using SyslogLogging;
 
     /// <summary>
     /// Logging settings.
@@ -10,6 +10,11 @@
     public class LoggingSettings
     {
         #region Public-Members
+
+        /// <summary>
+        /// Enable or disable logging.
+        /// </summary>
+        public bool Enable { get; set; } = true;
 
         /// <summary>
         /// List of syslog servers.
@@ -22,8 +27,8 @@
             }
             set
             {
-                if (value == null) _Servers = new List<SyslogServer>();
-                else _Servers = value;
+                if (value == null) value = new List<SyslogServer>();
+                _Servers = value;
             }
         }
 
@@ -62,6 +67,16 @@
                 _MinimumSeverity = value;
             }
         }
+
+        /// <summary>
+        /// Enable or disable logging of queries.
+        /// </summary>
+        public bool LogQueries { get; set; } = false;
+
+        /// <summary>
+        /// Enable or disable logging of results.
+        /// </summary>
+        public bool LogResults { get; set; } = false;
 
         #endregion
 

@@ -8,6 +8,7 @@
     using System.Text.Json.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
+    using OllamaFlow.Core.Serialization;
 
     /// <summary>
     /// Origin server.
@@ -15,6 +16,12 @@
     public class OllamaBackend
     {
         #region Public-Members
+
+        /// <summary>
+        /// Serializer.
+        /// </summary>
+        [JsonIgnore]
+        public static Serializer Serializer = new Serializer();
 
         /// <summary>
         /// Unique identifier for this origin server.
@@ -64,41 +71,8 @@
         public bool Ssl { get; set; } = false;
 
         /// <summary>
-        /// Interval at which the list of available models is refreshed. 
-        /// Default is 30 seconds (30000).  Minimum is 1 second (1000).
-        /// </summary>
-        public int ModelRefreshIntervalMs
-        {
-            get
-            {
-                return _ModelRefreshIntervalMs;
-            }
-            set
-            {
-                if (value < 1000) throw new ArgumentOutOfRangeException(nameof(ModelRefreshIntervalMs));
-                _ModelRefreshIntervalMs = value;
-            }
-        }
-
-        /// <summary>
-        /// Interval at which health is checked against this server.
-        /// Default is 5 seconds (5000).  Minimum is 1 second (1000).
-        /// </summary>
-        public int HealthCheckIntervalMs
-        {
-            get
-            {
-                return _HealthCheckIntervalMs;
-            }
-            set
-            {
-                if (value < 1000) throw new ArgumentOutOfRangeException(nameof(HealthCheckIntervalMs));
-                _HealthCheckIntervalMs = value;
-            }
-        }
-
-        /// <summary>
         /// Number of consecutive failed health checks before marking a server as unhealthy.
+        /// Default is 2.
         /// </summary>
         public int UnhealthyThreshold
         {
@@ -115,6 +89,7 @@
 
         /// <summary>
         /// Number of consecutive successful health checks before marking a server as healthy.
+        /// Default is 2.
         /// </summary>
         public int HealthyThreshold
         {
@@ -164,13 +139,8 @@
         }
 
         /// <summary>
-        /// Boolean indicating if the backend is healthy.
-        /// </summary>
-        [JsonIgnore]
-        public bool Healthy { get; internal set; } = false;
-
-        /// <summary>
         /// Maximum number of parallel requests to this backend.
+        /// Default is 4.
         /// </summary>
         public int MaxParallelRequests
         {
@@ -187,6 +157,7 @@
 
         /// <summary>
         /// Threshold at which 429 rate limit responses are sent.
+        /// Default is 10.
         /// </summary>
         public int RateLimitRequestsThreshold
         {
@@ -202,16 +173,6 @@
         }
 
         /// <summary>
-        /// True to log the request body.
-        /// </summary>
-        public bool LogRequestBody { get; set; } = false;
-
-        /// <summary>
-        /// True to log the response body.
-        /// </summary>
-        public bool LogResponseBody { get; set; } = false;
-
-        /// <summary>
         /// URL prefix.
         /// </summary>
         [JsonIgnore]
@@ -223,11 +184,42 @@
             }
         }
 
+        /// <summary>
+        /// Boolean indicating if the full request should be logged.
+        /// </summary>
+        public bool LogRequestFull { get; set; } = false;
+
+        /// <summary>
+        /// Boolean indicating if the request body should be logged.
+        /// </summary>
+        public bool LogRequestBody { get; set; } = false;
+
+        /// <summary>
+        /// Boolean indicating if the response body should be logged.
+        /// </summary>
+        public bool LogResponseBody { get; set; } = false;
+
+        /// <summary>
+        /// Boolean indicating if the object is active or not.
+        /// </summary>
+        public bool Active { get; set; } = true;
+
+        /// <summary>
+        /// Creation timestamp, in UTC time.
+        /// </summary>
+        public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// Last update timestamp, in UTC time.
+        /// </summary>
+        public DateTime LastUpdateUtc { get; set; } = DateTime.UtcNow;
+
         #endregion
 
         #region Internal-Members
 
         internal readonly object Lock = new object();
+        internal bool Healthy = false;
         internal int HealthCheckSuccess = 0;
         internal int HealthCheckFailure = 0;
         internal bool ModelsDiscovered = false;
@@ -264,8 +256,6 @@
 
         private string _Hostname = "localhost";
         private int _Port = 8000;
-        private int _ModelRefreshIntervalMs = 30000;
-        private int _HealthCheckIntervalMs = 5000;
         private int _UnhealthyThreshold = 2;
         private int _HealthyThreshold = 2;
         private int _MaxParallelRequests = 4;

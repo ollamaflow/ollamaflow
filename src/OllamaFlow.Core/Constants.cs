@@ -21,12 +21,17 @@ namespace OllamaFlow.Core
 
         #endregion
 
-        #region Settings
+        #region Settings-and-Database
 
         /// <summary>
         /// Settings file.
         /// </summary>
-        public static string SettingsFile = "./ollamaflow.json";
+        public const string SettingsFile = "./ollamaflow.json";
+
+        /// <summary>
+        /// Database filename.
+        /// </summary>
+        public const string DatabaseFilename = "./ollamaflow.db";
 
         #endregion
 
@@ -67,7 +72,7 @@ namespace OllamaFlow.Core
         /// <summary>
         /// Log filename.
         /// </summary>
-        public static string LogFilename = "./ollamaflow.log";
+        public static string LogFilename = "ollamaflow.log";
 
         /// <summary>
         /// Log directory.

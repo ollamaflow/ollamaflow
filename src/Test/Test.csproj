@@ -9,4 +9,13 @@
     <ProjectReference Include="..\OllamaFlow.Core\OllamaFlow.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="clean.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="clean.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
