@@ -134,11 +134,11 @@
                 + "healthcheckmethod = '" + Sanitizer.Sanitize(obj.HealthCheckMethod.Method) + "',"
                 + "healthcheckurl = '" + Sanitizer.Sanitize(obj.HealthCheckUrl) + "',"
                 + "maxparallelrequests = " + obj.MaxParallelRequests + ","
-                + "ratelimitthreshold = " + obj.RateLimitRequestsThreshold + ", "
-                + "logrequestfull = " + (obj.LogRequestFull ? "1" : "0") + ", "
-                + "logrequestbody = " + (obj.LogRequestBody ? "1" : "0") + ", "
-                + "logresponsebody = " + (obj.LogResponseBody ? "1" : "0") + ", "
-                + "active = " + (obj.Active ? "1" : "0") + ", "
+                + "ratelimitthreshold = " + obj.RateLimitRequestsThreshold + ","
+                + "logrequestfull = " + (obj.LogRequestFull ? "1" : "0") + ","
+                + "logrequestbody = " + (obj.LogRequestBody ? "1" : "0") + ","
+                + "logresponsebody = " + (obj.LogResponseBody ? "1" : "0") + ","
+                + "active = " + (obj.Active ? "1" : "0") + " "
                 + "WHERE identifier = '" + Sanitizer.Sanitize(obj.Identifier) + "' "
                 + "RETURNING *;";
         }
