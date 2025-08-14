@@ -69,7 +69,7 @@ docker run -d \
 ```bash
 # Clone the repository
 git clone https://github.com/jchristn/ollamaflow.git
-cd ollamaflow
+cd ollamaflow/src
 
 # Build and run
 dotnet build
