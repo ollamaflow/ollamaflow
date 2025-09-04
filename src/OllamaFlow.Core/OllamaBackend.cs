@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Http;   
+    using System.Net.Http;
     using System.Text;
     using System.Text.Json.Serialization;
     using System.Threading;
@@ -214,6 +214,56 @@
         /// </summary>
         public DateTime LastUpdateUtc { get; set; } = DateTime.UtcNow;
 
+        /// <summary>
+        /// Timestamp at which the backend was seen as healthy, in UTC time.
+        /// </summary>
+        public DateTime? HealthySinceUtc { get; set; }
+
+        /// <summary>
+        /// Timestamp at which the backend was seen as unhealthy, in UTC time.
+        /// </summary>
+        public DateTime? UnhealthySinceUtc { get; set; }
+
+        /// <summary>
+        /// Uptime for the backend.
+        /// </summary>
+        public TimeSpan? Uptime
+        {
+            get
+            {
+                if (HealthySinceUtc != null) return DateTime.UtcNow - HealthySinceUtc.Value;
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Downtime for the backend.
+        /// </summary>
+        public TimeSpan? Downtime
+        {
+            get
+            {
+                if (UnhealthySinceUtc != null) return DateTime.UtcNow - UnhealthySinceUtc.Value;
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Number of active requests.
+        /// </summary>
+        public int ActiveRequests
+        {
+            get
+            {
+                return _ActiveRequests;
+            }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(ActiveRequests));
+                _ActiveRequests = value;
+            }
+        }
+
         #endregion
 
         #region Internal-Members
@@ -223,8 +273,8 @@
         internal int HealthCheckSuccess = 0;
         internal int HealthCheckFailure = 0;
         internal bool ModelsDiscovered = false;
-        internal int ActiveRequests = 0;
-        internal int PendingRequests = 0;
+        internal int _ActiveRequests = 0;
+        internal int _PendingRequests = 0;
         internal List<string> Models
         {
             get

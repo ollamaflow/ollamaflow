@@ -246,10 +246,10 @@
 							}
 						},
 						"url": {
-							"raw": "{{protocol}}://astra:{{port}}/api/ps",
+							"raw": "{{protocol}}://{{hostname}}:{{port}}/api/ps",
 							"protocol": "{{protocol}}",
 							"host": [
-								"astra"
+								"{{hostname}}"
 							],
 							"port": "{{port}}",
 							"path": [
@@ -436,7 +436,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"frontend1\",\r\n    \"Name\": \"Default Ollama frontend\",\r\n    \"Hostname\": \"localhost\",\r\n    \"TimeoutMs\": 60000,\r\n    \"LoadBalancing\": \"RoundRobin\",\r\n    \"BlockHttp10\": true,\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"MaxRequestBodySize\": 536870912,\r\n    \"Backends\": [\r\n        \"backend1\",\r\n        \"backend2\",\r\n        \"backend3\",\r\n        \"backend4\"\r\n    ],\r\n    \"RequiredModels\": [\r\n        \"all-minilm\",\r\n        \"qwen2.5:7b\"\r\n    ]\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"frontend1\",\r\n    \"Name\": \"My first virtual Ollama\",\r\n    \"Hostname\": \"*\",\r\n    \"TimeoutMs\": 60000,\r\n    \"LoadBalancing\": \"RoundRobin\",\r\n    \"BlockHttp10\": true,\r\n    \"MaxRequestBodySize\": 536870912,\r\n    \"Backends\": [\r\n        \"backend1\",\r\n        \"backend2\",\r\n        \"backend3\",\r\n        \"backend4\",\r\n        \"backend5\"\r\n    ],\r\n    \"RequiredModels\": [\r\n        \"all-minilm\"\r\n    ],\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"Active\": true,\r\n    \"CreatedUtc\": \"2025-07-31T18:15:56.692931Z\",\r\n    \"LastUpdateUtc\": \"2025-07-31T18:15:56.692933Z\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -485,7 +485,48 @@
 							"response": []
 						},
 						{
+							"name": "Retrieve all health",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/backends",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{hostname}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"v1.0",
+										"backends"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Retrieve",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/backends/backend1",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{hostname}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"v1.0",
+										"backends",
+										"backend1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Retrieve health",
 							"request": {
 								"method": "GET",
 								"header": [],

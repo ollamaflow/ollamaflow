@@ -942,6 +942,31 @@
             Last update timestamp, in UTC time.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.HealthySinceUtc">
+            <summary>
+            Timestamp at which the backend was seen as healthy, in UTC time.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.UnhealthySinceUtc">
+            <summary>
+            Timestamp at which the backend was seen as unhealthy, in UTC time.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.Uptime">
+            <summary>
+            Uptime for the backend.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.Downtime">
+            <summary>
+            Downtime for the backend.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.ActiveRequests">
+            <summary>
+            Number of active requests.
+            </summary>
+        </member>
         <member name="M:OllamaFlow.Core.OllamaBackend.#ctor">
             <summary>
             Ollama backend.

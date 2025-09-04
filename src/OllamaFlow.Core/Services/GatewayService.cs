@@ -137,7 +137,9 @@
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/frontends/{identifier}", UpdateFrontendRoute, ExceptionRoute);
 
             webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/v1.0/backends", GetBackendsRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/backends/health", GetBackendsHealthRoute, ExceptionRoute);
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/backends/{identifier}", GetBackendRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/backends/{identifier}/health", GetBackendHealthRoute, ExceptionRoute);
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.DELETE, "/v1.0/backends/{identifier}", DeleteBackendRoute, ExceptionRoute);
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends", CreateBackendRoute, ExceptionRoute);
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends/{identifier}", UpdateBackendRoute, ExceptionRoute);
@@ -331,8 +333,8 @@
                 }
 
                 int totalRequests =
-                    Volatile.Read(ref backend.ActiveRequests) +
-                    Volatile.Read(ref backend.PendingRequests);
+                    Volatile.Read(ref backend._ActiveRequests) +
+                    Volatile.Read(ref backend._PendingRequests);
 
                 if (totalRequests > backend.RateLimitRequestsThreshold)
                 {
@@ -343,7 +345,7 @@
                     return;
                 }
 
-                Interlocked.Increment(ref backend.PendingRequests);
+                Interlocked.Increment(ref backend._PendingRequests);
 
                 bool responseReceived = await ProxyRequest(
                     requestGuid,
@@ -462,8 +464,8 @@
                     #region Enter-Semaphore
 
                     await backend.Semaphore.WaitAsync().ConfigureAwait(false);
-                    Interlocked.Increment(ref backend.ActiveRequests);
-                    Interlocked.Decrement(ref backend.PendingRequests);
+                    Interlocked.Increment(ref backend._ActiveRequests);
+                    Interlocked.Decrement(ref backend._PendingRequests);
 
                     #endregion
 
@@ -689,7 +691,7 @@
                     if (resp != null) resp.Dispose();
 
                     backend.Semaphore.Release();
-                    Interlocked.Decrement(ref backend.ActiveRequests);
+                    Interlocked.Decrement(ref backend._ActiveRequests);
                 }
 
                 #endregion
@@ -767,6 +769,13 @@
             await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
         }
 
+        private async Task GetBackendsHealthRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            List<OllamaBackend> objs = new List<OllamaBackend>(_HealthCheck.Backends);
+            await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
+        }
+
         private async Task GetBackendRoute(HttpContextBase ctx)
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
@@ -774,6 +783,22 @@
             OllamaBackend obj = _BackendService.GetByIdentifier(identifier);
             if (obj == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
             await ctx.Response.Send(_Serializer.SerializeJson(obj, true));
+        }
+
+        private async Task GetBackendHealthRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string identifier = ctx.Request.Url.Parameters["identifier"];
+            List<OllamaBackend> backends = new List<OllamaBackend>(_HealthCheck.Backends);
+            if (backends.Any(b => b.Identifier.Equals(identifier)))
+            {
+                OllamaBackend backend = backends.First(b => b.Identifier.Equals(identifier));
+                await ctx.Response.Send(_Serializer.SerializeJson(backend, true));
+            }
+            else
+            {
+                throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+            }
         }
 
         private async Task DeleteBackendRoute(HttpContextBase ctx)

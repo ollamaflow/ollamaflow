@@ -249,11 +249,24 @@
 
                     if (backends != null && backends.Count > 0)
                     {
-                        foreach (OllamaBackend backend in backends)
-                        {
-                            if (!_Backends.ContainsKey(backend.Identifier)) _Backends.TryAdd(backend.Identifier, backend);
+                        OllamaBackend backend = null;
+
+                        foreach (OllamaBackend be in backends)
+                        { 
+                            if (!_Backends.ContainsKey(be.Identifier))
+                            {
+                                backend = be;
+                                backend.UnhealthySinceUtc = DateTime.UtcNow;
+                                _Backends.TryAdd(backend.Identifier, backend);
+                            }
+                            else
+                            {
+                                backend = be;
+                            }
+
                             if (!backend.Active) continue;
-                            tasks.Add(Task.Run(() => HealthCheckTask(_Backends[backend.Identifier], token = default)));
+
+                            tasks.Add(Task.Run(() => HealthCheckTask(backend, token = default)));
                         }
 
                         Task.WaitAll(tasks.ToArray());
@@ -305,12 +318,15 @@
                         lock (backend.Lock)
                         {
                             if (backend.HealthCheckSuccess < 99) backend.HealthCheckSuccess++;
+
                             backend.HealthCheckFailure = 0;
+                            backend.UnhealthySinceUtc = null;
 
                             if (!backend.Healthy && backend.HealthCheckSuccess >= backend.HealthyThreshold)
                             {
                                 backend.Healthy = true;
                                 _Logging.Info(_Header + "backend " + backend.Identifier + " is now healthy");
+                                if (backend.HealthySinceUtc == null) backend.HealthySinceUtc = DateTime.UtcNow; 
                             }
                         }
                     }
@@ -321,12 +337,15 @@
                         lock (backend.Lock)
                         {
                             if (backend.HealthCheckFailure < 99) backend.HealthCheckFailure++;
+
                             backend.HealthCheckSuccess = 0;
+                            backend.HealthySinceUtc = null;
 
                             if (backend.Healthy && backend.HealthCheckFailure >= backend.UnhealthyThreshold)
                             {
                                 backend.Healthy = false;
                                 _Logging.Warn(_Header + "backend " + backend.Identifier + " is now unhealthy (HTTP " + (int)response.StatusCode + ")");
+                                if (backend.UnhealthySinceUtc == null) backend.HealthySinceUtc = null;
                             }
                         }
                     }
