@@ -248,7 +248,7 @@
                     return;
                 case UnauthorizedAccessException:
                     ctx.Response.StatusCode = 401;
-                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.AuthorizationFailed, null, "You are not authorized to perform this request."), true));
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.AuthenticationFailed, null), true));
                     return;
                 default:
                     ctx.Response.StatusCode = 500;
