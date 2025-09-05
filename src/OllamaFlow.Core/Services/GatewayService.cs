@@ -832,6 +832,8 @@
             OllamaBackend updated = _Serializer.DeserializeJson<OllamaBackend>(ctx.Request.DataAsString);
             updated.Identifier = identifier;
             updated = _BackendService.Update(updated);
+
+            _HealthCheck.UpdateBackend(updated);
             await ctx.Response.Send(_Serializer.SerializeJson(updated, true));
         }
 

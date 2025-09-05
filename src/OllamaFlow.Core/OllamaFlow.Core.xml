@@ -1515,6 +1515,12 @@
             <param name="frontend">Frontend.</param>
             <returns>Backend.</returns>
         </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.UpdateBackend(OllamaFlow.Core.OllamaBackend)">
+            <summary>
+            Update a backend if cached.
+            </summary>
+            <param name="backend">Backend.</param>
+        </member>
         <member name="T:OllamaFlow.Core.Services.ModelDiscoveryService">
             <summary>
             Model discovery service.

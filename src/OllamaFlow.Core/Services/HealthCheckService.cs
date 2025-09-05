@@ -213,6 +213,33 @@
             }
         }
 
+        /// <summary>
+        /// Update a backend if cached.
+        /// </summary>
+        /// <param name="backend">Backend.</param>
+        public void UpdateBackend(OllamaBackend backend)
+        {
+            if (backend == null) throw new ArgumentNullException(nameof(backend));
+
+            if (_Backends.TryGetValue(backend.Identifier, out OllamaBackend cached))
+            {
+                cached.Name = backend.Name;
+                cached.Hostname = backend.Hostname;
+                cached.Port = backend.Port;
+                cached.Ssl = backend.Ssl;
+                cached.UnhealthyThreshold = backend.UnhealthyThreshold;
+                cached.HealthyThreshold = backend.HealthyThreshold;
+                cached.HealthCheckMethod = backend.HealthCheckMethod;
+                cached.HealthCheckUrl = backend.HealthCheckUrl;
+                cached.MaxParallelRequests = backend.MaxParallelRequests;
+                cached.RateLimitRequestsThreshold = backend.RateLimitRequestsThreshold;
+                cached.LogRequestFull = backend.LogRequestFull;
+                cached.LogRequestBody = backend.LogRequestBody;
+                cached.LogResponseBody = backend.LogResponseBody;
+                cached.Active = backend.Active;
+            }
+        }
+
         #endregion
 
         #region Private-Methods
