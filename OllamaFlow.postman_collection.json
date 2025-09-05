@@ -490,7 +490,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/backends",
+									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/backends/health",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{hostname}}"
@@ -498,7 +498,8 @@
 									"port": "{{port}}",
 									"path": [
 										"v1.0",
-										"backends"
+										"backends",
+										"health"
 									]
 								}
 							},
@@ -531,7 +532,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/backends/backend1",
+									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/backends/backend1/health",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{hostname}}"
@@ -540,7 +541,8 @@
 									"path": [
 										"v1.0",
 										"backends",
-										"backend1"
+										"backend1",
+										"health"
 									]
 								}
 							},
