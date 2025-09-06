@@ -84,7 +84,7 @@ OllamaFlow uses a simple JSON configuration file. Here's a minimal example:
 ```json
 {
   "Webserver": {
-    "Hostname": "localhost",
+    "Hostname": "*",
     "Port": 43411
   },
   "Logging": {
