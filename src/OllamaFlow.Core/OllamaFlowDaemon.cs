@@ -49,7 +49,6 @@
         private FrontendService _FrontendService = null;
         private BackendService _BackendService = null;
         private HealthCheckService _HealthCheckService = null;
-        private ModelDiscoveryService _ModelDiscoveryService = null;
         private ModelSynchronizationService _ModelSynchronizationService = null;
         private GatewayService _GatewayService = null;
         private Webserver _Webserver = null;
@@ -141,7 +140,6 @@
                         // Dispose services
                         DisposeService(ref _GatewayService, "GatewayService");
                         DisposeService(ref _ModelSynchronizationService, "ModelSynchronizationService");
-                        DisposeService(ref _ModelDiscoveryService, "ModelDiscoveryService");
                         DisposeService(ref _HealthCheckService, "HealthCheckService");
                         DisposeService(ref _BackendService, "BackendService");
                         DisposeService(ref _FrontendService, "FrontendService");
@@ -285,15 +283,6 @@
                 _BackendService,
                 _TokenSource);
 
-            _ModelDiscoveryService = new ModelDiscoveryService(
-                _Settings,
-                _Logging,
-                _Serializer,
-                _FrontendService,
-                _BackendService,
-                _HealthCheckService,
-                _TokenSource);
-
             _ModelSynchronizationService = new ModelSynchronizationService(
                 _Settings,
                 _Logging,
@@ -311,6 +300,7 @@
                 _FrontendService,
                 _BackendService,
                 _HealthCheckService,
+                _ModelSynchronizationService,
                 _TokenSource);
 
             #endregion

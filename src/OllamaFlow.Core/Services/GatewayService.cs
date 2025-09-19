@@ -46,6 +46,7 @@
         private FrontendService _FrontendService = null;
         private BackendService _BackendService = null;
         private HealthCheckService _HealthCheck = null;
+        private ModelSynchronizationService _ModelSynchronization = null;
 
         private const int BUFFER_SIZE = 65536;
 
@@ -63,6 +64,7 @@
         /// <param name="frontend">Frontend service.</param>
         /// <param name="backend">Backend service.</param>
         /// <param name="healthCheck">Healthcheck service.</param>
+        /// <param name="modelSynchronization">Model synchronization service.</param>
         /// <param name="tokenSource">Cancellation token source.</param>
         public GatewayService(
             OllamaFlowSettings settings,
@@ -72,6 +74,7 @@
             FrontendService frontend,
             BackendService backend,
             HealthCheckService healthCheck,
+            ModelSynchronizationService modelSynchronization,
             CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -82,6 +85,7 @@
             _FrontendService = frontend ?? throw new ArgumentNullException(nameof(frontend));
             _BackendService = backend ?? throw new ArgumentNullException(nameof(backend));
             _HealthCheck = healthCheck ?? throw new ArgumentNullException(nameof(healthCheck));
+            _ModelSynchronization = modelSynchronization ?? throw new ArgumentNullException(nameof(modelSynchronization));
 
             _Logging.Debug(_Header + "initialized");
         }
@@ -143,6 +147,17 @@
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.DELETE, "/v1.0/backends/{identifier}", DeleteBackendRoute, ExceptionRoute);
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends", CreateBackendRoute, ExceptionRoute);
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends/{identifier}", UpdateBackendRoute, ExceptionRoute);
+        }
+
+        /// <summary>
+        /// Authentication route.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task AuthenticationRoute(HttpContextBase ctx)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -733,7 +748,13 @@
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
             string identifier = ctx.Request.Url.Parameters["identifier"];
             if (!_FrontendService.Exists(identifier)) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+
             _FrontendService.Delete(identifier);
+
+            // Notify all services of frontend removal
+            _HealthCheck.RemoveFrontend(identifier);
+            _ModelSynchronization.RemoveFrontend(identifier);
+
             ctx.Response.StatusCode = 204;
             await ctx.Response.Send();
         }
@@ -744,7 +765,13 @@
             OllamaFrontend obj = _Serializer.DeserializeJson<OllamaFrontend>(ctx.Request.DataAsString);
             OllamaFrontend existing = _FrontendService.GetByIdentifier(obj.Identifier);
             if (existing != null) throw new ArgumentException("An object with identifier " + obj.Identifier + " already exists.");
+
             OllamaFrontend created = _FrontendService.Create(obj);
+
+            // Notify all services of new frontend
+            _HealthCheck.AddFrontend(created);
+            _ModelSynchronization.AddFrontend(created);
+
             ctx.Response.StatusCode = 201;
             await ctx.Response.Send(_Serializer.SerializeJson(created, true));
         }
@@ -759,6 +786,11 @@
             OllamaFrontend updated = _Serializer.DeserializeJson<OllamaFrontend>(ctx.Request.DataAsString);
             updated.Identifier = identifier;
             updated = _FrontendService.Update(updated);
+
+            // Notify all services of frontend update
+            _HealthCheck.UpdateFrontend(updated);
+            _ModelSynchronization.UpdateFrontend(updated);
+
             await ctx.Response.Send(_Serializer.SerializeJson(updated, true));
         }
 
@@ -806,7 +838,13 @@
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
             string identifier = ctx.Request.Url.Parameters["identifier"];
             if (!_BackendService.Exists(identifier)) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+
             _BackendService.Delete(identifier);
+
+            // Notify all services of backend removal
+            _HealthCheck.RemoveBackend(identifier);
+            _ModelSynchronization.RemoveBackend(identifier);
+
             ctx.Response.StatusCode = 204;
             await ctx.Response.Send();
         }
@@ -817,7 +855,13 @@
             OllamaBackend obj = _Serializer.DeserializeJson<OllamaBackend>(ctx.Request.DataAsString);
             OllamaBackend existing = _BackendService.GetByIdentifier(obj.Identifier);
             if (existing != null) throw new ArgumentException("An object with identifier " + obj.Identifier + " already exists.");
+
             OllamaBackend created = _BackendService.Create(obj);
+
+            // Notify all services of new backend
+            _HealthCheck.AddBackend(created);
+            _ModelSynchronization.AddBackend(created);
+
             ctx.Response.StatusCode = 201;
             await ctx.Response.Send(_Serializer.SerializeJson(created, true));
         }
@@ -833,7 +877,10 @@
             updated.Identifier = identifier;
             updated = _BackendService.Update(updated);
 
+            // Notify all services of backend update
             _HealthCheck.UpdateBackend(updated);
+            _ModelSynchronization.UpdateBackend(updated);
+
             await ctx.Response.Send(_Serializer.SerializeJson(updated, true));
         }
 

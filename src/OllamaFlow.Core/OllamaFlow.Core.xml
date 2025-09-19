@@ -1398,7 +1398,7 @@
             Gateway service.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,System.Threading.CancellationTokenSource)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,OllamaFlow.Core.Services.ModelSynchronizationService,System.Threading.CancellationTokenSource)">
             <summary>
             Instantiate.
             </summary>
@@ -1409,6 +1409,7 @@
             <param name="frontend">Frontend service.</param>
             <param name="backend">Backend service.</param>
             <param name="healthCheck">Healthcheck service.</param>
+            <param name="modelSynchronization">Model synchronization service.</param>
             <param name="tokenSource">Cancellation token source.</param>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.Dispose(System.Boolean)">
@@ -1427,6 +1428,14 @@
             Initialize routes.
             </summary>
             <param name="webserver">Webserver.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.AuthenticationRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Authentication route.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.OptionsRoute(WatsonWebserver.Core.HttpContextBase)">
             <summary>
@@ -1514,47 +1523,96 @@
             </summary>
             <param name="frontend">Frontend.</param>
             <returns>Backend.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
         </member>
         <member name="M:OllamaFlow.Core.Services.HealthCheckService.UpdateBackend(OllamaFlow.Core.OllamaBackend)">
             <summary>
             Update a backend if cached.
             </summary>
             <param name="backend">Backend.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when backend is null.</exception>
         </member>
-        <member name="T:OllamaFlow.Core.Services.ModelDiscoveryService">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.AddBackend(OllamaFlow.Core.OllamaBackend)">
             <summary>
-            Model discovery service.
+            Add a new backend to health monitoring.
+            </summary>
+            <param name="backend">Backend to add.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when backend is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.RemoveBackend(System.String)">
+            <summary>
+            Remove a backend from health monitoring.
+            </summary>
+            <param name="identifier">Backend identifier to remove.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when identifier is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.UpdateFrontend(OllamaFlow.Core.OllamaFrontend)">
+            <summary>
+            Update a frontend if cached.
+            </summary>
+            <param name="frontend">Frontend to update.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.AddFrontend(OllamaFlow.Core.OllamaFrontend)">
+            <summary>
+            Add a new frontend to monitoring.
+            </summary>
+            <param name="frontend">Frontend to add.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.RemoveFrontend(System.String)">
+            <summary>
+            Remove a frontend from monitoring.
+            </summary>
+            <param name="identifier">Frontend identifier to remove.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when identifier is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.InitializeExistingNodesAsync">
+            <summary>
+            Initialize existing nodes from database at startup.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Services.ModelDiscoveryService.IntervalMs">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.StartBackendHealthCheckTask(OllamaFlow.Core.OllamaBackend)">
             <summary>
-            Interval, in milliseconds.
-            Default is 30000.
-            Minimum is 5000.
+            Start a dedicated health check task for a specific backend.
             </summary>
+            <param name="backend">Backend to start health checking.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelDiscoveryService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,System.Threading.CancellationTokenSource)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.StopBackendHealthCheckTask(System.String)">
             <summary>
-            Model discovery service.
+            Stop and cleanup the dedicated health check task for a specific backend.
             </summary>
-            <param name="settings">Settings.</param>
-            <param name="logging">Logging.</param>
-            <param name="serializer">Serializer.</param>
-            <param name="frontend">Frontend service.</param>
-            <param name="backend">Backend service.</param>
-            <param name="healthCheck">Healthcheck service.</param>
-            <param name="tokenSource">Cancellation token source.</param>
+            <param name="identifier">Backend identifier.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelDiscoveryService.Dispose(System.Boolean)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.BackendHealthCheckLoop(OllamaFlow.Core.OllamaBackend,System.Threading.CancellationToken)">
             <summary>
-            Dispose.
+            Main health check loop for a single backend.
             </summary>
-            <param name="disposing">Disposing.</param>
+            <param name="backend">Backend to monitor.</param>
+            <param name="token">Cancellation token.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelDiscoveryService.Dispose">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.PerformHealthCheck(OllamaFlow.Core.OllamaBackend,System.String,System.Threading.CancellationToken)">
             <summary>
-            Dispose.
+            Perform a single health check for a backend.
             </summary>
+            <param name="backend">Backend to check.</param>
+            <param name="healthCheckUrl">Health check URL.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.HandleHealthCheckSuccess(OllamaFlow.Core.OllamaBackend,System.String)">
+            <summary>
+            Handle successful health check.
+            </summary>
+            <param name="backend">Backend that passed health check.</param>
+            <param name="healthCheckUrl">Health check URL.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.HandleHealthCheckFailure(OllamaFlow.Core.OllamaBackend,System.String,System.String)">
+            <summary>
+            Handle failed health check.
+            </summary>
+            <param name="backend">Backend that failed health check.</param>
+            <param name="healthCheckUrl">Health check URL.</param>
+            <param name="reason">Failure reason.</param>
         </member>
         <member name="T:OllamaFlow.Core.Services.ModelSynchronizationService">
             <summary>
@@ -1596,6 +1654,118 @@
             <summary>
             Dispose.
             </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.AddBackend(OllamaFlow.Core.OllamaBackend)">
+            <summary>
+            Add a backend and start model synchronization for it.
+            </summary>
+            <param name="backend">Backend that was added.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when backend is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.UpdateBackend(OllamaFlow.Core.OllamaBackend)">
+            <summary>
+            Update a backend configuration.
+            </summary>
+            <param name="backend">Backend that was updated.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when backend is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.RemoveBackend(System.String)">
+            <summary>
+            Remove a backend and stop model synchronization for it.
+            </summary>
+            <param name="identifier">Identifier of backend that was removed.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when identifier is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.AddFrontend(OllamaFlow.Core.OllamaFrontend)">
+            <summary>
+            Add a frontend and sync its required models.
+            </summary>
+            <param name="frontend">Frontend that was added.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.UpdateFrontend(OllamaFlow.Core.OllamaFrontend)">
+            <summary>
+            Update a frontend configuration and sync required models.
+            </summary>
+            <param name="frontend">Frontend that was updated.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.RemoveFrontend(System.String)">
+            <summary>
+            Remove a frontend.
+            </summary>
+            <param name="identifier">Identifier of frontend that was removed.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when identifier is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.GetBackendModels(System.String)">
+            <summary>
+            Get discovered models for a specific backend.
+            </summary>
+            <param name="backendIdentifier">Backend identifier.</param>
+            <returns>List of model names, or empty list if backend not found.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when backendIdentifier is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.InitializeExistingBackendsAsync">
+            <summary>
+            Initialize existing backends from database at startup.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.StartBackendSynchronizationTask(OllamaFlow.Core.OllamaBackend)">
+            <summary>
+            Start a dedicated model synchronization task for a specific backend.
+            </summary>
+            <param name="backend">Backend to start synchronization for.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.StopBackendSynchronizationTask(System.String)">
+            <summary>
+            Stop and cleanup the dedicated synchronization task for a specific backend.
+            </summary>
+            <param name="identifier">Backend identifier.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.BackendSynchronizationLoop(OllamaFlow.Core.OllamaBackend,System.Threading.CancellationToken)">
+            <summary>
+            Main model discovery and synchronization for a single backend.
+            </summary>
+            <param name="backend">Backend to monitor.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.SynchronizeModelsForBackend(OllamaFlow.Core.OllamaBackend,System.Threading.CancellationToken)">
+            <summary>
+            Discover and synchronize models for a specific backend.
+            </summary>
+            <param name="backend">Backend to discover and synchronize models for.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.PullModelToBackendInternal(OllamaFlow.Core.OllamaBackend,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Pull a specific model to a backend (internal version that assumes active pull tracking is already handled).
+            </summary>
+            <param name="backend">Backend to pull model to.</param>
+            <param name="modelName">Name of model to pull.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.DiscoverModelsForBackend(OllamaFlow.Core.OllamaBackend,System.Threading.CancellationToken)">
+            <summary>
+            Discover models for a specific backend.
+            </summary>
+            <param name="backend">Backend to discover models for.</param>
+            <param name="token">Cancellation token.</param>
+            <returns>List of discovered model names.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.ParseModelsFromResponse(System.String)">
+            <summary>
+            Parse model names from Ollama /api/tags response.
+            </summary>
+            <param name="responseBody">JSON response body.</param>
+            <returns>List of model names.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.PerformModelPull(OllamaFlow.Core.OllamaBackend,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Perform the actual model pull operation.
+            </summary>
+            <param name="backend">Backend to pull model to.</param>
+            <param name="modelName">Name of model to pull.</param>
+            <param name="token">Cancellation token.</param>
         </member>
         <member name="T:OllamaFlow.Core.Settings.LoggingSettings">
             <summary>
