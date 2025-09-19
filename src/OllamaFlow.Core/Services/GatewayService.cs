@@ -47,6 +47,7 @@
         private BackendService _BackendService = null;
         private HealthCheckService _HealthCheck = null;
         private ModelSynchronizationService _ModelSynchronization = null;
+        private SessionStickinessService _SessionStickiness = null;
 
         private const int BUFFER_SIZE = 65536;
 
@@ -65,6 +66,7 @@
         /// <param name="backend">Backend service.</param>
         /// <param name="healthCheck">Healthcheck service.</param>
         /// <param name="modelSynchronization">Model synchronization service.</param>
+        /// <param name="sessionStickiness">Session stickiness service.</param>
         /// <param name="tokenSource">Cancellation token source.</param>
         public GatewayService(
             OllamaFlowSettings settings,
@@ -75,6 +77,7 @@
             BackendService backend,
             HealthCheckService healthCheck,
             ModelSynchronizationService modelSynchronization,
+            SessionStickinessService sessionStickiness,
             CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -86,6 +89,7 @@
             _BackendService = backend ?? throw new ArgumentNullException(nameof(backend));
             _HealthCheck = healthCheck ?? throw new ArgumentNullException(nameof(healthCheck));
             _ModelSynchronization = modelSynchronization ?? throw new ArgumentNullException(nameof(modelSynchronization));
+            _SessionStickiness = sessionStickiness ?? throw new ArgumentNullException(nameof(sessionStickiness));
 
             _Logging.Debug(_Header + "initialized");
         }
@@ -147,6 +151,11 @@
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.DELETE, "/v1.0/backends/{identifier}", DeleteBackendRoute, ExceptionRoute);
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends", CreateBackendRoute, ExceptionRoute);
             webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends/{identifier}", UpdateBackendRoute, ExceptionRoute);
+
+            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/v1.0/sessions", GetSessionsRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/sessions/{clientId}", GetClientSessionsRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.DELETE, "/v1.0/sessions/{clientId}", DeleteClientSessionsRoute, ExceptionRoute);
+            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.DELETE, "/v1.0/sessions", DeleteAllSessionsRoute, ExceptionRoute);
         }
 
         /// <summary>
@@ -328,7 +337,8 @@
                     }
                 }
 
-                OllamaBackend backend = _HealthCheck.GetNextBackend(frontend);
+                string clientId = GetClientIdentifier(ctx);
+                OllamaBackend backend = _HealthCheck.GetNextBackend(frontend, clientId);
                 if (backend == null)
                 {
                     _Logging.Warn(_Header + "no backend found for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.RawWithoutQuery);
@@ -388,6 +398,11 @@
         #endregion
 
         #region Private-Methods
+
+        private string GetClientIdentifier(HttpContextBase ctx)
+        {
+            return ctx.Request.Source.IpAddress;
+        }
 
         private async Task GetRootRoute(HttpContextBase ctx)
         {
@@ -476,20 +491,13 @@
 
                 try
                 {
-                    #region Enter-Semaphore
-
                     await backend.Semaphore.WaitAsync().ConfigureAwait(false);
                     Interlocked.Increment(ref backend._ActiveRequests);
                     Interlocked.Decrement(ref backend._PendingRequests);
 
-                    #endregion
-
-                    #region Build-Request-and-Send
-
                     using (RestRequest req = new RestRequest(url, ConvertHttpMethod(ctx.Request.Method)))
                     {
-                        if (frontend.TimeoutMs > 0)
-                            req.TimeoutMilliseconds = frontend.TimeoutMs;
+                        if (frontend.TimeoutMs > 0) req.TimeoutMilliseconds = frontend.TimeoutMs;
 
                         req.Headers.Add(Constants.ForwardedForHeader, ctx.Request.Source.IpAddress);
 
@@ -518,11 +526,14 @@
 
                         if (frontend.LogRequestBody || backend.LogRequestBody)
                         {
+                            int length = ctx.Request.DataAsBytes?.Length ?? 0;
+                            byte[] dataBytes =  ctx.Request.DataAsBytes ?? Array.Empty<byte>();
+
                             _Logging.Debug(
                                 _Header
-                                + "request body (" + ctx.Request.DataAsBytes.Length + " bytes): "
+                                + "request body (" + length + " bytes): "
                                 + Environment.NewLine
-                                + Encoding.UTF8.GetString(ctx.Request.DataAsBytes));
+                                + Encoding.UTF8.GetString(dataBytes));
 
                             _Logging.Debug(_Header + "using content-type: " + req.ContentType);
                         }
@@ -535,10 +546,8 @@
                         {
                             #region With-Data
 
-                            if (!String.IsNullOrEmpty(ctx.Request.ContentType))
-                                req.ContentType = ctx.Request.ContentType;
-                            else
-                                req.ContentType = Constants.BinaryContentType;
+                            if (!String.IsNullOrEmpty(ctx.Request.ContentType)) req.ContentType = ctx.Request.ContentType;
+                            else req.ContentType = Constants.BinaryContentType;
 
                             resp = await req.SendAsync(ctx.Request.DataAsBytes);
 
@@ -591,33 +600,53 @@
 
                             if (!resp.ServerSentEvents)
                             {
+                                #region Not-Server-Sent-Events
+
                                 if (!ctx.Response.ChunkedTransfer)
                                 {
                                     await ctx.Response.Send(resp.DataAsBytes);
                                 }
                                 else
                                 {
-                                    if (resp.DataAsBytes.Length > 0)
+                                    while (true)
                                     {
-                                        for (int i = 0; i < resp.DataAsBytes.Length; i += BUFFER_SIZE)
+                                        ChunkData chunk = await resp.ReadChunkAsync().ConfigureAwait(false);
+                                        if (chunk == null || chunk.IsFinal)
                                         {
-                                            int currentChunkSize = Math.Min(BUFFER_SIZE, resp.DataAsBytes.Length - i);
-
-                                            byte[] chunk = new byte[currentChunkSize];
-                                            Array.Copy(resp.DataAsBytes, i, chunk, 0, currentChunkSize);
-
-                                            if (chunk.Length == BUFFER_SIZE) await ctx.Response.SendChunk(chunk, false).ConfigureAwait(false);
-                                            else await ctx.Response.SendChunk(chunk, true).ConfigureAwait(false);
+                                            if (chunk?.Data != null && chunk.Data.Length > 0)
+                                            {
+                                                // For NDJSON format, append Environment.NewLine to final chunk
+                                                byte[] newlineBytes = System.Text.Encoding.UTF8.GetBytes(Environment.NewLine);
+                                                byte[] finalData = new byte[chunk.Data.Length + newlineBytes.Length];
+                                                Array.Copy(chunk.Data, finalData, chunk.Data.Length);
+                                                Array.Copy(newlineBytes, 0, finalData, chunk.Data.Length, newlineBytes.Length);
+                                                await ctx.Response.SendChunk(finalData, true).ConfigureAwait(false);
+                                            }
+                                            else
+                                            {
+                                                // Send empty final chunk
+                                                await ctx.Response.SendChunk(Array.Empty<byte>(), true).ConfigureAwait(false);
+                                            }
+                                            break;
+                                        }
+                                        else if (chunk.Data != null && chunk.Data.Length > 0)
+                                        {
+                                            // For NDJSON format, append Environment.NewLine to each chunk
+                                            byte[] newlineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
+                                            byte[] chunkWithNewline = new byte[chunk.Data.Length + newlineBytes.Length];
+                                            Array.Copy(chunk.Data, chunkWithNewline, chunk.Data.Length);
+                                            Array.Copy(newlineBytes, 0, chunkWithNewline, chunk.Data.Length, newlineBytes.Length);
+                                            await ctx.Response.SendChunk(chunkWithNewline, false).ConfigureAwait(false);
                                         }
                                     }
-                                    else
-                                    {
-                                        await ctx.Response.SendChunk(Array.Empty<byte>(), true).ConfigureAwait(false);
-                                    }
                                 }
+
+                                #endregion
                             }
                             else
                             {
+                                #region Server-Sent-Events
+
                                 ctx.Response.ProtocolVersion = "HTTP/1.1";
                                 ctx.Response.ServerSentEvents = true;
 
@@ -643,6 +672,8 @@
                                 }
 
                                 await ctx.Response.SendEvent(null, true);
+
+                                #endregion
                             }
 
                             #endregion
@@ -654,8 +685,6 @@
                             _Logging.Warn(_Header + "no response from origin " + url);
                             return false;
                         }
-
-                        #endregion
                     }
                 }
                 catch (System.Net.Http.HttpRequestException hre)
@@ -883,6 +912,54 @@
 
             await ctx.Response.Send(_Serializer.SerializeJson(updated, true));
         }
+
+        private async Task GetSessionsRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            List<Models.StickySession> sessions = _SessionStickiness.GetAllSessions();
+            await ctx.Response.Send(_Serializer.SerializeJson(sessions, true));
+        }
+
+        private async Task GetClientSessionsRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string clientId = ctx.Request.Url.Parameters["clientId"];
+            List<Models.StickySession> sessions = _SessionStickiness.GetClientSessions(clientId);
+            await ctx.Response.Send(_Serializer.SerializeJson(sessions, true));
+        }
+
+        private async Task DeleteClientSessionsRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string clientId = ctx.Request.Url.Parameters["clientId"];
+            int removedCount = _SessionStickiness.RemoveClientSessions(clientId);
+
+            var result = new
+            {
+                clientId = clientId,
+                removedSessionCount = removedCount,
+                message = $"Removed {removedCount} sessions for client {clientId}"
+            };
+
+            ctx.Response.StatusCode = 200;
+            await ctx.Response.Send(_Serializer.SerializeJson(result, true));
+        }
+
+        private async Task DeleteAllSessionsRoute(HttpContextBase ctx)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            int removedCount = _SessionStickiness.ClearAllSessions();
+
+            var result = new
+            {
+                removedSessionCount = removedCount,
+                message = $"Removed all {removedCount} sessions"
+            };
+
+            ctx.Response.StatusCode = 200;
+            await ctx.Response.Send(_Serializer.SerializeJson(result, true));
+        }
+
 
         #endregion
 

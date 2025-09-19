@@ -77,6 +77,7 @@ namespace OllamaFlow.Core.Services
         // Per-backend task management
         private ConcurrentDictionary<string, Task> _BackendTasks = new ConcurrentDictionary<string, Task>();
         private ConcurrentDictionary<string, CancellationTokenSource> _BackendTokenSources = new ConcurrentDictionary<string, CancellationTokenSource>();
+        private ConcurrentDictionary<string, ManualResetEventSlim> _BackendWaitEvents = new ConcurrentDictionary<string, ManualResetEventSlim>();
 
         // Track active pulls per backend
         private ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> _ActivePulls =
@@ -121,7 +122,7 @@ namespace OllamaFlow.Core.Services
             _TokenSource = tokenSource ?? new CancellationTokenSource();
 
             // Initialize existing backends from database
-            InitializeExistingBackendsAsync().ConfigureAwait(false);
+            InitializeExistingBackends();
 
             _Logging.Debug(_Header + "initialized");
         }
@@ -194,6 +195,13 @@ namespace OllamaFlow.Core.Services
             // Start dedicated synchronization task for this backend
             StartBackendSynchronizationTask(backend);
 
+            // Trigger immediate sync for the new backend
+            if (_BackendWaitEvents.TryGetValue(backend.Identifier, out ManualResetEventSlim waitEvent))
+            {
+                _Logging.Debug(_Header + "triggering immediate sync for new backend " + backend.Identifier);
+                waitEvent.Set();
+            }
+
             _Logging.Debug(_Header + "notified of new backend " + backend.Identifier + " and started synchronization task");
         }
 
@@ -242,7 +250,22 @@ namespace OllamaFlow.Core.Services
         public void UpdateFrontend(OllamaFrontend frontend)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
-            _Logging.Debug(_Header + "notified of updated frontend " + frontend.Identifier + " - will sync required models");
+
+            _Logging.Debug(_Header + "notified of updated frontend " + frontend.Identifier);
+
+            // Trigger immediate synchronization for all backends used by this frontend
+            if (frontend.Backends != null && frontend.Backends.Count > 0)
+            {
+                foreach (string backendId in frontend.Backends)
+                {
+                    // Signal immediate sync by setting the wait event for the backend
+                    if (_BackendWaitEvents.TryGetValue(backendId, out ManualResetEventSlim waitEvent))
+                    {
+                        _Logging.Debug(_Header + "triggering immediate sync for backend " + backendId + " due to frontend " + frontend.Identifier + " update");
+                        waitEvent.Set();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -276,16 +299,9 @@ namespace OllamaFlow.Core.Services
 
         #endregion
 
-        #region Internal-Methods
-
-        #endregion
-
         #region Private-Methods
 
-        /// <summary>
-        /// Initialize existing backends from database at startup.
-        /// </summary>
-        private async Task InitializeExistingBackendsAsync()
+        private void InitializeExistingBackends()
         {
             try
             {
@@ -309,10 +325,6 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        /// <summary>
-        /// Start a dedicated model synchronization task for a specific backend.
-        /// </summary>
-        /// <param name="backend">Backend to start synchronization for.</param>
         private void StartBackendSynchronizationTask(OllamaBackend backend)
         {
             if (backend == null || String.IsNullOrEmpty(backend.Identifier)) return;
@@ -320,6 +332,10 @@ namespace OllamaFlow.Core.Services
             // Create cancellation token source for this backend
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             _BackendTokenSources.TryAdd(backend.Identifier, tokenSource);
+
+            // Create wait event for immediate synchronization triggering
+            ManualResetEventSlim waitEvent = new ManualResetEventSlim(false);
+            _BackendWaitEvents.TryAdd(backend.Identifier, waitEvent);
 
             // Create combined token that respects both service shutdown and individual backend cancellation
             CancellationToken combinedToken = CancellationTokenSource.CreateLinkedTokenSource(_TokenSource.Token, tokenSource.Token).Token;
@@ -329,10 +345,6 @@ namespace OllamaFlow.Core.Services
             _BackendTasks.TryAdd(backend.Identifier, syncTask);
         }
 
-        /// <summary>
-        /// Stop and cleanup the dedicated synchronization task for a specific backend.
-        /// </summary>
-        /// <param name="identifier">Backend identifier.</param>
         private void StopBackendSynchronizationTask(string identifier)
         {
             if (String.IsNullOrEmpty(identifier)) return;
@@ -348,6 +360,20 @@ namespace OllamaFlow.Core.Services
                 catch (Exception ex)
                 {
                     _Logging.Warn(_Header + $"error cancelling token for backend {identifier}: {ex.Message}");
+                }
+            }
+
+            // Cleanup wait event
+            if (_BackendWaitEvents.TryRemove(identifier, out ManualResetEventSlim waitEvent))
+            {
+                try
+                {
+                    waitEvent.Set(); // Wake any waiting threads
+                    waitEvent.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    _Logging.Warn(_Header + $"error disposing wait event for backend {identifier}: {ex.Message}");
                 }
             }
 
@@ -380,11 +406,6 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"stopped and cleaned up synchronization task for backend {identifier}");
         }
 
-        /// <summary>
-        /// Main model discovery and synchronization for a single backend.
-        /// </summary>
-        /// <param name="backend">Backend to monitor.</param>
-        /// <param name="token">Cancellation token.</param>
         private async Task BackendSynchronizationLoop(OllamaBackend backend, CancellationToken token)
         {
             _Logging.Debug(_Header + $"starting model discovery and synchronization for backend {backend.Identifier}");
@@ -393,7 +414,16 @@ namespace OllamaFlow.Core.Services
             {
                 try
                 {
-                    await Task.Delay(_IntervalMs, token).ConfigureAwait(false);
+                    // Wait for the interval OR until signaled for immediate sync
+                    if (_BackendWaitEvents.TryGetValue(backend.Identifier, out ManualResetEventSlim waitEvent))
+                    {
+                        waitEvent.Wait(_IntervalMs, token);
+                        waitEvent.Reset(); // Reset for next cycle
+                    }
+                    else
+                    {
+                        await Task.Delay(_IntervalMs, token).ConfigureAwait(false);
+                    }
 
                     if (token.IsCancellationRequested) break;
 
@@ -444,11 +474,6 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"model discovery and synchronization terminated for backend {backend.Identifier}");
         }
 
-        /// <summary>
-        /// Discover and synchronize models for a specific backend.
-        /// </summary>
-        /// <param name="backend">Backend to discover and synchronize models for.</param>
-        /// <param name="token">Cancellation token.</param>
         private async Task SynchronizeModelsForBackend(OllamaBackend backend, CancellationToken token)
         {
             try
@@ -469,7 +494,6 @@ namespace OllamaFlow.Core.Services
                 }
 
                 // Remove duplicates
-                _Logging.Debug(_Header + $"backend {backend.Identifier} raw required models (before distinct): [{string.Join(", ", requiredModels)}]");
                 requiredModels = requiredModels.Distinct().ToList();
                 _Logging.Debug(_Header + $"backend {backend.Identifier} required models (after distinct): [{string.Join(", ", requiredModels)}]");
 
@@ -548,12 +572,6 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        /// <summary>
-        /// Pull a specific model to a backend (internal version that assumes active pull tracking is already handled).
-        /// </summary>
-        /// <param name="backend">Backend to pull model to.</param>
-        /// <param name="modelName">Name of model to pull.</param>
-        /// <param name="token">Cancellation token.</param>
         private async Task PullModelToBackendInternal(OllamaBackend backend, string modelName, CancellationToken token)
         {
             if (!_BackendSemaphores.TryGetValue(backend.Identifier, out SemaphoreSlim semaphore))
@@ -600,12 +618,6 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        /// <summary>
-        /// Discover models for a specific backend.
-        /// </summary>
-        /// <param name="backend">Backend to discover models for.</param>
-        /// <param name="token">Cancellation token.</param>
-        /// <returns>List of discovered model names.</returns>
         private async Task<List<string>> DiscoverModelsForBackend(OllamaBackend backend, CancellationToken token)
         {
             try
@@ -649,11 +661,6 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        /// <summary>
-        /// Parse model names from Ollama /api/tags response.
-        /// </summary>
-        /// <param name="responseBody">JSON response body.</param>
-        /// <returns>List of model names.</returns>
         private List<string> ParseModelsFromResponse(string responseBody)
         {
             List<string> models = new List<string>();
@@ -686,12 +693,6 @@ namespace OllamaFlow.Core.Services
             return models;
         }
 
-        /// <summary>
-        /// Perform the actual model pull operation.
-        /// </summary>
-        /// <param name="backend">Backend to pull model to.</param>
-        /// <param name="modelName">Name of model to pull.</param>
-        /// <param name="token">Cancellation token.</param>
         private async Task PerformModelPull(OllamaBackend backend, string modelName, CancellationToken token)
         {
             try

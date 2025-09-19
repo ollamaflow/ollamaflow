@@ -73,6 +73,7 @@ namespace OllamaFlow.Core.Services
 
         private FrontendService _FrontendService = null;
         private BackendService _BackendService = null;
+        private SessionStickinessService _SessionStickiness = null;
 
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
 
@@ -97,6 +98,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="serializer">Serializer.</param>
         /// <param name="frontend">Frontend service.</param>
         /// <param name="backend">Backend service.</param>
+        /// <param name="sessionStickiness">Session stickiness service.</param>
         /// <param name="tokenSource">Cancellation token source.</param>
         public HealthCheckService(
             OllamaFlowSettings settings,
@@ -104,6 +106,7 @@ namespace OllamaFlow.Core.Services
             Serializer serializer,
             FrontendService frontend,
             BackendService backend,
+            SessionStickinessService sessionStickiness,
             CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -111,10 +114,11 @@ namespace OllamaFlow.Core.Services
             _Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _FrontendService = frontend ?? throw new ArgumentNullException(nameof(frontend));
             _BackendService = backend ?? throw new ArgumentNullException(nameof(backend));
+            _SessionStickiness = sessionStickiness ?? throw new ArgumentNullException(nameof(sessionStickiness));
             _TokenSource = tokenSource ?? new CancellationTokenSource();
 
             // Initialize existing frontends and backends from database
-            InitializeExistingNodesAsync().ConfigureAwait(false);
+            InitializeExistingNodes();
 
             _Logging.Debug(_Header + "initialized");
         }
@@ -216,6 +220,69 @@ namespace OllamaFlow.Core.Services
         }
 
         /// <summary>
+        /// Retrieve the next backend that should be used for a request to a given frontend, considering sticky sessions.
+        /// </summary>
+        /// <param name="frontend">Frontend.</param>
+        /// <param name="clientId">Client identifier for sticky session lookup.</param>
+        /// <returns>Backend.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when frontend or clientId is null.</exception>
+        public OllamaBackend GetNextBackend(OllamaFrontend frontend, string clientId)
+        {
+            if (frontend == null) throw new ArgumentNullException(nameof(frontend));
+            if (String.IsNullOrEmpty(clientId)) throw new ArgumentNullException(nameof(clientId));
+
+            // Check if sticky sessions are enabled for this frontend
+            if (frontend.UseStickySessions)
+            {
+                // Try to get existing sticky backend
+                string stickyBackendId = _SessionStickiness.GetStickyBackend(clientId, frontend.Identifier);
+
+                if (!String.IsNullOrEmpty(stickyBackendId))
+                {
+                    // Verify the sticky backend is still available and healthy
+                    if (_Backends.TryGetValue(stickyBackendId, out OllamaBackend stickyBackend))
+                    {
+                        if (stickyBackend.Active && stickyBackend.Healthy)
+                        {
+                            // Touch the session to extend its expiration
+                            _SessionStickiness.TouchSession(clientId, frontend.Identifier, frontend.StickySessionExpirationMs);
+                            _Logging.Debug(_Header + "using sticky backend " + stickyBackendId + " for client " + clientId + " frontend " + frontend.Identifier);
+                            return stickyBackend;
+                        }
+                        else
+                        {
+                            // Backend is unhealthy or inactive, remove the sticky session
+                            _SessionStickiness.RemoveSession(clientId, frontend.Identifier);
+                            _Logging.Debug(_Header + "sticky backend " + stickyBackendId + " is unhealthy/inactive, removed session for client " + clientId + " frontend " + frontend.Identifier);
+                        }
+                    }
+                    else
+                    {
+                        // Backend no longer exists, remove the sticky session
+                        _SessionStickiness.RemoveSession(clientId, frontend.Identifier);
+                        _Logging.Debug(_Header + "sticky backend " + stickyBackendId + " no longer exists, removed session for client " + clientId + " frontend " + frontend.Identifier);
+                    }
+                }
+
+                // No valid sticky session, select a new backend using normal load balancing
+                OllamaBackend selectedBackend = GetNextBackend(frontend);
+
+                if (selectedBackend != null)
+                {
+                    // Create new sticky session
+                    _SessionStickiness.SetStickyBackend(clientId, frontend.Identifier, selectedBackend.Identifier, frontend.StickySessionExpirationMs);
+                }
+
+                return selectedBackend;
+            }
+            else
+            {
+                // Sticky sessions not enabled, use normal load balancing
+                return GetNextBackend(frontend);
+            }
+        }
+
+        /// <summary>
         /// Update a backend if cached.
         /// </summary>
         /// <param name="backend">Backend.</param>
@@ -296,7 +363,11 @@ namespace OllamaFlow.Core.Services
             {
                 // Stop and cleanup the dedicated health check task for this backend
                 StopBackendHealthCheckTask(identifier);
-                _Logging.Debug(_Header + "removed backend " + identifier + " from health monitoring and stopped dedicated task");
+
+                // Remove all sticky sessions associated with this backend
+                int removedSessions = _SessionStickiness.RemoveBackendSessions(identifier);
+
+                _Logging.Debug(_Header + "removed backend " + identifier + " from health monitoring and stopped dedicated task, removed " + removedSessions + " sticky sessions");
             }
         }
 
@@ -345,22 +416,18 @@ namespace OllamaFlow.Core.Services
 
             if (_Frontends.TryRemove(identifier, out OllamaFrontend removed))
             {
-                _Logging.Debug(_Header + "removed frontend " + identifier + " from monitoring");
+                // Remove all sticky sessions associated with this frontend
+                int removedSessions = _SessionStickiness.RemoveFrontendSessions(identifier);
+
+                _Logging.Debug(_Header + "removed frontend " + identifier + " from monitoring, removed " + removedSessions + " sticky sessions");
             }
         }
 
         #endregion
 
-        #region Internal-Methods
-
-        #endregion
-
         #region Private-Methods
 
-        /// <summary>
-        /// Initialize existing nodes from database at startup.
-        /// </summary>
-        private async Task InitializeExistingNodesAsync()
+        private void InitializeExistingNodes()
         {
             try
             {
@@ -392,10 +459,6 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        /// <summary>
-        /// Start a dedicated health check task for a specific backend.
-        /// </summary>
-        /// <param name="backend">Backend to start health checking.</param>
         private void StartBackendHealthCheckTask(OllamaBackend backend)
         {
             if (backend == null || String.IsNullOrEmpty(backend.Identifier)) return;
@@ -414,10 +477,6 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"started dedicated health check task for backend {backend.Identifier}");
         }
 
-        /// <summary>
-        /// Stop and cleanup the dedicated health check task for a specific backend.
-        /// </summary>
-        /// <param name="identifier">Backend identifier.</param>
         private void StopBackendHealthCheckTask(string identifier)
         {
             if (String.IsNullOrEmpty(identifier)) return;
@@ -456,11 +515,6 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"stopped and cleaned up health check task for backend {identifier}");
         }
 
-        /// <summary>
-        /// Main health check loop for a single backend.
-        /// </summary>
-        /// <param name="backend">Backend to monitor.</param>
-        /// <param name="token">Cancellation token.</param>
         private async Task BackendHealthCheckLoop(OllamaBackend backend, CancellationToken token)
         {
             string healthCheckUrl = (backend.Ssl ? "https://" : "http://") + backend.Hostname + ":" + backend.Port + backend.HealthCheckUrl;
@@ -511,12 +565,6 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"health check terminated for backend {backend.Identifier}");
         }
 
-        /// <summary>
-        /// Perform a single health check for a backend.
-        /// </summary>
-        /// <param name="backend">Backend to check.</param>
-        /// <param name="healthCheckUrl">Health check URL.</param>
-        /// <param name="token">Cancellation token.</param>
         private async Task PerformHealthCheck(OllamaBackend backend, string healthCheckUrl, CancellationToken token)
         {
             using (HttpClient client = new HttpClient())
@@ -549,11 +597,6 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        /// <summary>
-        /// Handle successful health check.
-        /// </summary>
-        /// <param name="backend">Backend that passed health check.</param>
-        /// <param name="healthCheckUrl">Health check URL.</param>
         private void HandleHealthCheckSuccess(OllamaBackend backend, string healthCheckUrl)
         {
             if (_Backends.TryGetValue(backend.Identifier, out OllamaBackend cached))
@@ -577,12 +620,6 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"health check success for backend {backend.Identifier} at {healthCheckUrl}");
         }
 
-        /// <summary>
-        /// Handle failed health check.
-        /// </summary>
-        /// <param name="backend">Backend that failed health check.</param>
-        /// <param name="healthCheckUrl">Health check URL.</param>
-        /// <param name="reason">Failure reason.</param>
         private void HandleHealthCheckFailure(OllamaBackend backend, string healthCheckUrl, string reason)
         {
             if (_Backends.TryGetValue(backend.Identifier, out OllamaBackend cached))

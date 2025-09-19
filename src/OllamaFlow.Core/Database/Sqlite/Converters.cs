@@ -16,6 +16,11 @@
 
         internal static Serializer Serializer = new Serializer();
 
+        internal static bool HasColumn(DataTable table, string column)
+        {
+            return table.Columns.Contains(column);
+        }
+
         internal static string GetDataRowStringValue(DataRow row, string column)
         {
             if (row.Table.Columns.Contains(column))
@@ -593,7 +598,10 @@
                 RequiredModelsString = GetDataRowStringValue(row, "requiredmodels"),
                 LogRequestFull = GetDataRowIntValue(row, "logrequestfull") == 1,
                 LogRequestBody = GetDataRowIntValue(row, "logrequestbody") == 1,
-                LogResponseBody = GetDataRowIntValue(row, "logresponsebody") == 1, 
+                LogResponseBody = GetDataRowIntValue(row, "logresponsebody") == 1,
+                UseStickySessions = HasColumn(row.Table, "usestickysessions") ? GetDataRowIntValue(row, "usestickysessions") == 1 : false,
+                StickySessionExpirationMs = HasColumn(row.Table, "stickysessionexpirationms") ? GetDataRowIntValue(row, "stickysessionexpirationms") : 1800000,
+                Active = GetDataRowIntValue(row, "active") == 1,
                 CreatedUtc = DateTime.Parse(row["createdutc"].ToString()),
                 LastUpdateUtc = DateTime.Parse(row["lastupdateutc"].ToString())
             };

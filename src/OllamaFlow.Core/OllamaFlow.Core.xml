@@ -836,6 +836,77 @@
             Round robin.
             </summary>
         </member>
+        <member name="T:OllamaFlow.Core.Models.StickySession">
+            <summary>
+            Represents a sticky session binding a client to a specific backend.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.StickySession.ClientId">
+            <summary>
+            Client identifier (typically IP address).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.StickySession.FrontendId">
+            <summary>
+            Frontend identifier associated with this session.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.StickySession.BackendId">
+            <summary>
+            Backend identifier this client is bound to.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.StickySession.CreatedUtc">
+            <summary>
+            Creation timestamp, in UTC time.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.StickySession.ExpiresUtc">
+            <summary>
+            Expiration timestamp, in UTC time.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.StickySession.LastAccessUtc">
+            <summary>
+            Last access timestamp, in UTC time.
+            Updated each time the session is used.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.StickySession.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.StickySession.#ctor(System.String,System.String,System.String,System.Int32)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="clientId">Client identifier.</param>
+            <param name="frontendId">Frontend identifier.</param>
+            <param name="backendId">Backend identifier.</param>
+            <param name="expirationMs">Expiration duration in milliseconds.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when required parameters are null or empty.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when expirationMs is less than or equal to zero.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.StickySession.IsExpired">
+            <summary>
+            Check if the session has expired.
+            </summary>
+            <returns>True if the session has expired, false otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.StickySession.Touch(System.Int32)">
+            <summary>
+            Update the last access timestamp and extend expiration if needed.
+            </summary>
+            <param name="expirationMs">New expiration duration in milliseconds.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when expirationMs is less than or equal to zero.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.StickySession.GetSessionKey">
+            <summary>
+            Create a unique session key for storage.
+            </summary>
+            <returns>Session key combining client and frontend identifiers.</returns>
+        </member>
         <member name="T:OllamaFlow.Core.OllamaBackend">
             <summary>
             Origin server.
@@ -1125,6 +1196,21 @@
             Boolean indicating if the response body should be logged.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.UseStickySessions">
+            <summary>
+            Boolean indicating whether sticky sessions should be used for this frontend.
+            When enabled, clients will be routed to the same backend for subsequent requests.
+            Default is false.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.StickySessionExpirationMs">
+            <summary>
+            Duration in milliseconds for how long a sticky session should remain active.
+            Default is 1800000 milliseconds (30 minutes).
+            Minimum is 10000 milliseconds (10 seconds).
+            Maximum is 86400000 milliseconds (24 hours).
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.OllamaFrontend.Active">
             <summary>
             Boolean indicating if the object is active or not.
@@ -1398,7 +1484,7 @@
             Gateway service.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,OllamaFlow.Core.Services.ModelSynchronizationService,System.Threading.CancellationTokenSource)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,OllamaFlow.Core.Services.ModelSynchronizationService,OllamaFlow.Core.Services.SessionStickinessService,System.Threading.CancellationTokenSource)">
             <summary>
             Instantiate.
             </summary>
@@ -1410,6 +1496,7 @@
             <param name="backend">Backend service.</param>
             <param name="healthCheck">Healthcheck service.</param>
             <param name="modelSynchronization">Model synchronization service.</param>
+            <param name="sessionStickiness">Session stickiness service.</param>
             <param name="tokenSource">Cancellation token source.</param>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.Dispose(System.Boolean)">
@@ -1495,7 +1582,7 @@
             Retrieve the list of backends in memory.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,System.Threading.CancellationTokenSource)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.SessionStickinessService,System.Threading.CancellationTokenSource)">
             <summary>
             Health check service.
             </summary>
@@ -1504,6 +1591,7 @@
             <param name="serializer">Serializer.</param>
             <param name="frontend">Frontend service.</param>
             <param name="backend">Backend service.</param>
+            <param name="sessionStickiness">Session stickiness service.</param>
             <param name="tokenSource">Cancellation token source.</param>
         </member>
         <member name="M:OllamaFlow.Core.Services.HealthCheckService.Dispose(System.Boolean)">
@@ -1524,6 +1612,15 @@
             <param name="frontend">Frontend.</param>
             <returns>Backend.</returns>
             <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.GetNextBackend(OllamaFlow.Core.OllamaFrontend,System.String)">
+            <summary>
+            Retrieve the next backend that should be used for a request to a given frontend, considering sticky sessions.
+            </summary>
+            <param name="frontend">Frontend.</param>
+            <param name="clientId">Client identifier for sticky session lookup.</param>
+            <returns>Backend.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when frontend or clientId is null.</exception>
         </member>
         <member name="M:OllamaFlow.Core.Services.HealthCheckService.UpdateBackend(OllamaFlow.Core.OllamaBackend)">
             <summary>
@@ -1566,53 +1663,6 @@
             </summary>
             <param name="identifier">Frontend identifier to remove.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when identifier is null.</exception>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.InitializeExistingNodesAsync">
-            <summary>
-            Initialize existing nodes from database at startup.
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.StartBackendHealthCheckTask(OllamaFlow.Core.OllamaBackend)">
-            <summary>
-            Start a dedicated health check task for a specific backend.
-            </summary>
-            <param name="backend">Backend to start health checking.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.StopBackendHealthCheckTask(System.String)">
-            <summary>
-            Stop and cleanup the dedicated health check task for a specific backend.
-            </summary>
-            <param name="identifier">Backend identifier.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.BackendHealthCheckLoop(OllamaFlow.Core.OllamaBackend,System.Threading.CancellationToken)">
-            <summary>
-            Main health check loop for a single backend.
-            </summary>
-            <param name="backend">Backend to monitor.</param>
-            <param name="token">Cancellation token.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.PerformHealthCheck(OllamaFlow.Core.OllamaBackend,System.String,System.Threading.CancellationToken)">
-            <summary>
-            Perform a single health check for a backend.
-            </summary>
-            <param name="backend">Backend to check.</param>
-            <param name="healthCheckUrl">Health check URL.</param>
-            <param name="token">Cancellation token.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.HandleHealthCheckSuccess(OllamaFlow.Core.OllamaBackend,System.String)">
-            <summary>
-            Handle successful health check.
-            </summary>
-            <param name="backend">Backend that passed health check.</param>
-            <param name="healthCheckUrl">Health check URL.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.HandleHealthCheckFailure(OllamaFlow.Core.OllamaBackend,System.String,System.String)">
-            <summary>
-            Handle failed health check.
-            </summary>
-            <param name="backend">Backend that failed health check.</param>
-            <param name="healthCheckUrl">Health check URL.</param>
-            <param name="reason">Failure reason.</param>
         </member>
         <member name="T:OllamaFlow.Core.Services.ModelSynchronizationService">
             <summary>
@@ -1705,67 +1755,125 @@
             <returns>List of model names, or empty list if backend not found.</returns>
             <exception cref="T:System.ArgumentNullException">Thrown when backendIdentifier is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.InitializeExistingBackendsAsync">
+        <member name="T:OllamaFlow.Core.Services.SessionStickinessService">
             <summary>
-            Initialize existing backends from database at startup.
+            Service for managing sticky sessions between clients and backends.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.StartBackendSynchronizationTask(OllamaFlow.Core.OllamaBackend)">
+        <member name="P:OllamaFlow.Core.Services.SessionStickinessService.CleanupIntervalMs">
             <summary>
-            Start a dedicated model synchronization task for a specific backend.
+            Interval in milliseconds for cleaning up expired sessions.
+            Default is 300000 milliseconds (5 minutes).
+            Minimum is 10000 milliseconds (10 seconds).
+            Maximum is 3600000 milliseconds (1 hour).
             </summary>
-            <param name="backend">Backend to start synchronization for.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.StopBackendSynchronizationTask(System.String)">
+        <member name="P:OllamaFlow.Core.Services.SessionStickinessService.ActiveSessionCount">
             <summary>
-            Stop and cleanup the dedicated synchronization task for a specific backend.
+            Get the total number of active sessions.
             </summary>
-            <param name="identifier">Backend identifier.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.BackendSynchronizationLoop(OllamaFlow.Core.OllamaBackend,System.Threading.CancellationToken)">
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.#ctor(SyslogLogging.LoggingModule)">
             <summary>
-            Main model discovery and synchronization for a single backend.
+            Instantiate.
             </summary>
-            <param name="backend">Backend to monitor.</param>
-            <param name="token">Cancellation token.</param>
+            <param name="logging">Logging module.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when logging is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.SynchronizeModelsForBackend(OllamaFlow.Core.OllamaBackend,System.Threading.CancellationToken)">
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.Dispose(System.Boolean)">
             <summary>
-            Discover and synchronize models for a specific backend.
+            Dispose.
             </summary>
-            <param name="backend">Backend to discover and synchronize models for.</param>
-            <param name="token">Cancellation token.</param>
+            <param name="disposing">Disposing.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.PullModelToBackendInternal(OllamaFlow.Core.OllamaBackend,System.String,System.Threading.CancellationToken)">
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.Dispose">
             <summary>
-            Pull a specific model to a backend (internal version that assumes active pull tracking is already handled).
+            Dispose.
             </summary>
-            <param name="backend">Backend to pull model to.</param>
-            <param name="modelName">Name of model to pull.</param>
-            <param name="token">Cancellation token.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.DiscoverModelsForBackend(OllamaFlow.Core.OllamaBackend,System.Threading.CancellationToken)">
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.GetStickyBackend(System.String,System.String)">
             <summary>
-            Discover models for a specific backend.
+            Get the sticky backend for a client and frontend combination.
             </summary>
-            <param name="backend">Backend to discover models for.</param>
-            <param name="token">Cancellation token.</param>
-            <returns>List of discovered model names.</returns>
+            <param name="clientId">Client identifier.</param>
+            <param name="frontendId">Frontend identifier.</param>
+            <returns>Backend identifier if a valid sticky session exists, null otherwise.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when clientId or frontendId is null or empty.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.ParseModelsFromResponse(System.String)">
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.SetStickyBackend(System.String,System.String,System.String,System.Int32)">
             <summary>
-            Parse model names from Ollama /api/tags response.
+            Set a sticky backend for a client and frontend combination.
             </summary>
-            <param name="responseBody">JSON response body.</param>
-            <returns>List of model names.</returns>
+            <param name="clientId">Client identifier.</param>
+            <param name="frontendId">Frontend identifier.</param>
+            <param name="backendId">Backend identifier.</param>
+            <param name="expirationMs">Session expiration in milliseconds.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when required parameters are null or empty.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when expirationMs is less than or equal to zero.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.PerformModelPull(OllamaFlow.Core.OllamaBackend,System.String,System.Threading.CancellationToken)">
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.TouchSession(System.String,System.String,System.Int32)">
             <summary>
-            Perform the actual model pull operation.
+            Update the last access time for an existing session and extend its expiration.
             </summary>
-            <param name="backend">Backend to pull model to.</param>
-            <param name="modelName">Name of model to pull.</param>
-            <param name="token">Cancellation token.</param>
+            <param name="clientId">Client identifier.</param>
+            <param name="frontendId">Frontend identifier.</param>
+            <param name="expirationMs">New session expiration in milliseconds.</param>
+            <returns>True if the session was found and updated, false otherwise.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when clientId or frontendId is null or empty.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when expirationMs is less than or equal to zero.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.RemoveSession(System.String,System.String)">
+            <summary>
+            Remove a specific sticky session.
+            </summary>
+            <param name="clientId">Client identifier.</param>
+            <param name="frontendId">Frontend identifier.</param>
+            <returns>True if the session was found and removed, false otherwise.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when clientId or frontendId is null or empty.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.RemoveClientSessions(System.String)">
+            <summary>
+            Remove all sessions for a specific client.
+            </summary>
+            <param name="clientId">Client identifier.</param>
+            <returns>Number of sessions removed.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when clientId is null or empty.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.RemoveFrontendSessions(System.String)">
+            <summary>
+            Remove all sessions associated with a specific frontend.
+            </summary>
+            <param name="frontendId">Frontend identifier.</param>
+            <returns>Number of sessions removed.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when frontendId is null or empty.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.RemoveBackendSessions(System.String)">
+            <summary>
+            Remove all sessions associated with a specific backend.
+            </summary>
+            <param name="backendId">Backend identifier.</param>
+            <returns>Number of sessions removed.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when backendId is null or empty.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.GetAllSessions">
+            <summary>
+            Get all active sessions.
+            </summary>
+            <returns>List of all active sticky sessions.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.GetClientSessions(System.String)">
+            <summary>
+            Get all sessions for a specific client.
+            </summary>
+            <param name="clientId">Client identifier.</param>
+            <returns>List of sessions for the specified client.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when clientId is null or empty.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.SessionStickinessService.ClearAllSessions">
+            <summary>
+            Clear all sessions.
+            </summary>
+            <returns>Number of sessions removed.</returns>
         </member>
         <member name="T:OllamaFlow.Core.Settings.LoggingSettings">
             <summary>

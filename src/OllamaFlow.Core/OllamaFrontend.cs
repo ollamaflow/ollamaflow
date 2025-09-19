@@ -181,6 +181,33 @@
         public bool LogResponseBody { get; set; } = false;
 
         /// <summary>
+        /// Boolean indicating whether sticky sessions should be used for this frontend.
+        /// When enabled, clients will be routed to the same backend for subsequent requests.
+        /// Default is false.
+        /// </summary>
+        public bool UseStickySessions { get; set; } = false;
+
+        /// <summary>
+        /// Duration in milliseconds for how long a sticky session should remain active.
+        /// Default is 1800000 milliseconds (30 minutes).
+        /// Minimum is 10000 milliseconds (10 seconds).
+        /// Maximum is 86400000 milliseconds (24 hours).
+        /// </summary>
+        public int StickySessionExpirationMs
+        {
+            get
+            {
+                return _StickySessionExpirationMs;
+            }
+            set
+            {
+                if (value < 10000) throw new ArgumentOutOfRangeException(nameof(StickySessionExpirationMs), "Minimum value is 10000 milliseconds (10 seconds)");
+                if (value > 86400000) throw new ArgumentOutOfRangeException(nameof(StickySessionExpirationMs), "Maximum value is 86400000 milliseconds (24 hours)");
+                _StickySessionExpirationMs = value;
+            }
+        }
+
+        /// <summary>
         /// Boolean indicating if the object is active or not.
         /// </summary>
         public bool Active { get; set; } = true;
@@ -213,6 +240,7 @@
         private string _BackendsString = "[]";
         private List<string> _RequiredModels = new List<string>();
         private string _RequiredModelsString = "[]";
+        private int _StickySessionExpirationMs = 1800000; // 30 minutes
 
         #endregion
 

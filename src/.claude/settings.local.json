@@ -3,7 +3,11 @@
     "allow": [
       "Read(//c/Code/OllamaFlow/OllamaFlow/**)",
       "Bash(dotnet build)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl:*)",
+      "Bash(xxd:*)"
     ],
     "deny": [],
     "ask": []

@@ -48,6 +48,7 @@
         private DatabaseDriverBase _Database = null;
         private FrontendService _FrontendService = null;
         private BackendService _BackendService = null;
+        private SessionStickinessService _SessionStickinessService = null;
         private HealthCheckService _HealthCheckService = null;
         private ModelSynchronizationService _ModelSynchronizationService = null;
         private GatewayService _GatewayService = null;
@@ -141,6 +142,7 @@
                         DisposeService(ref _GatewayService, "GatewayService");
                         DisposeService(ref _ModelSynchronizationService, "ModelSynchronizationService");
                         DisposeService(ref _HealthCheckService, "HealthCheckService");
+                        DisposeService(ref _SessionStickinessService, "SessionStickinessService");
                         DisposeService(ref _BackendService, "BackendService");
                         DisposeService(ref _FrontendService, "FrontendService");
 
@@ -274,6 +276,7 @@
 
             _FrontendService = new FrontendService(_Settings, _Logging, _Database, _TokenSource);
             _BackendService = new BackendService(_Settings, _Logging, _Database, _TokenSource);
+            _SessionStickinessService = new SessionStickinessService(_Logging);
 
             _HealthCheckService = new HealthCheckService(
                 _Settings,
@@ -281,6 +284,7 @@
                 _Serializer,
                 _FrontendService,
                 _BackendService,
+                _SessionStickinessService,
                 _TokenSource);
 
             _ModelSynchronizationService = new ModelSynchronizationService(
@@ -301,6 +305,7 @@
                 _BackendService,
                 _HealthCheckService,
                 _ModelSynchronizationService,
+                _SessionStickinessService,
                 _TokenSource);
 
             #endregion
