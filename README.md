@@ -8,11 +8,15 @@
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
   [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com)
   [![Docker](https://img.shields.io/badge/Docker-available-blue.svg)](https://hub.docker.com/r/jchristn/ollamaflow)
+  [![Documentation](https://img.shields.io/badge/Documentation-Available-brightgreen.svg)](https://ollamaflow.readme.io/)
+  [![Web UI](https://img.shields.io/badge/Web%20UI-Dashboard-orange.svg)](https://github.com/ollamaflow/ui)
 </div>
 
 ## 🚀 Scale Your Ollama Infrastructure
 
 OllamaFlow is a lightweight, intelligent orchestration layer that transforms multiple Ollama instances into a unified, high-availability AI inference cluster. Whether you're scaling AI workloads across multiple GPUs or ensuring zero-downtime model serving, OllamaFlow has you covered.
+
+> 📖 **[Complete Documentation](https://ollamaflow.readme.io/)** | 🎨 **[Web UI Dashboard](https://github.com/ollamaflow/ui)**
 
 ### Why OllamaFlow?
 
@@ -22,6 +26,7 @@ OllamaFlow is a lightweight, intelligent orchestration layer that transforms mul
 - **❤️ Health Monitoring**: Real-time health checks with configurable thresholds
 - **📊 Zero Downtime**: Seamlessly handle backend failures without dropping requests
 - **🛠️ RESTful Admin API**: Full control through a comprehensive management API
+- **🎨 Web Dashboard**: Optional web UI for visual cluster management and monitoring
 
 ## 🎨 Key Features
 
@@ -171,6 +176,8 @@ curl -X PUT \
 
 A complete **Postman collection** (`OllamaFlow.postman_collection.json`) is included in the repository root with examples for all API endpoints, both Ollama-compatible and administrative APIs.
 
+For a visual interface, check out the **[OllamaFlow Web UI](https://github.com/ollamaflow/ui)** which provides a dashboard for cluster management and monitoring.
+
 ## 🤝 Contributing
 
 We welcome contributions! Whether it's:
@@ -213,6 +220,12 @@ OllamaFlow adds minimal overhead to your Ollama requests:
 - **Cost Optimization**: Maximize hardware utilization across your infrastructure
 - **Multi-Tenant Scenarios**: Isolate workloads while sharing infrastructure
 
+## 📚 Documentation & Resources
+
+- **[Complete Documentation](https://ollamaflow.readme.io/)** - Comprehensive guides, API reference, and tutorials
+- **[Web UI Dashboard](https://github.com/ollamaflow/ui)** - Visual cluster management interface
+- **[Postman Collection](OllamaFlow.postman_collection.json)** - API testing and examples
+
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -226,5 +239,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
   <b>Ready to scale your AI infrastructure?</b><br>
-  Get started with OllamaFlow today!
+  Get started with OllamaFlow today!<br><br>
+  📖 <a href="https://ollamaflow.readme.io/"><b>Documentation</b></a> |
+  🎨 <a href="https://github.com/ollamaflow/ui"><b>Web Dashboard</b></a>
 </div>
