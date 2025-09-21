@@ -82,7 +82,7 @@
         </member>
         <member name="F:OllamaFlow.Core.Constants.ForwardedForHeader">
             <summary>
-            Forwarded for header, generally x-forwarded-for.
+            Forwarded for header, generally X-Forwarded-For.
             </summary>
         </member>
         <member name="F:OllamaFlow.Core.Constants.RequestIdHeader">
