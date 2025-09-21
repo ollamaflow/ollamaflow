@@ -264,6 +264,11 @@
             }
         }
 
+        /// <summary>
+        /// Boolean indicating whether or not the backend was chosen due to stickiness.
+        /// </summary>
+        public bool IsSticky { get; set; } = false;
+
         #endregion
 
         #region Internal-Members

@@ -247,6 +247,8 @@ namespace OllamaFlow.Core.Services
                             // Touch the session to extend its expiration
                             _SessionStickiness.TouchSession(clientId, frontend.Identifier, frontend.StickySessionExpirationMs);
                             _Logging.Debug(_Header + "using sticky backend " + stickyBackendId + " for client " + clientId + " frontend " + frontend.Identifier);
+                            
+                            stickyBackend.IsSticky = true;
                             return stickyBackend;
                         }
                         else
@@ -271,6 +273,7 @@ namespace OllamaFlow.Core.Services
                 {
                     // Create new sticky session
                     _SessionStickiness.SetStickyBackend(clientId, frontend.Identifier, selectedBackend.Identifier, frontend.StickySessionExpirationMs);
+                    selectedBackend.IsSticky = frontend.UseStickySessions;
                 }
 
                 return selectedBackend;

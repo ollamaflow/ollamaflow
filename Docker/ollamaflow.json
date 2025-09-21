@@ -59,5 +59,9 @@
   },
   "AdminBearerTokens": [
     "ollamaflowadmin"
+  ],
+  "StickyHeaders": [
+    "x-conversation-id",
+    "x-thread-id"
   ]
 }

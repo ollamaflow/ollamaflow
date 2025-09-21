@@ -135,12 +135,17 @@ namespace OllamaFlow.Core
         /// <summary>
         /// Request ID header.
         /// </summary>
-        public static string RequestIdHeader = "x-ollamaflow-request-id";
+        public static string RequestIdHeader = "x-ollamaflow-request";
 
         /// <summary>
         /// Backend server ID header.
         /// </summary>
-        public static string BackendServerHeader = "x-ollamaflow-backend-id";
+        public static string BackendServerHeader = "x-ollamaflow-backend";
+
+        /// <summary>
+        /// Sticky server header.
+        /// </summary>
+        public static string StickyServerHeader = "x-ollamaflow-sticky";
 
         #endregion
     }

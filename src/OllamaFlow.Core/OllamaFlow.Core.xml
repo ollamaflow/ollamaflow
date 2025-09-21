@@ -4,135 +4,6 @@
         <name>OllamaFlow.Core</name>
     </assembly>
     <members>
-        <member name="T:OllamaFlow.Core.ApiErrorEnum">
-            <summary>
-            API error codes.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthenticationFailed">
-            <summary>
-            Authentication failed.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthorizationFailed">
-            <summary>
-            Authorization failed.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadGateway">
-            <summary>
-            Bad gateway.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadRequest">
-            <summary>
-            Bad request.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.Conflict">
-            <summary>
-            Conflict.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.DeserializationError">
-            <summary>
-            DeserializationError.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.Inactive">
-            <summary>
-            Inactive.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.InternalError">
-            <summary>
-            Internal error.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.InvalidRange">
-            <summary>
-            Invalid range.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.InUse">
-            <summary>
-            In use.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotEmpty">
-            <summary>
-            Not empty.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotFound">
-            <summary>
-            Not found.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.SlowDown">
-            <summary>
-            Slow down.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.TokenExpired">
-            <summary>
-            Token expired.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.TooLarge">
-            <summary>
-            Request too large.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.UnsupportedHttpVersion">
-            <summary>
-            Unsupported HTTP version.
-            </summary>
-        </member>
-        <member name="T:OllamaFlow.Core.ApiErrorResponse">
-            <summary>
-            API error response.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.Error">
-            <summary>
-            Error.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.Message">
-            <summary>
-            Human-readable message.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.StatusCode">
-            <summary>
-            HTTP status code.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.Context">
-            <summary>
-            Additional contextual information.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.Description">
-            <summary>
-            Description.
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor">
-            <summary>
-            Instantiate.
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor(OllamaFlow.Core.ApiErrorEnum,System.Object,System.String)">
-            <summary>
-            Instantiate.
-            </summary>
-            <param name="error">Error code.</param>
-            <param name="context">Context.</param>
-            <param name="description">Description.</param>
-            
-        </member>
         <member name="T:OllamaFlow.Core.Constants">
             <summary>
             Constants.
@@ -222,6 +93,11 @@
         <member name="F:OllamaFlow.Core.Constants.BackendServerHeader">
             <summary>
             Backend server ID header.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Constants.StickyServerHeader">
+            <summary>
+            Sticky server header.
             </summary>
         </member>
         <member name="T:OllamaFlow.Core.Database.DatabaseDriverBase">
@@ -590,127 +466,6 @@
             Finalizer for SqliteDatabaseDriver.
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.EndpointGroup">
-            <summary>
-            Endpoint group.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EndpointGroup.ParameterizedUrls">
-            <summary>
-            Key is the upper-case HTTP method.
-            Value is a list of parameterized URLs to match, e.g. /{version}/foo/bar/{id}.
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.EndpointGroup.#ctor">
-            <summary>
-            Endpoint group.
-            </summary>
-        </member>
-        <member name="T:OllamaFlow.Core.EnumerationOrderEnum">
-            <summary>
-            Enumeration order. 
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedAscending">
-            <summary>
-            Created ascending.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedDescending">
-            <summary>
-            Created descending.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierAscending">
-            <summary>
-            Identifier ascending.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierDescending">
-            <summary>
-            Identifier descending.
-            </summary>
-        </member>
-        <member name="T:OllamaFlow.Core.EnumerationRequest">
-            <summary>
-            Object used to request enumeration.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationRequest.Ordering">
-            <summary>
-            Order by.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationRequest.MaxResults">
-            <summary>
-            Maximum number of results to retrieve.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationRequest.Skip">
-            <summary>
-            The number of records to skip.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationRequest.ContinuationToken">
-            <summary>
-            Continuation token.
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.EnumerationRequest.#ctor">
-            <summary>
-            Instantiate.
-            </summary>
-        </member>
-        <member name="T:OllamaFlow.Core.EnumerationResult`1">
-            <summary>
-            Object returned as the result of an enumeration.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.Success">
-            <summary>
-            Indicates if the statistics operation was successful.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.Timestamp">
-            <summary>
-            Start and end timestamps.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.MaxResults">
-            <summary>
-            Maximum number of results to retrieve.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.ContinuationToken">
-            <summary>
-            Continuation token.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.EndOfResults">
-            <summary>
-            Boolean indicating end of results.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.TotalRecords">
-            <summary>
-            Total number of records.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.RecordsRemaining">
-            <summary>
-            Number of candidate records remaining in the enumeration.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.Objects">
-            <summary>
-            Objects.
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.EnumerationResult`1.#ctor">
-            <summary>
-            Instantiates the object.
-            </summary>
-        </member>
         <member name="T:OllamaFlow.Core.Helpers.RequestTypeEnum">
             <summary>
             Represents the different types of requests that can be proxied to Ollama.
@@ -821,6 +576,240 @@
             OpenAI-compatible model retrieval endpoint.
             </summary>
         </member>
+        <member name="T:OllamaFlow.Core.ApiErrorEnum">
+            <summary>
+            API error codes.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthenticationFailed">
+            <summary>
+            Authentication failed.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthorizationFailed">
+            <summary>
+            Authorization failed.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadGateway">
+            <summary>
+            Bad gateway.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadRequest">
+            <summary>
+            Bad request.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.Conflict">
+            <summary>
+            Conflict.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.DeserializationError">
+            <summary>
+            DeserializationError.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.Inactive">
+            <summary>
+            Inactive.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.InternalError">
+            <summary>
+            Internal error.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.InvalidRange">
+            <summary>
+            Invalid range.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.InUse">
+            <summary>
+            In use.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotEmpty">
+            <summary>
+            Not empty.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotFound">
+            <summary>
+            Not found.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.SlowDown">
+            <summary>
+            Slow down.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.TokenExpired">
+            <summary>
+            Token expired.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.TooLarge">
+            <summary>
+            Request too large.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.UnsupportedHttpVersion">
+            <summary>
+            Unsupported HTTP version.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.ApiErrorResponse">
+            <summary>
+            API error response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Error">
+            <summary>
+            Error.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Message">
+            <summary>
+            Human-readable message.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.StatusCode">
+            <summary>
+            HTTP status code.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Context">
+            <summary>
+            Additional contextual information.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Description">
+            <summary>
+            Description.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor(OllamaFlow.Core.ApiErrorEnum,System.Object,System.String)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="error">Error code.</param>
+            <param name="context">Context.</param>
+            <param name="description">Description.</param>
+            
+        </member>
+        <member name="T:OllamaFlow.Core.EnumerationOrderEnum">
+            <summary>
+            Enumeration order. 
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedAscending">
+            <summary>
+            Created ascending.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedDescending">
+            <summary>
+            Created descending.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierAscending">
+            <summary>
+            Identifier ascending.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierDescending">
+            <summary>
+            Identifier descending.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.EnumerationRequest">
+            <summary>
+            Object used to request enumeration.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.Ordering">
+            <summary>
+            Order by.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.MaxResults">
+            <summary>
+            Maximum number of results to retrieve.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.Skip">
+            <summary>
+            The number of records to skip.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.ContinuationToken">
+            <summary>
+            Continuation token.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.EnumerationRequest.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.EnumerationResult`1">
+            <summary>
+            Object returned as the result of an enumeration.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.Success">
+            <summary>
+            Indicates if the statistics operation was successful.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.Timestamp">
+            <summary>
+            Start and end timestamps.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.MaxResults">
+            <summary>
+            Maximum number of results to retrieve.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.ContinuationToken">
+            <summary>
+            Continuation token.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.EndOfResults">
+            <summary>
+            Boolean indicating end of results.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.TotalRecords">
+            <summary>
+            Total number of records.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.RecordsRemaining">
+            <summary>
+            Number of candidate records remaining in the enumeration.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.Objects">
+            <summary>
+            Objects.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.EnumerationResult`1.#ctor">
+            <summary>
+            Instantiates the object.
+            </summary>
+        </member>
         <member name="T:OllamaFlow.Core.LoadBalancingMode">
             <summary>
             Load balancing mode.
@@ -836,6 +825,46 @@
             Round robin.
             </summary>
         </member>
+        <member name="T:OllamaFlow.Core.Models.MessageEnvelope">
+            <summary>
+            Message envelope.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.MessageEnvelope.Type">
+            <summary>
+            Type of message.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.MessageEnvelope.MessageGuid">
+            <summary>
+            Message GUID.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.MessageEnvelope.Data">
+            <summary>
+            Data.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.MessageEnvelope.Metadata">
+            <summary>
+            Metadata.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.MessageEnvelope.#ctor">
+            <summary>
+            Message envelope.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.MessageTypeEnum">
+            <summary>
+            Message type.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Models.MessageTypeEnum.Telemetry">
+            <summary>
+            Telemetry.
+            </summary>
+        </member>
         <member name="T:OllamaFlow.Core.Models.StickySession">
             <summary>
             Represents a sticky session binding a client to a specific backend.
@@ -843,7 +872,7 @@
         </member>
         <member name="P:OllamaFlow.Core.Models.StickySession.ClientId">
             <summary>
-            Client identifier (typically IP address).
+            Client identifier (typically IP address or value from sticky headers).
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Models.StickySession.FrontendId">
@@ -906,6 +935,96 @@
             Create a unique session key for storage.
             </summary>
             <returns>Session key combining client and frontend identifiers.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.TelemetryMessage">
+            <summary>
+            Telemetry message.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.RequestId">
+            <summary>
+            Gets or sets the unique identifier for this request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.RequestType">
+            <summary>
+            Request type.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.ConversationId">
+            <summary>
+            Gets or sets the conversation/session identifier this request belongs to.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.BackendServerId">
+            <summary>
+            Gets or sets the identifier of the backend server that handled this request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.ClientId">
+            <summary>
+            Gets or sets the identifier of the client that initiated this request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.RequestBodySize">
+            <summary>
+            Request body size in bytes.
+            Must be non-negative.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.RequestArrivalUtc">
+            <summary>
+            Gets or sets the UTC timestamp when the request arrived at the load balancer.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.BackendSelectedUtc">
+            <summary>
+            Gets or sets the UTC timestamp when a backend server was selected to handle the request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.BackendRequestSentUtc">
+            <summary>
+            Gets or sets the UTC timestamp when the request was sent to the backend server.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.FirstTokenTimeUtc">
+            <summary>
+            Gets or sets the UTC timestamp when the first token was received from the backend server.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.LastTokenTimeUtc">
+            <summary>
+            Gets or sets the UTC timestamp when the last token was received from the backend server.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.BackendSelectionTimeMs">
+            <summary>
+            Gets the time in milliseconds between request arrival and backend server selection.
+            Returns null if either timestamp is not set.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.TimeToFirstTokenMs">
+            <summary>
+            Gets the time in milliseconds between sending the request to backend and receiving the first token.
+            Returns null if either timestamp is not set.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.TimeToCompletionMs">
+            <summary>
+            Gets the time in milliseconds between sending the request to backend and receiving the last token.
+            Returns null if either timestamp is not set.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.TotalRequestTimeMs">
+            <summary>
+            Gets the total end-to-end request time in milliseconds (from arrival to last token).
+            Returns null if last token timestamp is not set.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.TelemetryMessage.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OllamaFlow.Core.Models.TelemetryMessage"/> class.
+            </summary>
         </member>
         <member name="T:OllamaFlow.Core.OllamaBackend">
             <summary>
@@ -1038,78 +1157,15 @@
             Number of active requests.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.OllamaBackend.IsSticky">
+            <summary>
+            Boolean indicating whether or not the backend was chosen due to stickiness.
+            </summary>
+        </member>
         <member name="M:OllamaFlow.Core.OllamaBackend.#ctor">
             <summary>
             Ollama backend.
             </summary>
-        </member>
-        <member name="T:OllamaFlow.Core.OllamaFlowCallbacks">
-            <summary>
-            OllamaFlow callbacks.
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.OllamaFlowCallbacks.#ctor">
-            <summary>
-            OllamaFlow callbacks.
-            </summary>
-        </member>
-        <member name="T:OllamaFlow.Core.OllamaFlowDaemon">
-            <summary>
-            OllamaFlow Daemon.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaFlowDaemon.Callbacks">
-            <summary>
-            OllamaFlow callbacks.  Attach handlers to these methods to integrate your application logic into OllamaFlow.
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.#ctor(OllamaFlow.Core.OllamaFlowSettings,System.Threading.CancellationTokenSource)">
-            <summary>
-            Instantiate.
-            </summary>
-            <param name="settings">Settings.</param>
-            <param name="tokenSource">Cancellation token source.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.Dispose">
-            <summary>
-            Dispose.
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.Dispose(System.Boolean)">
-            <summary>
-            Dispose.
-            </summary>
-            <param name="disposing">Disposing.</param>
-        </member>
-        <member name="T:OllamaFlow.Core.OllamaFlowSettings">
-            <summary>
-            Settings.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Logging">
-            <summary>
-            Logging settings.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Webserver">
-            <summary>
-            Webserver settings.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaFlowSettings.DatabaseFilename">
-            <summary>
-            Database filename.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.OllamaFlowSettings.AdminBearerTokens">
-            <summary>
-            Administrator bearer tokens.
-            </summary> 
-        </member>
-        <member name="M:OllamaFlow.Core.OllamaFlowSettings.#ctor">
-            <summary>
-            Instantiate.
-            </summary> 
         </member>
         <member name="T:OllamaFlow.Core.OllamaFrontend">
             <summary>
@@ -1230,6 +1286,79 @@
             <summary>
             Instantiate.
             </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.OllamaFlowCallbacks">
+            <summary>
+            OllamaFlow callbacks.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowCallbacks.#ctor">
+            <summary>
+            OllamaFlow callbacks.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.OllamaFlowDaemon">
+            <summary>
+            OllamaFlow Daemon.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowDaemon.Callbacks">
+            <summary>
+            OllamaFlow callbacks.  Attach handlers to these methods to integrate your application logic into OllamaFlow.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.#ctor(OllamaFlow.Core.OllamaFlowSettings,System.Threading.CancellationTokenSource)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="tokenSource">Cancellation token source.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.Dispose">
+            <summary>
+            Dispose.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowDaemon.Dispose(System.Boolean)">
+            <summary>
+            Dispose.
+            </summary>
+            <param name="disposing">Disposing.</param>
+        </member>
+        <member name="T:OllamaFlow.Core.OllamaFlowSettings">
+            <summary>
+            Settings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Logging">
+            <summary>
+            Logging settings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.Webserver">
+            <summary>
+            Webserver settings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.DatabaseFilename">
+            <summary>
+            Database filename.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.AdminBearerTokens">
+            <summary>
+            Administrator bearer tokens.
+            </summary> 
+        </member>
+        <member name="P:OllamaFlow.Core.OllamaFlowSettings.StickyHeaders">
+            <summary>
+            List of headers to use to identify a node when evaluating session stickiness.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.OllamaFlowSettings.#ctor">
+            <summary>
+            Instantiate.
+            </summary> 
         </member>
         <member name="T:OllamaFlow.Core.Serialization.ISerializer">
             <summary>

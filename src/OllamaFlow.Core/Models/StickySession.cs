@@ -8,7 +8,7 @@ namespace OllamaFlow.Core.Models
     public class StickySession
     {
         /// <summary>
-        /// Client identifier (typically IP address).
+        /// Client identifier (typically IP address or value from sticky headers).
         /// </summary>
         public string ClientId { get; set; } = null;
 

@@ -37,7 +37,7 @@
             {
                 if (method == HttpMethod.POST) return RequestTypeEnum.GenerateChatCompletion;
             }
-            else if (url.Equals("/api/embeddings"))
+            else if (url.Equals("/api/embeddings") || url.Equals("/api/embed"))
             {
                 if (method == HttpMethod.POST) return RequestTypeEnum.GenerateEmbeddings;
             }

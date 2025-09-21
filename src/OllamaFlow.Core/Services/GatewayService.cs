@@ -20,6 +20,7 @@
     using WatsonWebserver;
     using WatsonWebserver.Core;
     using System.Data.Common;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Gateway service.
@@ -48,8 +49,6 @@
         private HealthCheckService _HealthCheck = null;
         private ModelSynchronizationService _ModelSynchronization = null;
         private SessionStickinessService _SessionStickiness = null;
-
-        private const int BUFFER_SIZE = 65536;
 
         #endregion
 
@@ -290,6 +289,14 @@
         {
             Guid requestGuid = Guid.NewGuid();
             ctx.Response.Headers.Add(Constants.RequestIdHeader, requestGuid.ToString());
+            ctx.Response.Headers.Add(Constants.ForwardedForHeader, ctx.Request.Source.IpAddress);
+
+            TelemetryMessage telemetry = new TelemetryMessage
+            {
+                ClientId = ctx.Request.Source.IpAddress,
+                RequestBodySize = ctx.Request.ContentLength,
+                RequestArrivalUtc = DateTime.UtcNow
+            };
 
             try
             {
@@ -304,6 +311,7 @@
                 }
 
                 RequestTypeEnum requestType = RequestTypeHelper.DetermineRequestType(ctx.Request.Method, ctx.Request.Url.RawWithQuery);
+                telemetry.RequestType = requestType;
 
                 if (requestType == RequestTypeEnum.PullModel)
                 {
@@ -338,6 +346,8 @@
                 }
 
                 string clientId = GetClientIdentifier(ctx);
+                telemetry.ClientId = clientId;
+
                 OllamaBackend backend = _HealthCheck.GetNextBackend(frontend, clientId);
                 if (backend == null)
                 {
@@ -347,6 +357,13 @@
                     await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadGateway, null, "No backend servers are available to service your request"), true));
                     return;
                 }
+                else
+                {
+                    telemetry.BackendServerId = backend.Identifier;
+                    telemetry.BackendSelectedUtc = DateTime.UtcNow;
+                }
+
+                ctx.Response.Headers.Add(Constants.StickyServerHeader, backend.IsSticky.ToString());
 
                 if (frontend.MaxRequestBodySize > 0 && ctx.Request.ContentLength > frontend.MaxRequestBodySize)
                 {
@@ -376,7 +393,8 @@
                     requestGuid,
                     ctx,
                     frontend,
-                    backend);
+                    backend,
+                    telemetry);
 
                 if (!responseReceived)
                 {
@@ -393,6 +411,10 @@
                 ctx.Response.StatusCode = 500;
                 await ctx.Response.Send();
             }
+            finally
+            {
+                _Logging.Debug(_Header + _Serializer.SerializeJson(telemetry, false));
+            }
         }
 
         #endregion
@@ -401,7 +423,16 @@
 
         private string GetClientIdentifier(HttpContextBase ctx)
         {
-            return ctx.Request.Source.IpAddress;
+            string ret = ctx.Request.Source.IpAddress;
+            if (ctx.Request.Headers != null)
+            {
+                foreach (string stickyHeader in _Settings.StickyHeaders)
+                {
+                    string value = ctx.Request.Headers[stickyHeader]; // NameValueCollection lookups are case-insensitive
+                    if (!String.IsNullOrEmpty(value)) return value;
+                }
+            }
+            return ret;
         }
 
         private async Task GetRootRoute(HttpContextBase ctx)
@@ -479,7 +510,8 @@
             Guid requestGuid,
             HttpContextBase ctx,
             OllamaFrontend frontend,
-            OllamaBackend backend)
+            OllamaBackend backend,
+            TelemetryMessage telemetry)
         {
             _Logging.Debug(_Header + "proxying request to " + backend.Identifier + " for Ollama endpoint " + frontend.Identifier + " for request " + requestGuid.ToString());
 
@@ -522,8 +554,6 @@
                             }
                         }
 
-                        #region Log-Request-Body
-
                         if (frontend.LogRequestBody || backend.LogRequestBody)
                         {
                             int length = ctx.Request.DataAsBytes?.Length ?? 0;
@@ -538,28 +568,17 @@
                             _Logging.Debug(_Header + "using content-type: " + req.ContentType);
                         }
 
-                        #endregion
-
-                        #region Send-Request
-
+                        telemetry.BackendRequestSentUtc = DateTime.UtcNow;
                         if (ctx.Request.DataAsBytes != null && ctx.Request.DataAsBytes.Length > 0)
                         {
-                            #region With-Data
-
                             if (!String.IsNullOrEmpty(ctx.Request.ContentType)) req.ContentType = ctx.Request.ContentType;
                             else req.ContentType = Constants.BinaryContentType;
 
                             resp = await req.SendAsync(ctx.Request.DataAsBytes);
-
-                            #endregion
                         }
                         else
                         {
-                            #region Without-Data
-
                             resp = await req.SendAsync();
-
-                            #endregion
                         }
 
                         if (resp != null)
@@ -588,9 +607,22 @@
 
                             #region Set-Headers
 
+                            if (resp.Headers != null && resp.Headers.Count > 0)
+                            {
+                                // copy header into ctx.Response.Headers without disturbing values
+                                // that already exist in ctx.Response.Headers
+                                // but ONLY if the value doesn't already exist
+                                foreach (string headerName in resp.Headers.AllKeys)
+                                {
+                                    if (headerName != null && ctx.Response.Headers[headerName] == null)
+                                    {
+                                        ctx.Response.Headers.Add(headerName, resp.Headers[headerName]);
+                                    }
+                                }
+                            }
+
                             ctx.Response.StatusCode = resp.StatusCode;
                             ctx.Response.ContentType = resp.ContentType;
-                            ctx.Response.Headers = resp.Headers;
                             ctx.Response.Headers.Add(Constants.BackendServerHeader, backend.Identifier);
                             ctx.Response.ChunkedTransfer = resp.ChunkedTransferEncoding;
 
@@ -611,6 +643,8 @@
                                     while (true)
                                     {
                                         ChunkData chunk = await resp.ReadChunkAsync().ConfigureAwait(false);
+                                        if (telemetry.FirstTokenTimeUtc == null) telemetry.FirstTokenTimeUtc = DateTime.UtcNow;
+
                                         if (chunk == null || chunk.IsFinal)
                                         {
                                             if (chunk?.Data != null && chunk.Data.Length > 0)
@@ -641,6 +675,8 @@
                                     }
                                 }
 
+                                telemetry.LastTokenTimeUtc = DateTime.UtcNow;
+
                                 #endregion
                             }
                             else
@@ -653,6 +689,7 @@
                                 while (true)
                                 {
                                     ServerSentEvent sse = await resp.ReadEventAsync();
+                                    if (telemetry.FirstTokenTimeUtc == null) telemetry.FirstTokenTimeUtc = DateTime.UtcNow;
 
                                     if (sse == null)
                                     {
@@ -670,6 +707,8 @@
                                         }
                                     }
                                 }
+
+                                telemetry.LastTokenTimeUtc = DateTime.UtcNow;
 
                                 await ctx.Response.SendEvent(null, true);
 
@@ -959,9 +998,6 @@
             ctx.Response.StatusCode = 200;
             await ctx.Response.Send(_Serializer.SerializeJson(result, true));
         }
-
-
-        #endregion
 
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     }
