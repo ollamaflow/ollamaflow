@@ -7,7 +7,9 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(curl:*)",
-      "Bash(xxd:*)"
+      "Bash(xxd:*)",
+      "Bash(git checkout:*)",
+      "Bash(dotnet test)"
     ],
     "deny": [],
     "ask": []

@@ -389,11 +389,12 @@
 
                 Interlocked.Increment(ref backend._PendingRequests);
 
-                bool responseReceived = await ProxyRequest(
+                bool responseReceived = await ProcessRequestWithRetry(
                     requestGuid,
                     ctx,
                     frontend,
                     backend,
+                    clientId,
                     telemetry);
 
                 if (!responseReceived)
@@ -503,6 +504,429 @@
                     return System.Net.Http.HttpMethod.Trace;
                 default:
                     throw new ArgumentException("Unknown HTTP method " + method.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Result of a proxy request operation.
+        /// </summary>
+        internal class ProxyResult
+        {
+            /// <summary>
+            /// Whether a response was received from the backend.
+            /// </summary>
+            public bool ResponseReceived { get; set; }
+
+            /// <summary>
+            /// The HTTP status code returned by the backend.
+            /// </summary>
+            public int StatusCode { get; set; }
+        }
+
+        /// <summary>
+        /// Process a request with retry logic for 50x errors.
+        /// </summary>
+        /// <param name="requestGuid">Request unique identifier.</param>
+        /// <param name="ctx">HTTP context.</param>
+        /// <param name="frontend">Frontend configuration.</param>
+        /// <param name="initialBackend">Initially selected backend.</param>
+        /// <param name="clientId">Client identifier.</param>
+        /// <param name="telemetry">Telemetry object.</param>
+        /// <returns>True if response was successfully sent, false otherwise.</returns>
+        private async Task<bool> ProcessRequestWithRetry(
+            Guid requestGuid,
+            HttpContextBase ctx,
+            OllamaFrontend frontend,
+            OllamaBackend initialBackend,
+            string clientId,
+            TelemetryMessage telemetry)
+        {
+            OllamaBackend currentBackend = initialBackend;
+
+            ProxyResult result = await ProxyRequestInternal(requestGuid, ctx, frontend, currentBackend, telemetry);
+
+            // Check if we should retry on 50x response
+            if (frontend.AllowRetries &&
+                result.ResponseReceived &&
+                result.StatusCode >= 500 &&
+                result.StatusCode < 600)
+            {
+                _Logging.Info(_Header + "received " + result.StatusCode + " response from backend " + currentBackend.Identifier + ", attempting retry");
+
+                // Remove sticky sessions for the failed backend
+                if (frontend.UseStickySessions)
+                {
+                    _SessionStickiness.RemoveSession(clientId, frontend.Identifier);
+                    _Logging.Debug(_Header + "removed sticky session for client " + clientId + " due to backend failure");
+                }
+
+                // Get another backend for retry (exclude the failed backend)
+                OllamaBackend retryBackend = GetAlternativeBackend(frontend, initialBackend.Identifier);
+
+                if (retryBackend != null)
+                {
+                    _Logging.Info(_Header + "retrying request with backend " + retryBackend.Identifier);
+                    telemetry.BackendServerId = retryBackend.Identifier;
+                    telemetry.BackendSelectedUtc = DateTime.UtcNow;
+
+                    // Update the response headers for the new backend
+                    ctx.Response.Headers.Remove(Constants.BackendServerHeader);
+                    ctx.Response.Headers.Remove(Constants.StickyServerHeader);
+                    ctx.Response.Headers.Add(Constants.StickyServerHeader, retryBackend.IsSticky.ToString());
+
+                    ProxyResult retryResult = await ProxyRequestInternal(requestGuid, ctx, frontend, retryBackend, telemetry);
+
+                    if (retryResult.ResponseReceived)
+                    {
+                        // If retry succeeded and sticky sessions are enabled, create new sticky session
+                        if (frontend.UseStickySessions && retryResult.StatusCode < 500)
+                        {
+                            _SessionStickiness.SetStickyBackend(clientId, frontend.Identifier, retryBackend.Identifier, frontend.StickySessionExpirationMs);
+                            _Logging.Debug(_Header + "created new sticky session for client " + clientId + " with backend " + retryBackend.Identifier);
+                        }
+
+                        return true;
+                    }
+                    else
+                    {
+                        _Logging.Warn(_Header + "retry to backend " + retryBackend.Identifier + " also failed");
+                        return false;
+                    }
+                }
+                else
+                {
+                    _Logging.Warn(_Header + "no alternative backend available for retry");
+                    // Return 502 Bad Gateway when no backends are available
+                    ctx.Response.StatusCode = 502;
+                    ctx.Response.ContentType = Constants.JsonContentType;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadGateway, null, "No backend servers are available to retry your request"), true));
+                    return false;
+                }
+            }
+
+            return result.ResponseReceived;
+        }
+
+        /// <summary>
+        /// Get an alternative backend excluding a specific backend.
+        /// </summary>
+        /// <param name="frontend">Frontend configuration.</param>
+        /// <param name="excludeBackendId">Backend to exclude from selection.</param>
+        /// <returns>Alternative backend or null if none available.</returns>
+        private OllamaBackend GetAlternativeBackend(OllamaFrontend frontend, string excludeBackendId)
+        {
+            List<OllamaBackend> healthyBackends = _HealthCheck.Backends.Where(b =>
+                frontend.Backends.Contains(b.Identifier) &&
+                b.Healthy &&
+                b.Identifier != excludeBackendId).ToList();
+
+            if (!healthyBackends.Any())
+            {
+                _Logging.Debug(_Header + "no alternative healthy backends available (excluding " + excludeBackendId + ")");
+                return null;
+            }
+
+            // Use load balancing to select from available backends
+            OllamaBackend selected = null;
+
+            switch (frontend.LoadBalancing)
+            {
+                case LoadBalancingMode.RoundRobin:
+                    lock (frontend.Lock)
+                    {
+                        if (frontend.LastBackendIndex >= healthyBackends.Count)
+                        {
+                            frontend.LastBackendIndex = 0;
+                        }
+                        selected = healthyBackends[frontend.LastBackendIndex];
+                        frontend.LastBackendIndex++;
+                    }
+                    break;
+
+                case LoadBalancingMode.Random:
+                    int index = _Random.Next(0, healthyBackends.Count);
+                    selected = healthyBackends[index];
+                    break;
+
+                default:
+                    selected = healthyBackends.First();
+                    break;
+            }
+
+            _Logging.Debug(_Header + "selected alternative backend " + selected.Identifier + " using " + frontend.LoadBalancing + " load balancing");
+            return selected;
+        }
+
+        private async Task<ProxyResult> ProxyRequestInternal(
+            Guid requestGuid,
+            HttpContextBase ctx,
+            OllamaFrontend frontend,
+            OllamaBackend backend,
+            TelemetryMessage telemetry)
+        {
+            _Logging.Debug(_Header + "proxying request to " + backend.Identifier + " for Ollama endpoint " + frontend.Identifier + " for request " + requestGuid.ToString());
+
+            RestResponse resp = null;
+
+            using (Timestamp ts = new Timestamp())
+            {
+                string url = backend.UrlPrefix + ctx.Request.Url.RawWithQuery;
+
+                try
+                {
+                    await backend.Semaphore.WaitAsync().ConfigureAwait(false);
+                    Interlocked.Increment(ref backend._ActiveRequests);
+                    Interlocked.Decrement(ref backend._PendingRequests);
+
+                    using (RestRequest req = new RestRequest(url, ConvertHttpMethod(ctx.Request.Method)))
+                    {
+                        if (frontend.TimeoutMs > 0) req.TimeoutMilliseconds = frontend.TimeoutMs;
+
+                        req.Headers.Add(Constants.ForwardedForHeader, ctx.Request.Source.IpAddress);
+
+                        if (ctx.Request.Headers != null && ctx.Request.Headers.Count > 0)
+                        {
+                            foreach (string key in ctx.Request.Headers.Keys)
+                            {
+                                if (!req.Headers.AllKeys.Contains(key))
+                                {
+                                    string val = ctx.Request.Headers.Get(key);
+                                    req.Headers.Add(key, val);
+                                }
+                            }
+                        }
+
+                        foreach (string key in req.Headers.AllKeys)
+                        {
+                            if (key.ToLower().Equals("host"))
+                            {
+                                req.Headers.Remove(key);
+                                req.Headers.Add("Host", backend.Hostname + ":" + backend.Port.ToString());
+                            }
+                        }
+
+                        if (frontend.LogRequestBody || backend.LogRequestBody)
+                        {
+                            int length = ctx.Request.DataAsBytes?.Length ?? 0;
+                            byte[] dataBytes =  ctx.Request.DataAsBytes ?? Array.Empty<byte>();
+
+                            _Logging.Debug(
+                                _Header
+                                + "request body (" + length + " bytes): "
+                                + Environment.NewLine
+                                + Encoding.UTF8.GetString(dataBytes));
+
+                            _Logging.Debug(_Header + "using content-type: " + req.ContentType);
+                        }
+
+                        telemetry.BackendRequestSentUtc = DateTime.UtcNow;
+                        if (ctx.Request.DataAsBytes != null && ctx.Request.DataAsBytes.Length > 0)
+                        {
+                            if (!String.IsNullOrEmpty(ctx.Request.ContentType)) req.ContentType = ctx.Request.ContentType;
+                            else req.ContentType = Constants.BinaryContentType;
+
+                            resp = await req.SendAsync(ctx.Request.DataAsBytes);
+                        }
+                        else
+                        {
+                            resp = await req.SendAsync();
+                        }
+
+                        if (resp != null)
+                        {
+                            #region Log-Response-Body
+
+                            if (frontend.LogResponseBody || backend.LogResponseBody)
+                            {
+                                if (resp.DataAsBytes != null && resp.DataAsBytes.Length > 0)
+                                {
+                                    _Logging.Debug(
+                                        _Header
+                                        + "response body (" + resp.DataAsBytes.Length + " bytes) status " + resp.StatusCode + ": "
+                                        + Environment.NewLine
+                                        + Encoding.UTF8.GetString(resp.DataAsBytes));
+                                }
+                                else
+                                {
+                                    _Logging.Debug(
+                                        _Header
+                                        + "response body (0 bytes) status " + resp.StatusCode);
+                                }
+                            }
+
+                            #endregion
+
+                            #region Set-Headers
+
+                            if (resp.Headers != null && resp.Headers.Count > 0)
+                            {
+                                // copy header into ctx.Response.Headers without disturbing values
+                                // that already exist in ctx.Response.Headers
+                                // but ONLY if the value doesn't already exist
+                                foreach (string headerName in resp.Headers.AllKeys)
+                                {
+                                    if (headerName != null && ctx.Response.Headers[headerName] == null)
+                                    {
+                                        ctx.Response.Headers.Add(headerName, resp.Headers[headerName]);
+                                    }
+                                }
+                            }
+
+                            ctx.Response.StatusCode = resp.StatusCode;
+                            ctx.Response.ContentType = resp.ContentType;
+                            ctx.Response.Headers.Add(Constants.BackendServerHeader, backend.Identifier);
+                            ctx.Response.ChunkedTransfer = resp.ChunkedTransferEncoding;
+
+                            #endregion
+
+                            #region Send-Response
+
+                            if (!resp.ServerSentEvents)
+                            {
+                                #region Not-Server-Sent-Events
+
+                                if (!ctx.Response.ChunkedTransfer)
+                                {
+                                    await ctx.Response.Send(resp.DataAsBytes);
+                                }
+                                else
+                                {
+                                    while (true)
+                                    {
+                                        ChunkData chunk = await resp.ReadChunkAsync().ConfigureAwait(false);
+                                        if (telemetry.FirstTokenTimeUtc == null) telemetry.FirstTokenTimeUtc = DateTime.UtcNow;
+
+                                        if (chunk == null || chunk.IsFinal)
+                                        {
+                                            if (chunk?.Data != null && chunk.Data.Length > 0)
+                                            {
+                                                // For NDJSON format, append Environment.NewLine to final chunk
+                                                byte[] newlineBytes = System.Text.Encoding.UTF8.GetBytes(Environment.NewLine);
+                                                byte[] finalData = new byte[chunk.Data.Length + newlineBytes.Length];
+                                                Array.Copy(chunk.Data, finalData, chunk.Data.Length);
+                                                Array.Copy(newlineBytes, 0, finalData, chunk.Data.Length, newlineBytes.Length);
+                                                await ctx.Response.SendChunk(finalData, true).ConfigureAwait(false);
+                                            }
+                                            else
+                                            {
+                                                // Send empty final chunk
+                                                await ctx.Response.SendChunk(Array.Empty<byte>(), true).ConfigureAwait(false);
+                                            }
+                                            break;
+                                        }
+                                        else if (chunk.Data != null && chunk.Data.Length > 0)
+                                        {
+                                            // For NDJSON format, append Environment.NewLine to each chunk
+                                            byte[] newlineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
+                                            byte[] chunkWithNewline = new byte[chunk.Data.Length + newlineBytes.Length];
+                                            Array.Copy(chunk.Data, chunkWithNewline, chunk.Data.Length);
+                                            Array.Copy(newlineBytes, 0, chunkWithNewline, chunk.Data.Length, newlineBytes.Length);
+                                            await ctx.Response.SendChunk(chunkWithNewline, false).ConfigureAwait(false);
+                                        }
+                                    }
+                                }
+
+                                telemetry.LastTokenTimeUtc = DateTime.UtcNow;
+
+                                #endregion
+                            }
+                            else
+                            {
+                                #region Server-Sent-Events
+
+                                ctx.Response.ProtocolVersion = "HTTP/1.1";
+                                ctx.Response.ServerSentEvents = true;
+
+                                while (true)
+                                {
+                                    ServerSentEvent sse = await resp.ReadEventAsync();
+                                    if (telemetry.FirstTokenTimeUtc == null) telemetry.FirstTokenTimeUtc = DateTime.UtcNow;
+
+                                    if (sse == null)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        if (!String.IsNullOrEmpty(sse.Data))
+                                        {
+                                            await ctx.Response.SendEvent(sse.Data, false);
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                telemetry.LastTokenTimeUtc = DateTime.UtcNow;
+
+                                await ctx.Response.SendEvent(null, true);
+
+                                #endregion
+                            }
+
+                            #endregion
+
+                            return new ProxyResult { ResponseReceived = true, StatusCode = resp.StatusCode };
+                        }
+                        else
+                        {
+                            _Logging.Warn(_Header + "no response from origin " + url);
+                            return new ProxyResult { ResponseReceived = false, StatusCode = 0 };
+                        }
+                    }
+                }
+                catch (System.Net.Http.HttpRequestException hre)
+                {
+                    _Logging.Warn(
+                        _Header
+                        + "exception proxying request to backend " + backend.Identifier
+                        + " for endpoint " + frontend.Identifier
+                        + " for request " + requestGuid.ToString()
+                        + ": " + hre.Message);
+
+                    return new ProxyResult { ResponseReceived = false, StatusCode = 0 };
+                }
+                catch (SocketException se)
+                {
+                    _Logging.Warn(
+                        _Header
+                        + "exception proxying request to backend " + backend.Identifier
+                        + " for endpoint " + frontend.Identifier
+                        + " for request " + requestGuid.ToString()
+                        + ": " + se.Message);
+
+                    return new ProxyResult { ResponseReceived = false, StatusCode = 0 };
+                }
+                catch (Exception e)
+                {
+                    _Logging.Warn(
+                        _Header
+                        + "exception proxying request to backend " + backend.Identifier
+                        + " for endpoint " + frontend.Identifier
+                        + " for request " + requestGuid.ToString()
+                        + Environment.NewLine
+                        + e.ToString());
+
+                    return new ProxyResult { ResponseReceived = false, StatusCode = 0 };
+                }
+                finally
+                {
+                    ts.End = DateTime.UtcNow;
+                    _Logging.Debug(
+                        _Header
+                        + "completed request " + requestGuid.ToString() + " "
+                        + "backend " + backend.Identifier + " "
+                        + "frontend " + frontend.Identifier + " "
+                        + (resp != null ? resp.StatusCode : "0") + " "
+                        + "(" + ts.TotalMs + "ms)");
+
+                    if (resp != null) resp.Dispose();
+
+                    backend.Semaphore.Release();
+                    Interlocked.Decrement(ref backend._ActiveRequests);
+                }
             }
         }
 

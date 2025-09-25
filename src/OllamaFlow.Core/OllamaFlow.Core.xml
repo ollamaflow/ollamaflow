@@ -1694,6 +1694,41 @@
             <param name="ctx">HTTP context.</param>
             <returns>Task.</returns>
         </member>
+        <member name="T:OllamaFlow.Core.Services.GatewayService.ProxyResult">
+            <summary>
+            Result of a proxy request operation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.ResponseReceived">
+            <summary>
+            Whether a response was received from the backend.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.StatusCode">
+            <summary>
+            The HTTP status code returned by the backend.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessRequestWithRetry(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.OllamaFrontend,OllamaFlow.Core.OllamaBackend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
+            <summary>
+            Process a request with retry logic for 50x errors.
+            </summary>
+            <param name="requestGuid">Request unique identifier.</param>
+            <param name="ctx">HTTP context.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="initialBackend">Initially selected backend.</param>
+            <param name="clientId">Client identifier.</param>
+            <param name="telemetry">Telemetry object.</param>
+            <returns>True if response was successfully sent, false otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetAlternativeBackend(OllamaFlow.Core.OllamaFrontend,System.String)">
+            <summary>
+            Get an alternative backend excluding a specific backend.
+            </summary>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="excludeBackendId">Backend to exclude from selection.</param>
+            <returns>Alternative backend or null if none available.</returns>
+        </member>
         <member name="T:OllamaFlow.Core.Services.HealthCheckService">
             <summary>
             Health check service.
