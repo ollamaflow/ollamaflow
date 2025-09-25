@@ -30,6 +30,7 @@
                 + "logresponsebody INT NOT NULL, "
                 + "usestickysessions INT NOT NULL DEFAULT 0, "
                 + "stickysessionexpirationms INT NOT NULL DEFAULT 1800000, "
+                + "allowretries INT NOT NULL DEFAULT 1, "
                 + "active INT NOT NULL, "
                 + "createdutc VARCHAR(64), "
                 + "lastupdateutc VARCHAR(64) "

@@ -4,9 +4,6 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Data;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using ExpressionTree;
     using OllamaFlow.Core.Serialization;
 
@@ -601,6 +598,7 @@
                 LogResponseBody = GetDataRowIntValue(row, "logresponsebody") == 1,
                 UseStickySessions = HasColumn(row.Table, "usestickysessions") ? GetDataRowIntValue(row, "usestickysessions") == 1 : false,
                 StickySessionExpirationMs = HasColumn(row.Table, "stickysessionexpirationms") ? GetDataRowIntValue(row, "stickysessionexpirationms") : 1800000,
+                AllowRetries = HasColumn(row.Table, "allowretries") ? GetDataRowIntValue(row, "allowretries") == 1 : false,
                 Active = GetDataRowIntValue(row, "active") == 1,
                 CreatedUtc = DateTime.Parse(row["createdutc"].ToString()),
                 LastUpdateUtc = DateTime.Parse(row["lastupdateutc"].ToString())

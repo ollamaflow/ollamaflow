@@ -208,6 +208,11 @@
         }
 
         /// <summary>
+        /// Allow OllamaFlow to retry failed requests.
+        /// </summary>
+        public bool AllowRetries { get; set; } = true;
+
+        /// <summary>
         /// Boolean indicating if the object is active or not.
         /// </summary>
         public bool Active { get; set; } = true;

@@ -1267,6 +1267,11 @@
             Maximum is 86400000 milliseconds (24 hours).
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.OllamaFrontend.AllowRetries">
+            <summary>
+            Allow OllamaFlow to retry failed requests.
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.OllamaFrontend.Active">
             <summary>
             Boolean indicating if the object is active or not.
