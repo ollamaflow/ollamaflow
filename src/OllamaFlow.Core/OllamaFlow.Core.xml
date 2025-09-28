@@ -100,6 +100,11 @@
             Sticky server header.
             </summary>
         </member>
+        <member name="F:OllamaFlow.Core.Constants.ExposeHeadersHeader">
+            <summary>
+            Expose headers header.
+            </summary>
+        </member>
         <member name="T:OllamaFlow.Core.Database.DatabaseDriverBase">
             <summary>
             Base class for database driver.
@@ -147,14 +152,14 @@
             Interface for backend methods.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.Create(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.Create(OllamaFlow.Core.Backend)">
             <summary>
             Create.
             </summary>
             <param name="obj">Record.</param>
             <returns>Record.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.OllamaBackend})">
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.Backend})">
             <summary>
             Create multiple records.
             </summary>
@@ -190,7 +195,7 @@
             <param name="continuationToken">Continuation token.</param>
             <returns>Number of records.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.Update(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IBackendMethods.Update(OllamaFlow.Core.Backend)">
             <summary>
             Update a record.
             </summary>
@@ -228,14 +233,14 @@
             Interface for frontend methods.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.Create(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.Create(OllamaFlow.Core.Frontend)">
             <summary>
             Create.
             </summary>
             <param name="obj">Record.</param>
             <returns>Record.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.OllamaFrontend})">
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.Frontend})">
             <summary>
             Create multiple records.
             </summary>
@@ -271,7 +276,7 @@
             <param name="continuationToken">Continuation token.</param>
             <returns>Number of records.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.Update(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Database.Interfaces.IFrontendMethods.Update(OllamaFlow.Core.Frontend)">
             <summary>
             Update a record.
             </summary>
@@ -318,10 +323,10 @@
             </summary>
             <param name="repo">Database driver.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.Create(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.Create(OllamaFlow.Core.Backend)">
             <inheritdoc />
         </member>
-        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.OllamaBackend})">
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.Backend})">
             <inheritdoc />
         </member>
         <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.ReadAll(OllamaFlow.Core.EnumerationOrderEnum)">
@@ -336,7 +341,7 @@
         <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.GetRecordCount(OllamaFlow.Core.EnumerationOrderEnum,System.String)">
             <inheritdoc />
         </member>
-        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.Update(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.Update(OllamaFlow.Core.Backend)">
             <inheritdoc />
         </member>
         <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.BackendMethods.DeleteByIdentifier(System.String)">
@@ -372,10 +377,10 @@
             </summary>
             <param name="repo">Database driver.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.Create(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.Create(OllamaFlow.Core.Frontend)">
             <inheritdoc />
         </member>
-        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.OllamaFrontend})">
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.CreateMany(System.Collections.Generic.List{OllamaFlow.Core.Frontend})">
             <inheritdoc />
         </member>
         <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.ReadAll(OllamaFlow.Core.EnumerationOrderEnum)">
@@ -390,7 +395,7 @@
         <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.GetRecordCount(OllamaFlow.Core.EnumerationOrderEnum,System.String)">
             <inheritdoc />
         </member>
-        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.Update(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.Update(OllamaFlow.Core.Frontend)">
             <inheritdoc />
         </member>
         <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.DeleteByGuid(System.String)">
@@ -464,6 +469,21 @@
         <member name="M:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver.Finalize">
             <summary>
             Finalizer for SqliteDatabaseDriver.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Enums.ApiFormatEnum">
+            <summary>
+            API format supported by backends.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Enums.ApiFormatEnum.Ollama">
+            <summary>
+            Ollama native API format.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Enums.ApiFormatEnum.OpenAI">
+            <summary>
+            OpenAI compatible API format.
             </summary>
         </member>
         <member name="T:OllamaFlow.Core.Helpers.RequestTypeEnum">
@@ -576,253 +596,789 @@
             OpenAI-compatible model retrieval endpoint.
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.ApiErrorEnum">
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest">
             <summary>
-            API error codes.
+            Base class for all agnostic requests.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthenticationFailed">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest.RequestId">
             <summary>
-            Authentication failed.
+            Unique identifier for this request.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthorizationFailed">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest.SourceFormat">
             <summary>
-            Authorization failed.
+            The API format this request originated from.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadGateway">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest.CreatedUtc">
             <summary>
-            Bad gateway.
+            Timestamp when the request was created.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadRequest">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest.ExtensionData">
             <summary>
-            Bad request.
+            Extension data for API-specific features that don't map to agnostic format.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.Conflict">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest.OriginalRequest">
             <summary>
-            Conflict.
+            Original request object for debugging/logging purposes.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.DeserializationError">
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse">
             <summary>
-            DeserializationError.
+            Base class for all agnostic responses.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.Inactive">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.ResponseId">
             <summary>
-            Inactive.
+            Unique identifier for this response.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.InternalError">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.RequestId">
             <summary>
-            Internal error.
+            The request ID this response is for.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.InvalidRange">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.SourceFormat">
             <summary>
-            Invalid range.
+            The API format where this response originated from.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.InUse">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.TargetFormat">
             <summary>
-            In use.
+            The API format this response should be transformed to.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotEmpty">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.CreatedUtc">
             <summary>
-            Not empty.
+            Timestamp when the response was created.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotFound">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.ExtensionData">
             <summary>
-            Not found.
+            Extension data for API-specific features that don't map to agnostic format.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.SlowDown">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.OriginalResponse">
             <summary>
-            Slow down.
+            Original backend response object for debugging/logging purposes.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.TokenExpired">
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Common.AgnosticChoice">
             <summary>
-            Token expired.
+            Represents a completion choice in a response.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.TooLarge">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticChoice.Index">
             <summary>
-            Request too large.
+            Index of this choice in the list of choices.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.ApiErrorEnum.UnsupportedHttpVersion">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticChoice.Message">
             <summary>
-            Unsupported HTTP version.
+            The message content for this choice.
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.ApiErrorResponse">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticChoice.Text">
             <summary>
-            API error response.
+            The text content for this choice (for non-chat completions).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.Error">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticChoice.FinishReason">
             <summary>
-            Error.
+            The reason the completion finished.
+            Valid values: "stop", "length", "content_filter", null
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.Message">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticChoice.LogProbs">
             <summary>
-            Human-readable message.
+            Log probabilities for the tokens in this choice.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.StatusCode">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticChoice.ExtensionData">
             <summary>
-            HTTP status code.
+            Extension data for API-specific choice features.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.Context">
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Common.AgnosticError">
             <summary>
-            Additional contextual information.
+            Represents an error in an agnostic format.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.ApiErrorResponse.Description">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticError.Message">
             <summary>
-            Description.
+            Error message.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticError.Type">
             <summary>
-            Instantiate.
+            Error type or category.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor(OllamaFlow.Core.ApiErrorEnum,System.Object,System.String)">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticError.Code">
             <summary>
-            Instantiate.
-            </summary>
-            <param name="error">Error code.</param>
-            <param name="context">Context.</param>
-            <param name="description">Description.</param>
-            
-        </member>
-        <member name="T:OllamaFlow.Core.EnumerationOrderEnum">
-            <summary>
-            Enumeration order. 
+            Error code.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedAscending">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticError.Parameter">
             <summary>
-            Created ascending.
+            Parameter that caused the error.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedDescending">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticError.Details">
             <summary>
-            Created descending.
+            Internal error details.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierAscending">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticError.ExtensionData">
             <summary>
-            Identifier ascending.
+            Extension data for API-specific error features.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierDescending">
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Common.AgnosticMessage">
             <summary>
-            Identifier descending.
+            Represents a message in a conversation.
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.EnumerationRequest">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticMessage.Role">
             <summary>
-            Object used to request enumeration.
+            The role of the message author.
+            Valid values: "system", "user", "assistant"
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationRequest.Ordering">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticMessage.Content">
             <summary>
-            Order by.
+            The content of the message.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationRequest.MaxResults">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticMessage.Name">
             <summary>
-            Maximum number of results to retrieve.
+            Optional name for the message author.
+            Used for multi-participant conversations.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationRequest.Skip">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticMessage.ExtensionData">
             <summary>
-            The number of records to skip.
+            Extension data for API-specific message features.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationRequest.ContinuationToken">
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Common.AgnosticMessageDelta">
             <summary>
-            Continuation token.
+            Agnostic message delta for streaming responses.
+            Represents incremental content changes in a streaming response.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.EnumerationRequest.#ctor">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticMessageDelta.Role">
             <summary>
-            Instantiate.
+            The role of the message (only in first chunk).
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.EnumerationResult`1">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticMessageDelta.Content">
             <summary>
-            Object returned as the result of an enumeration.
+            The incremental content for this delta.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.Success">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticMessageDelta.Name">
             <summary>
-            Indicates if the statistics operation was successful.
+            The name of the message sender (optional).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.Timestamp">
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel">
             <summary>
-            Start and end timestamps.
+            Represents model information in an agnostic format.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.MaxResults">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.Id">
             <summary>
-            Maximum number of results to retrieve.
+            Unique identifier for the model.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.ContinuationToken">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.Name">
             <summary>
-            Continuation token.
+            Human-readable name of the model.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.EndOfResults">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.Type">
             <summary>
-            Boolean indicating end of results.
+            Type of the model (e.g., "chat", "completion", "embedding").
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.TotalRecords">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.Description">
             <summary>
-            Total number of records.
+            Description of the model.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.RecordsRemaining">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.SizeBytes">
             <summary>
-            Number of candidate records remaining in the enumeration.
+            Size of the model in bytes.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.EnumerationResult`1.Objects">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.CreatedAt">
             <summary>
-            Objects.
+            When the model was created.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.EnumerationResult`1.#ctor">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.ModifiedAt">
             <summary>
-            Instantiates the object.
+            When the model was last modified.
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.LoadBalancingMode">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.Family">
             <summary>
-            Load balancing mode.
+            Model family or parent model.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.LoadBalancingMode.Random">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.Format">
             <summary>
-            Random.
+            Model format (e.g., "gguf", "pytorch").
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.LoadBalancingMode.RoundRobin">
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.Parameters">
             <summary>
-            Round robin.
+            Parameters or configuration for the model.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticModel.ExtensionData">
+            <summary>
+            Extension data for API-specific model features.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk">
+            <summary>
+            Represents a streaming chunk in an agnostic format.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.Id">
+            <summary>
+            Unique identifier for this chunk.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.Object">
+            <summary>
+            Object type, typically "chat.completion.chunk".
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.Created">
+            <summary>
+            Unix timestamp when the chunk was created.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.Model">
+            <summary>
+            The model used for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.Choices">
+            <summary>
+            The completion choices in this chunk.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.Usage">
+            <summary>
+            Usage statistics (typically only in the final chunk).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.IsComplete">
+            <summary>
+            Whether this is the final chunk in the stream.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.Done">
+            <summary>
+            Whether the response is done (for Ollama compatibility).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.Response">
+            <summary>
+            The response text for this chunk (for Ollama compatibility).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamChunk.ExtensionData">
+            <summary>
+            Extension data for API-specific chunk features.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamingChoice">
+            <summary>
+            Agnostic streaming choice for chat completions.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamingChoice.Index">
+            <summary>
+            Index of this choice in the list.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamingChoice.Delta">
+            <summary>
+            The streaming message delta (incremental content).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticStreamingChoice.FinishReason">
+            <summary>
+            The reason the model stopped generating tokens.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Common.AgnosticUsage">
+            <summary>
+            Token usage information for a completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticUsage.PromptTokens">
+            <summary>
+            Number of tokens in the prompt.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticUsage.CompletionTokens">
+            <summary>
+            Number of tokens in the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticUsage.TotalTokens">
+            <summary>
+            Total number of tokens used.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticUsage.PromptEvalDuration">
+            <summary>
+            Time taken to evaluate the prompt (milliseconds).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticUsage.CompletionDuration">
+            <summary>
+            Time taken to generate the completion (milliseconds).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticUsage.TotalDuration">
+            <summary>
+            Total time taken for the request (milliseconds).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticUsage.PromptEvalRate">
+            <summary>
+            Number of evaluations per second for prompt.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Common.AgnosticUsage.CompletionRate">
+            <summary>
+            Number of evaluations per second for completion.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest">
+            <summary>
+            Agnostic chat completion request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.Model">
+            <summary>
+            The model to use for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.Messages">
+            <summary>
+            The messages to generate a completion for.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.Temperature">
+            <summary>
+            Sampling temperature between 0 and 2.
+            Higher values make output more random, lower values more focused.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.MaxTokens">
+            <summary>
+            Maximum number of tokens to generate.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.Stream">
+            <summary>
+            Whether to stream the response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.Stop">
+            <summary>
+            Sequences where the API will stop generating further tokens.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.TopP">
+            <summary>
+            Nucleus sampling parameter between 0 and 1.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.N">
+            <summary>
+            Number of completions to generate.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.FrequencyPenalty">
+            <summary>
+            Frequency penalty between -2.0 and 2.0.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.PresencePenalty">
+            <summary>
+            Presence penalty between -2.0 and 2.0.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.Seed">
+            <summary>
+            Seed for deterministic generation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.System">
+            <summary>
+            System prompt or context.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.Template">
+            <summary>
+            Template to use for formatting the prompt.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticChatRequest.Options">
+            <summary>
+            Additional options for model-specific parameters.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest">
+            <summary>
+            Agnostic completion request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.Model">
+            <summary>
+            The model to use for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.Prompt">
+            <summary>
+            The prompt to generate a completion for.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.Temperature">
+            <summary>
+            Sampling temperature between 0 and 2.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.MaxTokens">
+            <summary>
+            Maximum number of tokens to generate.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.Stream">
+            <summary>
+            Whether to stream the response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.Stop">
+            <summary>
+            Sequences where the API will stop generating further tokens.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.TopP">
+            <summary>
+            Nucleus sampling parameter between 0 and 1.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.N">
+            <summary>
+            Number of completions to generate.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.FrequencyPenalty">
+            <summary>
+            Frequency penalty between -2.0 and 2.0.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.PresencePenalty">
+            <summary>
+            Presence penalty between -2.0 and 2.0.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.Seed">
+            <summary>
+            Seed for deterministic generation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.System">
+            <summary>
+            System prompt or context.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.Template">
+            <summary>
+            Template to use for formatting the prompt.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticCompletionRequest.Options">
+            <summary>
+            Additional options for model-specific parameters.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticEmbeddingRequest">
+            <summary>
+            Agnostic embedding request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticEmbeddingRequest.Model">
+            <summary>
+            The model to use for generating embeddings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticEmbeddingRequest.Input">
+            <summary>
+            Input text or texts to generate embeddings for.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticEmbeddingRequest.EncodingFormat">
+            <summary>
+            The format to return embeddings in.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticEmbeddingRequest.Options">
+            <summary>
+            Additional options for model-specific parameters.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticModelInfoRequest">
+            <summary>
+            Agnostic model information request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticModelInfoRequest.Model">
+            <summary>
+            The model to get information about.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Requests.AgnosticModelListRequest">
+            <summary>
+            Agnostic model list request.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticChatResponse">
+            <summary>
+            Agnostic chat completion response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticChatResponse.Id">
+            <summary>
+            Unique identifier for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticChatResponse.Object">
+            <summary>
+            Object type, typically "chat.completion".
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticChatResponse.Created">
+            <summary>
+            Unix timestamp when the completion was created.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticChatResponse.Model">
+            <summary>
+            The model used for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticChatResponse.Choices">
+            <summary>
+            The completion choices.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticChatResponse.Usage">
+            <summary>
+            Usage statistics for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticChatResponse.SystemFingerprint">
+            <summary>
+            System fingerprint for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticChatResponse.Done">
+            <summary>
+            Whether the response is complete.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticCompletionResponse">
+            <summary>
+            Agnostic completion response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticCompletionResponse.Id">
+            <summary>
+            Unique identifier for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticCompletionResponse.Object">
+            <summary>
+            Object type, typically "text_completion".
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticCompletionResponse.Created">
+            <summary>
+            Unix timestamp when the completion was created.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticCompletionResponse.Model">
+            <summary>
+            The model used for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticCompletionResponse.Choices">
+            <summary>
+            The completion choices.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticCompletionResponse.Usage">
+            <summary>
+            Usage statistics for the completion.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticCompletionResponse.Done">
+            <summary>
+            Whether the response is complete.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticCompletionResponse.Response">
+            <summary>
+            The generated response text (for Ollama compatibility).
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingResponse">
+            <summary>
+            Agnostic embedding response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingResponse.Object">
+            <summary>
+            Object type, typically "list".
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingResponse.Data">
+            <summary>
+            The embedding data.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingResponse.Model">
+            <summary>
+            The model used for generating embeddings.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingResponse.Usage">
+            <summary>
+            Usage statistics for the embedding generation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingResponse.Embedding">
+            <summary>
+            The embedding vector (for single embedding requests).
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingData">
+            <summary>
+            Individual embedding data item.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingData.Object">
+            <summary>
+            Object type, typically "embedding".
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingData.Index">
+            <summary>
+            Index of this embedding in the list.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticEmbeddingData.Embedding">
+            <summary>
+            The embedding vector.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticModelInfoResponse">
+            <summary>
+            Agnostic model information response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticModelInfoResponse.Model">
+            <summary>
+            The model information.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticModelInfoResponse.Template">
+            <summary>
+            Model template (for Ollama compatibility).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticModelInfoResponse.Parameters">
+            <summary>
+            Model parameters (for Ollama compatibility).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticModelInfoResponse.System">
+            <summary>
+            Model system prompt (for Ollama compatibility).
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticModelListResponse">
+            <summary>
+            Agnostic model list response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticModelListResponse.Object">
+            <summary>
+            Object type, typically "list".
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticModelListResponse.Data">
+            <summary>
+            List of available models.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticModelListResponse.Models">
+            <summary>
+            List of models (for Ollama compatibility).
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticStreamingChatResponse">
+            <summary>
+            Agnostic streaming chat completion response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticStreamingChatResponse.ChunkId">
+            <summary>
+            Unique identifier for this streaming chunk.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticStreamingChatResponse.Model">
+            <summary>
+            The model that generated this response chunk.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticStreamingChatResponse.Choices">
+            <summary>
+            Choices for the streaming response chunk.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticStreamingChatResponse.Usage">
+            <summary>
+            Usage information for the complete response (only in final chunk).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticStreamingChatResponse.IsFinal">
+            <summary>
+            Indicates if this is the final chunk in the stream.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticStreamingChatResponse.Done">
+            <summary>
+            Indicates if the response generation is complete.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Responses.AgnosticStreamingChatResponse.Error">
+            <summary>
+            Error information if the streaming failed.
             </summary>
         </member>
         <member name="T:OllamaFlow.Core.Models.MessageEnvelope">
@@ -966,6 +1522,11 @@
             Gets or sets the identifier of the client that initiated this request.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.TransformationId">
+            <summary>
+            Gets or sets the transformation identifier if request/response transformation was performed.
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.Models.TelemetryMessage.RequestBodySize">
             <summary>
             Request body size in bytes.
@@ -1026,240 +1587,480 @@
             Initializes a new instance of the <see cref="T:OllamaFlow.Core.Models.TelemetryMessage"/> class.
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.OllamaBackend">
+        <member name="T:OllamaFlow.Core.ApiErrorEnum">
+            <summary>
+            API error codes.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthenticationFailed">
+            <summary>
+            Authentication failed.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.AuthorizationFailed">
+            <summary>
+            Authorization failed.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadGateway">
+            <summary>
+            Bad gateway.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.BadRequest">
+            <summary>
+            Bad request.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.Conflict">
+            <summary>
+            Conflict.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.DeserializationError">
+            <summary>
+            DeserializationError.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.Inactive">
+            <summary>
+            Inactive.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.InternalError">
+            <summary>
+            Internal error.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.InvalidRange">
+            <summary>
+            Invalid range.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.InUse">
+            <summary>
+            In use.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotEmpty">
+            <summary>
+            Not empty.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.NotFound">
+            <summary>
+            Not found.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.SlowDown">
+            <summary>
+            Slow down.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.TokenExpired">
+            <summary>
+            Token expired.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.TooLarge">
+            <summary>
+            Request too large.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.ApiErrorEnum.UnsupportedHttpVersion">
+            <summary>
+            Unsupported HTTP version.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.ApiErrorResponse">
+            <summary>
+            API error response.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Error">
+            <summary>
+            Error.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Message">
+            <summary>
+            Human-readable message.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.StatusCode">
+            <summary>
+            HTTP status code.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Context">
+            <summary>
+            Additional contextual information.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.ApiErrorResponse.Description">
+            <summary>
+            Description.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.ApiErrorResponse.#ctor(OllamaFlow.Core.ApiErrorEnum,System.Object,System.String)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="error">Error code.</param>
+            <param name="context">Context.</param>
+            <param name="description">Description.</param>
+            
+        </member>
+        <member name="T:OllamaFlow.Core.Backend">
             <summary>
             Origin server.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.OllamaBackend.Serializer">
+        <member name="F:OllamaFlow.Core.Backend.Serializer">
             <summary>
             Serializer.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.Identifier">
+        <member name="P:OllamaFlow.Core.Backend.Identifier">
             <summary>
             Unique identifier for this origin server.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.Name">
+        <member name="P:OllamaFlow.Core.Backend.Name">
             <summary>
             Name for this origin server.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.Hostname">
+        <member name="P:OllamaFlow.Core.Backend.Hostname">
             <summary>
             Hostname.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.Port">
+        <member name="P:OllamaFlow.Core.Backend.Port">
             <summary>
             TCP port.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.Ssl">
+        <member name="P:OllamaFlow.Core.Backend.Ssl">
             <summary>
             Enable or disable SSL.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.UnhealthyThreshold">
+        <member name="P:OllamaFlow.Core.Backend.UnhealthyThreshold">
             <summary>
             Number of consecutive failed health checks before marking a server as unhealthy.
             Default is 2.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.HealthyThreshold">
+        <member name="P:OllamaFlow.Core.Backend.HealthyThreshold">
             <summary>
             Number of consecutive successful health checks before marking a server as healthy.
             Default is 2.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.HealthCheckMethod">
+        <member name="P:OllamaFlow.Core.Backend.HealthCheckMethod">
             <summary>
             HTTP method to use when performing a healthcheck.
             Default is GET.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.HealthCheckUrl">
+        <member name="P:OllamaFlow.Core.Backend.HealthCheckUrl">
             <summary>
             URL to use when performing a healthcheck.
             Default is /.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.MaxParallelRequests">
+        <member name="P:OllamaFlow.Core.Backend.MaxParallelRequests">
             <summary>
             Maximum number of parallel requests to this backend.
             Default is 4.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.RateLimitRequestsThreshold">
+        <member name="P:OllamaFlow.Core.Backend.RateLimitRequestsThreshold">
             <summary>
             Threshold at which 429 rate limit responses are sent.
             Default is 10.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.UrlPrefix">
+        <member name="P:OllamaFlow.Core.Backend.UrlPrefix">
             <summary>
             URL prefix.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.LogRequestFull">
+        <member name="P:OllamaFlow.Core.Backend.LogRequestFull">
             <summary>
             Boolean indicating if the full request should be logged.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.LogRequestBody">
+        <member name="P:OllamaFlow.Core.Backend.LogRequestBody">
             <summary>
             Boolean indicating if the request body should be logged.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.LogResponseBody">
+        <member name="P:OllamaFlow.Core.Backend.LogResponseBody">
             <summary>
             Boolean indicating if the response body should be logged.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.Active">
+        <member name="P:OllamaFlow.Core.Backend.ApiFormat">
+            <summary>
+            API format supported by this backend.
+            Default is Ollama.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.Active">
             <summary>
             Boolean indicating if the object is active or not.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.CreatedUtc">
+        <member name="P:OllamaFlow.Core.Backend.CreatedUtc">
             <summary>
             Creation timestamp, in UTC time.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.LastUpdateUtc">
+        <member name="P:OllamaFlow.Core.Backend.LastUpdateUtc">
             <summary>
             Last update timestamp, in UTC time.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.HealthySinceUtc">
+        <member name="P:OllamaFlow.Core.Backend.HealthySinceUtc">
             <summary>
             Timestamp at which the backend was seen as healthy, in UTC time.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.UnhealthySinceUtc">
+        <member name="P:OllamaFlow.Core.Backend.UnhealthySinceUtc">
             <summary>
             Timestamp at which the backend was seen as unhealthy, in UTC time.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.Uptime">
+        <member name="P:OllamaFlow.Core.Backend.Uptime">
             <summary>
             Uptime for the backend.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.Downtime">
+        <member name="P:OllamaFlow.Core.Backend.Downtime">
             <summary>
             Downtime for the backend.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.ActiveRequests">
+        <member name="P:OllamaFlow.Core.Backend.ActiveRequests">
             <summary>
             Number of active requests.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaBackend.IsSticky">
+        <member name="P:OllamaFlow.Core.Backend.IsSticky">
             <summary>
             Boolean indicating whether or not the backend was chosen due to stickiness.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.OllamaBackend.#ctor">
+        <member name="M:OllamaFlow.Core.Backend.#ctor">
             <summary>
-            Ollama backend.
+            Backend server.
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.OllamaFrontend">
+        <member name="T:OllamaFlow.Core.EnumerationOrderEnum">
+            <summary>
+            Enumeration order. 
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedAscending">
+            <summary>
+            Created ascending.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.CreatedDescending">
+            <summary>
+            Created descending.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierAscending">
+            <summary>
+            Identifier ascending.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.EnumerationOrderEnum.IdentifierDescending">
+            <summary>
+            Identifier descending.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.EnumerationRequest">
+            <summary>
+            Object used to request enumeration.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.Ordering">
+            <summary>
+            Order by.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.MaxResults">
+            <summary>
+            Maximum number of results to retrieve.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.Skip">
+            <summary>
+            The number of records to skip.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationRequest.ContinuationToken">
+            <summary>
+            Continuation token.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.EnumerationRequest.#ctor">
+            <summary>
+            Instantiate.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.EnumerationResult`1">
+            <summary>
+            Object returned as the result of an enumeration.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.Success">
+            <summary>
+            Indicates if the statistics operation was successful.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.Timestamp">
+            <summary>
+            Start and end timestamps.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.MaxResults">
+            <summary>
+            Maximum number of results to retrieve.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.ContinuationToken">
+            <summary>
+            Continuation token.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.EndOfResults">
+            <summary>
+            Boolean indicating end of results.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.TotalRecords">
+            <summary>
+            Total number of records.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.RecordsRemaining">
+            <summary>
+            Number of candidate records remaining in the enumeration.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.EnumerationResult`1.Objects">
+            <summary>
+            Objects.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.EnumerationResult`1.#ctor">
+            <summary>
+            Instantiates the object.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Frontend">
             <summary>
             API endpoint.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.OllamaFrontend.Serializer">
+        <member name="F:OllamaFlow.Core.Frontend.Serializer">
             <summary>
             Serializer.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.Identifier">
+        <member name="P:OllamaFlow.Core.Frontend.Identifier">
             <summary>
             Unique identifier for this API endpoint.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.Name">
+        <member name="P:OllamaFlow.Core.Frontend.Name">
             <summary>
             Name for this API endpoint.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.Hostname">
+        <member name="P:OllamaFlow.Core.Frontend.Hostname">
             <summary>
             Hostname associated with this frontend.
             Use * to specify that this frontend is a catch-all.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.TimeoutMs">
+        <member name="P:OllamaFlow.Core.Frontend.TimeoutMs">
             <summary>
             Number of milliseconds to wait before considering the request to be timed out.
             Default is 60 seconds.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.LoadBalancing">
+        <member name="P:OllamaFlow.Core.Frontend.LoadBalancing">
             <summary>
             Load-balancing mode.
             Default is RoundRobin.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.BlockHttp10">
+        <member name="P:OllamaFlow.Core.Frontend.BlockHttp10">
             <summary>
             True to terminate HTTP/1.0 requests.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.MaxRequestBodySize">
+        <member name="P:OllamaFlow.Core.Frontend.MaxRequestBodySize">
             <summary>
             Maximum request body size.  Default is 512MB.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.Backends">
+        <member name="P:OllamaFlow.Core.Frontend.Backends">
             <summary>
             Ollama backend server identifiers.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.BackendsString">
+        <member name="P:OllamaFlow.Core.Frontend.BackendsString">
             <summary>
             String containing JSON-serialized list of backend identifiers.
             Used by the database layer.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.RequiredModels">
+        <member name="P:OllamaFlow.Core.Frontend.RequiredModels">
             <summary>
             List of models that should be present on each mapped backend Ollama server.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.RequiredModelsString">
+        <member name="P:OllamaFlow.Core.Frontend.RequiredModelsString">
             <summary>
             String containing JSON-serialized list of required models.
             Used by the database layer.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.LogRequestFull">
+        <member name="P:OllamaFlow.Core.Frontend.LogRequestFull">
             <summary>
             Boolean indicating if the full request should be logged.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.LogRequestBody">
+        <member name="P:OllamaFlow.Core.Frontend.LogRequestBody">
             <summary>
             Boolean indicating if the request body should be logged.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.LogResponseBody">
+        <member name="P:OllamaFlow.Core.Frontend.LogResponseBody">
             <summary>
             Boolean indicating if the response body should be logged.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.UseStickySessions">
+        <member name="P:OllamaFlow.Core.Frontend.UseStickySessions">
             <summary>
             Boolean indicating whether sticky sessions should be used for this frontend.
             When enabled, clients will be routed to the same backend for subsequent requests.
             Default is false.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.StickySessionExpirationMs">
+        <member name="P:OllamaFlow.Core.Frontend.StickySessionExpirationMs">
             <summary>
             Duration in milliseconds for how long a sticky session should remain active.
             Default is 1800000 milliseconds (30 minutes).
@@ -1267,29 +2068,44 @@
             Maximum is 86400000 milliseconds (24 hours).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.AllowRetries">
+        <member name="P:OllamaFlow.Core.Frontend.AllowRetries">
             <summary>
             Allow OllamaFlow to retry failed requests.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.Active">
+        <member name="P:OllamaFlow.Core.Frontend.Active">
             <summary>
             Boolean indicating if the object is active or not.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.CreatedUtc">
+        <member name="P:OllamaFlow.Core.Frontend.CreatedUtc">
             <summary>
             Creation timestamp, in UTC time.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.OllamaFrontend.LastUpdateUtc">
+        <member name="P:OllamaFlow.Core.Frontend.LastUpdateUtc">
             <summary>
             Last update timestamp, in UTC time.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.OllamaFrontend.#ctor">
+        <member name="M:OllamaFlow.Core.Frontend.#ctor">
             <summary>
             Instantiate.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.LoadBalancingMode">
+            <summary>
+            Load balancing mode.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.LoadBalancingMode.Random">
+            <summary>
+            Random.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.LoadBalancingMode.RoundRobin">
+            <summary>
+            Round robin.
             </summary>
         </member>
         <member name="T:OllamaFlow.Core.OllamaFlowCallbacks">
@@ -1422,14 +2238,14 @@
             <param name="database">Database driver.</param>
             <param name="tokenSource">Cancellation token source.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.BackendService.Create(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Services.BackendService.Create(OllamaFlow.Core.Backend)">
             <summary>
             Create a new backend.
             </summary>
             <param name="backend">Backend to create.</param>
             <returns>Created backend.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.BackendService.CreateMany(System.Collections.Generic.IEnumerable{OllamaFlow.Core.OllamaBackend})">
+        <member name="M:OllamaFlow.Core.Services.BackendService.CreateMany(System.Collections.Generic.IEnumerable{OllamaFlow.Core.Backend})">
             <summary>
             Create multiple backends.
             </summary>
@@ -1464,7 +2280,7 @@
             <param name="request">Enumeration request.</param>
             <returns>Enumeration result.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.BackendService.Update(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Services.BackendService.Update(OllamaFlow.Core.Backend)">
             <summary>
             Update a backend.
             </summary>
@@ -1530,14 +2346,14 @@
             <param name="database">Database driver.</param>
             <param name="tokenSource">Cancellation token source.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.FrontendService.Create(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Services.FrontendService.Create(OllamaFlow.Core.Frontend)">
             <summary>
             Create a new frontend.
             </summary>
             <param name="frontend">Frontend to create.</param>
             <returns>Created frontend.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.FrontendService.CreateMany(System.Collections.Generic.IEnumerable{OllamaFlow.Core.OllamaFrontend})">
+        <member name="M:OllamaFlow.Core.Services.FrontendService.CreateMany(System.Collections.Generic.IEnumerable{OllamaFlow.Core.Frontend})">
             <summary>
             Create multiple frontends.
             </summary>
@@ -1572,7 +2388,7 @@
             <param name="request">Enumeration request.</param>
             <returns>Enumeration result.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.FrontendService.Update(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Services.FrontendService.Update(OllamaFlow.Core.Frontend)">
             <summary>
             Update a frontend.
             </summary>
@@ -1618,7 +2434,7 @@
             Gateway service.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,OllamaFlow.Core.Services.ModelSynchronizationService,OllamaFlow.Core.Services.SessionStickinessService,System.Threading.CancellationTokenSource)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,OllamaFlow.Core.Services.ModelSynchronizationService,OllamaFlow.Core.Services.SessionStickinessService,OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline,System.Threading.CancellationTokenSource)">
             <summary>
             Instantiate.
             </summary>
@@ -1631,6 +2447,7 @@
             <param name="healthCheck">Healthcheck service.</param>
             <param name="modelSynchronization">Model synchronization service.</param>
             <param name="sessionStickiness">Session stickiness service.</param>
+            <param name="transformationPipeline">Transformation pipeline for API format conversion.</param>
             <param name="tokenSource">Cancellation token source.</param>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.Dispose(System.Boolean)">
@@ -1694,6 +2511,13 @@
             <param name="ctx">HTTP context.</param>
             <returns>Task.</returns>
         </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.DetectSourceApiFormat(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Detect the source API format based on the request URL and headers.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Detected API format.</returns>
+        </member>
         <member name="T:OllamaFlow.Core.Services.GatewayService.ProxyResult">
             <summary>
             Result of a proxy request operation.
@@ -1709,7 +2533,27 @@
             The HTTP status code returned by the backend.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessRequestWithRetry(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.OllamaFrontend,OllamaFlow.Core.OllamaBackend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
+        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.ResponseBody">
+            <summary>
+            The response body as bytes.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.ContentType">
+            <summary>
+            The response content type.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.Headers">
+            <summary>
+            The response headers.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.AlreadySent">
+            <summary>
+            Whether the response was sent to the client (for non-transformed responses).
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessRequestWithRetry(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
             <summary>
             Process a request with retry logic for 50x errors.
             </summary>
@@ -1721,13 +2565,121 @@
             <param name="telemetry">Telemetry object.</param>
             <returns>True if response was successfully sent, false otherwise.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.GetAlternativeBackend(OllamaFlow.Core.OllamaFrontend,System.String)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessRequestWithTransformation(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
+            <summary>
+            Process request using the transformation pipeline for API format compatibility.
+            </summary>
+            <param name="requestGuid">Request identifier.</param>
+            <param name="ctx">HTTP context.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Selected backend.</param>
+            <param name="clientId">Client identifier.</param>
+            <param name="telemetry">Telemetry object.</param>
+            <returns>True if response was successfully sent, false otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetTargetUrlPath(System.String,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Get the target URL path based on API format conversion.
+            </summary>
+            <param name="sourcePath">Source URL path.</param>
+            <param name="sourceFormat">Source API format.</param>
+            <param name="targetFormat">Target API format.</param>
+            <returns>Target URL path.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.ProxyTransformedRequest(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Services.Transformation.TransformationPipelineResult,System.Byte[],System.String)">
+            <summary>
+            Proxy the transformed request to the backend server.
+            </summary>
+            <param name="requestGuid">Request identifier.</param>
+            <param name="originalContext">Original HTTP context.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Backend server.</param>
+            <param name="telemetry">Telemetry object.</param>
+            <param name="transformationResult">Transformation result for logging.</param>
+            <param name="transformedRequestBody">Transformed request body bytes.</param>
+            <param name="targetUrlPath">Target URL path.</param>
+            <returns>Proxy result.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.TransformAndSendResponse(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Services.GatewayService.ProxyResult,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Backend)">
+            <summary>
+            Transform the backend response and send it to the client.
+            </summary>
+            <param name="originalContext">Original HTTP context for the client response.</param>
+            <param name="proxyResult">Result from the backend proxy operation.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="backend">Backend server information.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessRequestWithStreamingTransformation(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Process a request with streaming transformation support.
+            This method handles streaming responses and transforms them between API formats in real-time.
+            </summary>
+            <param name="requestGuid">Request identifier.</param>
+            <param name="ctx">HTTP context.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Backend server.</param>
+            <param name="clientId">Client identifier.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="requestType">Type of request being processed.</param>
+            <returns>True if request was processed successfully.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.ProxyRequestWithStreamingTransformation(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Services.Transformation.TransformationPipelineResult,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum,System.Byte[],System.String)">
+            <summary>
+            Proxy request to backend with real-time streaming transformation support.
+            </summary>
+            <param name="requestGuid">Request identifier.</param>
+            <param name="originalContext">Original HTTP context from client.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Backend server.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <param name="transformationResult">Transformation pipeline result.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="requestType">Type of request being processed.</param>
+            <param name="transformedRequestBody">Transformed request body bytes.</param>
+            <param name="targetUrlPath">Target URL path for backend.</param>
+            <returns>True if request was processed successfully.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessStreamingResponseWithTransformation(RestWrapper.RestResponse,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Process streaming response with real-time transformation between API formats.
+            </summary>
+            <param name="backendResponse">Response from backend server.</param>
+            <param name="clientContext">HTTP context for client response.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="requestType">Type of request being processed.</param>
+            <returns>True if streaming was processed successfully.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.SendTransformedChunk(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult,OllamaFlow.Core.Enums.ApiFormatEnum,System.Boolean)">
+            <summary>
+            Send a transformed chunk to the client in the appropriate format.
+            </summary>
+            <param name="context">Client HTTP context.</param>
+            <param name="chunkResult">Transformed chunk result.</param>
+            <param name="targetFormat">Target format for the client.</param>
+            <param name="isFinal">Whether this is the final chunk.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetAlternativeBackend(OllamaFlow.Core.Frontend,System.String)">
             <summary>
             Get an alternative backend excluding a specific backend.
             </summary>
             <param name="frontend">Frontend configuration.</param>
             <param name="excludeBackendId">Backend to exclude from selection.</param>
             <returns>Alternative backend or null if none available.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.IsStreamingRequest(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Determines if the request is asking for streaming responses.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <param name="agnosticRequest">Agnostic request.</param>
+            <param name="requestType">Request type.</param>
+            <returns>True if streaming is requested.</returns>
         </member>
         <member name="T:OllamaFlow.Core.Services.HealthCheckService">
             <summary>
@@ -1774,7 +2726,7 @@
             Dispose.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.GetNextBackend(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.GetNextBackend(OllamaFlow.Core.Frontend)">
             <summary>
             Retrieve the next backend that should be used for a request to a given frontend.
             </summary>
@@ -1782,7 +2734,7 @@
             <returns>Backend.</returns>
             <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.GetNextBackend(OllamaFlow.Core.OllamaFrontend,System.String)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.GetNextBackend(OllamaFlow.Core.Frontend,System.String)">
             <summary>
             Retrieve the next backend that should be used for a request to a given frontend, considering sticky sessions.
             </summary>
@@ -1791,14 +2743,14 @@
             <returns>Backend.</returns>
             <exception cref="T:System.ArgumentNullException">Thrown when frontend or clientId is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.UpdateBackend(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.UpdateBackend(OllamaFlow.Core.Backend)">
             <summary>
             Update a backend if cached.
             </summary>
             <param name="backend">Backend.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when backend is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.AddBackend(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.AddBackend(OllamaFlow.Core.Backend)">
             <summary>
             Add a new backend to health monitoring.
             </summary>
@@ -1812,14 +2764,14 @@
             <param name="identifier">Backend identifier to remove.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when identifier is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.UpdateFrontend(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.UpdateFrontend(OllamaFlow.Core.Frontend)">
             <summary>
             Update a frontend if cached.
             </summary>
             <param name="frontend">Frontend to update.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.AddFrontend(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.AddFrontend(OllamaFlow.Core.Frontend)">
             <summary>
             Add a new frontend to monitoring.
             </summary>
@@ -1836,6 +2788,7 @@
         <member name="T:OllamaFlow.Core.Services.ModelSynchronizationService">
             <summary>
             Model synchronization service.
+            Only operates on Ollama backends since OpenAI/vLLM backends don't support runtime model pulling.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Services.ModelSynchronizationService.IntervalMs">
@@ -1874,14 +2827,15 @@
             Dispose.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.AddBackend(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.AddBackend(OllamaFlow.Core.Backend)">
             <summary>
             Add a backend and start model synchronization for it.
+            Only operates on Ollama backends since OpenAI/vLLM don't support runtime model pulling.
             </summary>
             <param name="backend">Backend that was added.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when backend is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.UpdateBackend(OllamaFlow.Core.OllamaBackend)">
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.UpdateBackend(OllamaFlow.Core.Backend)">
             <summary>
             Update a backend configuration.
             </summary>
@@ -1895,14 +2849,14 @@
             <param name="identifier">Identifier of backend that was removed.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when identifier is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.AddFrontend(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.AddFrontend(OllamaFlow.Core.Frontend)">
             <summary>
             Add a frontend and sync its required models.
             </summary>
             <param name="frontend">Frontend that was added.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
         </member>
-        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.UpdateFrontend(OllamaFlow.Core.OllamaFrontend)">
+        <member name="M:OllamaFlow.Core.Services.ModelSynchronizationService.UpdateFrontend(OllamaFlow.Core.Frontend)">
             <summary>
             Update a frontend configuration and sync required models.
             </summary>
@@ -2043,6 +2997,787 @@
             Clear all sessions.
             </summary>
             <returns>Number of sessions removed.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Inbound.OllamaToAgnosticTransformer">
+            <summary>
+            Transforms Ollama API requests to agnostic format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Inbound.OllamaToAgnosticTransformer.#ctor(OllamaFlow.Core.Serialization.Serializer)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="serializer">Serializer.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Inbound.OllamaToAgnosticTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Determines if this transformer can handle the given source format and request type.
+            </summary>
+            <param name="sourceFormat">The API format of the source request.</param>
+            <param name="requestType">The type of request being transformed.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Inbound.OllamaToAgnosticTransformer.TransformAsync(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Transform the HTTP request context to an agnostic request.
+            </summary>
+            <param name="context">The HTTP context containing the request.</param>
+            <param name="requestType">The type of request being transformed.</param>
+            <returns>Agnostic request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Inbound.OllamaToAgnosticTransformer.ConvertToDouble(System.Object)">
+            <summary>
+            Safely convert an object (potentially a JsonElement) to double.
+            </summary>
+            <param name="value">Value to convert.</param>
+            <returns>Double value.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Inbound.OllamaToAgnosticTransformer.ConvertToInt32(System.Object)">
+            <summary>
+            Safely convert an object (potentially a JsonElement) to int32.
+            </summary>
+            <param name="value">Value to convert.</param>
+            <returns>Integer value.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Inbound.OpenAIToAgnosticTransformer">
+            <summary>
+            Transforms OpenAI API requests to agnostic format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Inbound.OpenAIToAgnosticTransformer.#ctor(OllamaFlow.Core.Serialization.Serializer)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="serializer">Serializer.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Inbound.OpenAIToAgnosticTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Determines if this transformer can handle the given source format and request type.
+            </summary>
+            <param name="sourceFormat">The API format of the source request.</param>
+            <param name="requestType">The type of request being transformed.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Inbound.OpenAIToAgnosticTransformer.TransformAsync(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Transform the HTTP request context to an agnostic request.
+            </summary>
+            <param name="context">The HTTP context containing the request.</param>
+            <param name="requestType">The type of request being transformed.</param>
+            <returns>Agnostic request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Interfaces.IInboundTransformer">
+            <summary>
+            Interface for transforming inbound requests from specific API formats to agnostic format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IInboundTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Determines if this transformer can handle the given source format and request type.
+            </summary>
+            <param name="sourceFormat">The API format of the source request.</param>
+            <param name="requestType">The type of request being transformed.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IInboundTransformer.TransformAsync(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Transform the HTTP request context to an agnostic request.
+            </summary>
+            <param name="context">The HTTP context containing the request.</param>
+            <param name="requestType">The type of request being transformed.</param>
+            <returns>Agnostic request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Interfaces.IOutboundTransformer">
+            <summary>
+            Interface for transforming agnostic requests to specific backend API formats.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IOutboundTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest)">
+            <summary>
+            Determines if this transformer can handle the given target format and agnostic request type.
+            </summary>
+            <param name="targetFormat">The target API format for the backend.</param>
+            <param name="agnosticRequest">The agnostic request to be transformed.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IOutboundTransformer.TransformAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest)">
+            <summary>
+            Transform the agnostic request to a backend-specific format.
+            </summary>
+            <param name="agnosticRequest">The agnostic request to transform.</param>
+            <returns>Backend-specific request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Interfaces.IResponseTransformer">
+            <summary>
+            Interface for transforming responses between API formats and agnostic format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IResponseTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,System.Type)">
+            <summary>
+            Determines if this transformer can handle the given API format and response type.
+            </summary>
+            <param name="apiFormat">The API format of the response.</param>
+            <param name="responseType">The type of response object.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IResponseTransformer.TransformToAgnosticAsync(System.Object,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform a backend response to agnostic format.
+            </summary>
+            <param name="backendResponse">The backend response object.</param>
+            <param name="sourceFormat">The API format of the backend response.</param>
+            <returns>Agnostic response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IResponseTransformer.TransformFromAgnosticAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an agnostic response to a specific client API format.
+            </summary>
+            <param name="agnosticResponse">The agnostic response to transform.</param>
+            <param name="targetFormat">The target API format for the client.</param>
+            <returns>Client-specific response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Interfaces.IStreamingTransformer">
+            <summary>
+            Interface for transforming streaming responses between API formats.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IStreamingTransformer.CanTransformStream(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Determines if this transformer can handle streaming transformations between the specified formats.
+            </summary>
+            <param name="sourceFormat">Source API format.</param>
+            <param name="targetFormat">Target API format.</param>
+            <param name="requestType">Type of request being streamed.</param>
+            <returns>True if transformation is supported.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IStreamingTransformer.TransformChunkAsync(System.Object,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum,System.Threading.CancellationToken)">
+            <summary>
+            Transform a streaming response chunk from source format to target format via agnostic format.
+            </summary>
+            <param name="sourceChunk">Source format streaming chunk (as string or bytes).</param>
+            <param name="sourceFormat">Source API format.</param>
+            <param name="targetFormat">Target API format.</param>
+            <param name="requestType">Type of request being streamed.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Transformed chunk ready for target format output.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.IStreamingTransformer.CreateFinalChunkAsync(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum,System.Threading.CancellationToken)">
+            <summary>
+            Create a final chunk to signal end of stream in the target format.
+            </summary>
+            <param name="targetFormat">Target API format.</param>
+            <param name="requestType">Type of request being streamed.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Final chunk for target format.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult">
+            <summary>
+            Result of a streaming chunk transformation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult.ChunkData">
+            <summary>
+            The transformed chunk data.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult.ContentType">
+            <summary>
+            Content type for the chunk.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult.IsServerSentEvent">
+            <summary>
+            Indicates if this chunk should be sent using Server-Sent Events format.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult.EventName">
+            <summary>
+            SSE event name (only relevant if IsServerSentEvent is true).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult.IsFinal">
+            <summary>
+            Indicates if this is the final chunk in the stream.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult.Error">
+            <summary>
+            Error information if transformation failed.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult.AgnosticResponse">
+            <summary>
+            Agnostic response object for logging/debugging.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline">
+            <summary>
+            Main transformation pipeline interface for converting between API formats and agnostic format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline.TransformInboundAsync(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an inbound request from a specific API format to agnostic format.
+            </summary>
+            <param name="context">HTTP context containing the request.</param>
+            <param name="sourceFormat">The API format of the incoming request.</param>
+            <returns>Agnostic request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline.TransformOutboundAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an agnostic request to a specific backend API format.
+            </summary>
+            <param name="agnosticRequest">The agnostic request to transform.</param>
+            <param name="targetFormat">The target API format for the backend.</param>
+            <returns>Backend-specific request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline.TransformResponseInboundAsync(System.Object,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform a backend response from a specific API format to agnostic format.
+            </summary>
+            <param name="backendResponse">The backend response object.</param>
+            <param name="sourceFormat">The API format of the backend response.</param>
+            <returns>Agnostic response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline.TransformResponseOutboundAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an agnostic response to a specific client API format.
+            </summary>
+            <param name="agnosticResponse">The agnostic response to transform.</param>
+            <param name="targetFormat">The target API format for the client.</param>
+            <returns>Client-specific response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline.GetStreamingTransformer">
+            <summary>
+            Get the streaming transformer for handling streaming transformations.
+            </summary>
+            <returns>Streaming transformer instance.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline.SupportsStreamingTransformation(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Determines if streaming transformation is supported between the specified formats.
+            </summary>
+            <param name="sourceFormat">Source API format.</param>
+            <param name="targetFormat">Target API format.</param>
+            <param name="requestType">Type of request being streamed.</param>
+            <returns>True if streaming transformation is supported.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Outbound.AgnosticToOllamaTransformer">
+            <summary>
+            Transforms agnostic requests to Ollama API format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Outbound.AgnosticToOllamaTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest)">
+            <summary>
+            Determines if this transformer can handle the given target format and agnostic request type.
+            </summary>
+            <param name="targetFormat">The target API format for the backend.</param>
+            <param name="agnosticRequest">The agnostic request to be transformed.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Outbound.AgnosticToOllamaTransformer.TransformAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest)">
+            <summary>
+            Transform the agnostic request to a backend-specific format.
+            </summary>
+            <param name="agnosticRequest">The agnostic request to transform.</param>
+            <returns>Backend-specific request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Outbound.AgnosticToOpenAITransformer">
+            <summary>
+            Transforms agnostic requests to OpenAI API format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Outbound.AgnosticToOpenAITransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest)">
+            <summary>
+            Determines if this transformer can handle the given target format and agnostic request type.
+            </summary>
+            <param name="targetFormat">The target API format for the backend.</param>
+            <param name="agnosticRequest">The agnostic request to be transformed.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Outbound.AgnosticToOpenAITransformer.TransformAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest)">
+            <summary>
+            Transform the agnostic request to a backend-specific format.
+            </summary>
+            <param name="agnosticRequest">The agnostic request to transform.</param>
+            <returns>Backend-specific request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Response.AgnosticToOllamaResponseTransformer">
+            <summary>
+            Transforms agnostic responses to Ollama API format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.AgnosticToOllamaResponseTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,System.Type)">
+            <summary>
+            Determines if this transformer can handle the given API format and response type.
+            </summary>
+            <param name="apiFormat">The API format of the response.</param>
+            <param name="responseType">The type of response object.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.AgnosticToOllamaResponseTransformer.TransformToAgnosticAsync(System.Object,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform a backend response to agnostic format.
+            </summary>
+            <param name="backendResponse">The backend response object.</param>
+            <param name="sourceFormat">The API format of the backend response.</param>
+            <returns>Agnostic response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.AgnosticToOllamaResponseTransformer.TransformFromAgnosticAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an agnostic response to Ollama format.
+            </summary>
+            <param name="agnosticResponse">The agnostic response to transform.</param>
+            <param name="targetFormat">The target API format for the client.</param>
+            <returns>Ollama-format response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Response.AgnosticToOpenAIResponseTransformer">
+            <summary>
+            Transforms agnostic responses to OpenAI API format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.AgnosticToOpenAIResponseTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,System.Type)">
+            <summary>
+            Determines if this transformer can handle the given API format and response type.
+            </summary>
+            <param name="apiFormat">The API format of the response.</param>
+            <param name="responseType">The type of response object.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.AgnosticToOpenAIResponseTransformer.TransformToAgnosticAsync(System.Object,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform a backend response to agnostic format.
+            </summary>
+            <param name="backendResponse">The backend response object.</param>
+            <param name="sourceFormat">The API format of the backend response.</param>
+            <returns>Agnostic response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.AgnosticToOpenAIResponseTransformer.TransformFromAgnosticAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an agnostic response to OpenAI format.
+            </summary>
+            <param name="agnosticResponse">The agnostic response to transform.</param>
+            <param name="targetFormat">The target API format for the client.</param>
+            <returns>OpenAI-format response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Response.OllamaToAgnosticResponseTransformer">
+            <summary>
+            Transforms Ollama API responses to agnostic format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.OllamaToAgnosticResponseTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,System.Type)">
+            <summary>
+            Determines if this transformer can handle the given API format and response type.
+            </summary>
+            <param name="apiFormat">The API format of the response.</param>
+            <param name="responseType">The type of response object.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.OllamaToAgnosticResponseTransformer.TransformToAgnosticAsync(System.Object,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an Ollama response to agnostic format.
+            </summary>
+            <param name="backendResponse">The backend response object (JSON string or bytes).</param>
+            <param name="sourceFormat">The API format of the backend response.</param>
+            <returns>Agnostic response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.OllamaToAgnosticResponseTransformer.TransformFromAgnosticAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an agnostic response to Ollama format.
+            </summary>
+            <param name="agnosticResponse">The agnostic response to transform.</param>
+            <param name="targetFormat">The target API format.</param>
+            <returns>Ollama-format response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Response.OpenAIToAgnosticResponseTransformer">
+            <summary>
+            Transforms OpenAI API responses to agnostic format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.OpenAIToAgnosticResponseTransformer.CanTransform(OllamaFlow.Core.Enums.ApiFormatEnum,System.Type)">
+            <summary>
+            Determines if this transformer can handle the given API format and response type.
+            </summary>
+            <param name="apiFormat">The API format of the response.</param>
+            <param name="responseType">The type of response object.</param>
+            <returns>True if this transformer can handle the transformation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.OpenAIToAgnosticResponseTransformer.TransformToAgnosticAsync(System.Object,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an OpenAI response to agnostic format.
+            </summary>
+            <param name="backendResponse">The backend response object (JSON string or bytes).</param>
+            <param name="sourceFormat">The API format of the backend response.</param>
+            <returns>Agnostic response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Response.OpenAIToAgnosticResponseTransformer.TransformFromAgnosticAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an agnostic response to OpenAI format.
+            </summary>
+            <param name="agnosticResponse">The agnostic response to transform.</param>
+            <param name="targetFormat">The target API format.</param>
+            <returns>OpenAI-format response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.Streaming.StreamingTransformer">
+            <summary>
+            Universal streaming transformer that handles bidirectional streaming transformations
+            between OpenAI and Ollama API formats via agnostic format.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Streaming.StreamingTransformer.#ctor(OllamaFlow.Core.Serialization.Serializer)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="serializer">Serializer.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Streaming.StreamingTransformer.CanTransformStream(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Determines if this transformer can handle streaming transformations between the specified formats.
+            </summary>
+            <param name="sourceFormat">Source API format.</param>
+            <param name="targetFormat">Target API format.</param>
+            <param name="requestType">Type of request being streamed.</param>
+            <returns>True if transformation is supported.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Streaming.StreamingTransformer.TransformChunkAsync(System.Object,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum,System.Threading.CancellationToken)">
+            <summary>
+            Transform a streaming response chunk from source format to target format via agnostic format.
+            </summary>
+            <param name="sourceChunk">Source format streaming chunk (as string or bytes).</param>
+            <param name="sourceFormat">Source API format.</param>
+            <param name="targetFormat">Target API format.</param>
+            <param name="requestType">Type of request being streamed.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Transformed chunk ready for target format output.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.Streaming.StreamingTransformer.CreateFinalChunkAsync(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum,System.Threading.CancellationToken)">
+            <summary>
+            Create a final chunk to signal end of stream in the target format.
+            </summary>
+            <param name="targetFormat">Target API format.</param>
+            <param name="requestType">Type of request being streamed.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Final chunk for target format.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.TransformationContext">
+            <summary>
+            Context information for transformation operations.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationContext.TransformationId">
+            <summary>
+            Unique identifier for this transformation operation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationContext.SourceFormat">
+            <summary>
+            The source API format.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationContext.TargetFormat">
+            <summary>
+            The target API format.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationContext.RequestType">
+            <summary>
+            The request type being transformed.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationContext.IsStreaming">
+            <summary>
+            Whether this is a streaming request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationContext.ClientId">
+            <summary>
+            The client identifier making the request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationContext.StartedUtc">
+            <summary>
+            Timestamp when the transformation started.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationContext.Metadata">
+            <summary>
+            Additional metadata for the transformation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationContext.ExtensionData">
+            <summary>
+            Extension data for transformation-specific context.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.TransformationException">
+            <summary>
+            Exception thrown when transformation between API formats fails.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationException.SourceFormat">
+            <summary>
+            The source API format being transformed from.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationException.TargetFormat">
+            <summary>
+            The target API format being transformed to.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationException.TransformationStage">
+            <summary>
+            The stage of transformation where the error occurred.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationException.OriginalObject">
+            <summary>
+            The original object that caused the transformation failure.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationException.#ctor(System.String,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,System.String,System.Object,System.Exception)">
+            <summary>
+            Initializes a new instance of the TransformationException class.
+            </summary>
+            <param name="message">The error message.</param>
+            <param name="sourceFormat">The source API format.</param>
+            <param name="targetFormat">The target API format.</param>
+            <param name="stage">The transformation stage.</param>
+            <param name="originalObject">The original object causing the error.</param>
+            <param name="innerException">The inner exception.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationException.GenerateErrorResponse">
+            <summary>
+            Generate an appropriate error response for the client based on their expected API format.
+            </summary>
+            <returns>API-specific error response object.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.TransformationPipeline">
+            <summary>
+            Orchestrates the complete transformation pipeline for API requests and responses.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.#ctor(OllamaFlow.Core.Serialization.Serializer)">
+            <summary>
+            Initialize the transformation pipeline with default transformers.
+            </summary>
+            <param name="serializer">Serializer for JSON operations.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.#ctor(System.Collections.Generic.IEnumerable{OllamaFlow.Core.Services.Transformation.Interfaces.IInboundTransformer},System.Collections.Generic.IEnumerable{OllamaFlow.Core.Services.Transformation.Interfaces.IOutboundTransformer},OllamaFlow.Core.Serialization.Serializer)">
+            <summary>
+            Initialize the transformation pipeline with custom transformers.
+            </summary>
+            <param name="inboundTransformers">Collection of inbound transformers.</param>
+            <param name="outboundTransformers">Collection of outbound transformers.</param>
+            <param name="serializer">Serializer for JSON operations.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.TransformInboundAsync(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an inbound request from a specific API format to agnostic format.
+            </summary>
+            <param name="context">HTTP context containing the request.</param>
+            <param name="sourceFormat">The API format of the incoming request.</param>
+            <returns>Agnostic request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.TransformOutboundAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an agnostic request to backend-specific format.
+            </summary>
+            <param name="agnosticRequest">The agnostic request to transform.</param>
+            <param name="targetFormat">The target API format for the backend.</param>
+            <returns>Backend-specific request object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.TransformResponseInboundAsync(System.Object,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform a backend response from a specific API format to agnostic format.
+            </summary>
+            <param name="backendResponse">The backend response object.</param>
+            <param name="sourceFormat">The API format of the backend response.</param>
+            <returns>Agnostic response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.TransformResponseOutboundAsync(OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Transform an agnostic response to a specific client API format.
+            </summary>
+            <param name="agnosticResponse">The agnostic response to transform.</param>
+            <param name="targetFormat">The target API format for the client.</param>
+            <returns>Client-specific response object.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.TransformCompleteAsync(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Perform complete transformation pipeline: inbound → agnostic → outbound.
+            </summary>
+            <param name="context">The HTTP context containing the request.</param>
+            <param name="sourceFormat">The API format of the incoming request.</param>
+            <param name="targetFormat">The target API format for the backend.</param>
+            <returns>Transformation pipeline result containing both agnostic and backend-specific requests.</returns>
+            <exception cref="T:OllamaFlow.Core.Services.Transformation.TransformationException">Thrown when transformation fails.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.RegisterInboundTransformer(OllamaFlow.Core.Services.Transformation.Interfaces.IInboundTransformer)">
+            <summary>
+            Register a new inbound transformer.
+            </summary>
+            <param name="transformer">The transformer to register.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.RegisterOutboundTransformer(OllamaFlow.Core.Services.Transformation.Interfaces.IOutboundTransformer)">
+            <summary>
+            Register a new outbound transformer.
+            </summary>
+            <param name="transformer">The transformer to register.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.GetCapabilities">
+            <summary>
+            Get information about available transformers.
+            </summary>
+            <returns>Transformation capabilities information.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.GetStreamingTransformer">
+            <summary>
+            Get the streaming transformer for handling streaming transformations.
+            </summary>
+            <returns>Streaming transformer instance.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.Transformation.TransformationPipeline.SupportsStreamingTransformation(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Determines if streaming transformation is supported between the specified formats.
+            </summary>
+            <param name="sourceFormat">Source API format.</param>
+            <param name="targetFormat">Target API format.</param>
+            <param name="requestType">Type of request being streamed.</param>
+            <returns>True if streaming transformation is supported.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.TransformationPipelineResult">
+            <summary>
+            Result of a complete transformation pipeline operation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationPipelineResult.AgnosticRequest">
+            <summary>
+            The agnostic request created from the inbound transformation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationPipelineResult.BackendRequest">
+            <summary>
+            The backend-specific request created from the outbound transformation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationPipelineResult.SourceFormat">
+            <summary>
+            The source API format of the original request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationPipelineResult.TargetFormat">
+            <summary>
+            The target API format for the backend request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationPipelineResult.RequestType">
+            <summary>
+            The type of request that was transformed.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationPipelineResult.TransformationId">
+            <summary>
+            Unique identifier for this transformation operation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationPipelineResult.CompletedUtc">
+            <summary>
+            Timestamp when the transformation was completed.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.TransformationCapabilities">
+            <summary>
+            Represents the transformation capabilities of the pipeline.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationCapabilities.InboundCapabilities">
+            <summary>
+            Available inbound transformation capabilities.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationCapabilities.OutboundCapabilities">
+            <summary>
+            Available outbound transformation capabilities.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationCapabilities.SupportedSourceFormats">
+            <summary>
+            All supported source API formats.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationCapabilities.SupportedTargetFormats">
+            <summary>
+            All supported target API formats.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.TransformationCapability">
+            <summary>
+            Represents a specific transformation capability.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationCapability.TransformerType">
+            <summary>
+            The name of the transformer class.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationCapability.SourceFormat">
+            <summary>
+            The source API format (null for outbound transformers).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationCapability.TargetFormat">
+            <summary>
+            The target API format (null for inbound transformers).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationCapability.RequestType">
+            <summary>
+            The request type supported.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.Transformation.TransformationCapability.Direction">
+            <summary>
+            The direction of transformation.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.Transformation.TransformationDirection">
+            <summary>
+            Direction of transformation.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Services.Transformation.TransformationDirection.Inbound">
+            <summary>
+            Inbound transformation (client request → agnostic).
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Services.Transformation.TransformationDirection.Outbound">
+            <summary>
+            Outbound transformation (agnostic → backend request).
+            </summary>
         </member>
         <member name="T:OllamaFlow.Core.Settings.LoggingSettings">
             <summary>

@@ -57,7 +57,7 @@
         /// </summary>
         /// <param name="backend">Backend to create.</param>
         /// <returns>Created backend.</returns>
-        public OllamaBackend Create(OllamaBackend backend)
+        public Backend Create(Backend backend)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
             if (string.IsNullOrEmpty(backend.Identifier)) throw new ArgumentNullException(nameof(backend.Identifier));
@@ -70,14 +70,14 @@
         /// </summary>
         /// <param name="backends">Backends to create.</param>
         /// <returns>Created backends.</returns>
-        public IEnumerable<OllamaBackend> CreateMany(IEnumerable<OllamaBackend> backends)
+        public IEnumerable<Backend> CreateMany(IEnumerable<Backend> backends)
         {
             if (backends == null) throw new ArgumentNullException(nameof(backends));
 
-            List<OllamaBackend> backendList = backends.ToList();
-            if (!backendList.Any()) return Enumerable.Empty<OllamaBackend>();
+            List<Backend> backendList = backends.ToList();
+            if (!backendList.Any()) return Enumerable.Empty<Backend>();
 
-            foreach (OllamaBackend backend in backendList)
+            foreach (Backend backend in backendList)
             {
                 if (string.IsNullOrEmpty(backend.Identifier)) throw new ArgumentNullException(nameof(backend.Identifier));
             }
@@ -91,7 +91,7 @@
         /// </summary>
         /// <param name="identifier">Backend identifier.</param>
         /// <returns>Backend if found, null otherwise.</returns>
-        public OllamaBackend GetByIdentifier(string identifier)
+        public Backend GetByIdentifier(string identifier)
         {
             if (string.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
             return _Database.Backend.ReadByIdentifiers(new List<string> { identifier }).FirstOrDefault();
@@ -102,11 +102,11 @@
         /// </summary>
         /// <param name="identifiers">Backend identifiers.</param>
         /// <returns>Backends.</returns>
-        public IEnumerable<OllamaBackend> GetByIdentifiers(IEnumerable<string> identifiers)
+        public IEnumerable<Backend> GetByIdentifiers(IEnumerable<string> identifiers)
         {
             if (identifiers == null) throw new ArgumentNullException(nameof(identifiers));
             List<string> idList = identifiers.ToList();
-            if (!idList.Any()) return Enumerable.Empty<OllamaBackend>();
+            if (!idList.Any()) return Enumerable.Empty<Backend>();
             return _Database.Backend.ReadByIdentifiers(idList);
         }
 
@@ -115,7 +115,7 @@
         /// </summary>
         /// <param name="order">Sort order.</param>
         /// <returns>All backends.</returns>
-        public IEnumerable<OllamaBackend> GetAll(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending)
+        public IEnumerable<Backend> GetAll(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending)
         {
             return _Database.Backend.ReadAll(order);
         }
@@ -125,7 +125,7 @@
         /// </summary>
         /// <param name="request">Enumeration request.</param>
         /// <returns>Enumeration result.</returns>
-        public EnumerationResult<OllamaBackend> GetPage(EnumerationRequest request)
+        public EnumerationResult<Backend> GetPage(EnumerationRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             return _Database.Backend.Enumerate(request);
@@ -136,11 +136,11 @@
         /// </summary>
         /// <param name="backend">Backend to update.</param>
         /// <returns>Updated backend.</returns>
-        public OllamaBackend Update(OllamaBackend backend)
+        public Backend Update(Backend backend)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
             if (string.IsNullOrEmpty(backend.Identifier)) throw new ArgumentException("Backend identifier cannot be null or empty.");
-            OllamaBackend original = GetByIdentifier(backend.Identifier);
+            Backend original = GetByIdentifier(backend.Identifier);
             if (original == null) throw new KeyNotFoundException("The specified object could not be found by identifier " + backend.Identifier + ".");
             backend.LastUpdateUtc = DateTime.UtcNow;
             return _Database.Backend.Update(backend);
@@ -248,11 +248,11 @@
         /// </summary>
         /// <param name="frontendIdentifier">Frontend identifier.</param>
         /// <returns>Backends associated with the frontend.</returns>
-        public IEnumerable<OllamaBackend> GetByFrontendIdentifier(string frontendIdentifier)
+        public IEnumerable<Backend> GetByFrontendIdentifier(string frontendIdentifier)
         {
             if (string.IsNullOrEmpty(frontendIdentifier)) throw new ArgumentNullException(nameof(frontendIdentifier));
-            OllamaFrontend frontend = _Database.Frontend.ReadByIdentifiers(new List<string> { frontendIdentifier }).FirstOrDefault();
-            if (frontend == null || frontend.Backends == null || !frontend.Backends.Any()) return Enumerable.Empty<OllamaBackend>();
+            Frontend frontend = _Database.Frontend.ReadByIdentifiers(new List<string> { frontendIdentifier }).FirstOrDefault();
+            if (frontend == null || frontend.Backends == null || !frontend.Backends.Any()) return Enumerable.Empty<Backend>();
             return _Database.Backend.ReadByIdentifiers(frontend.Backends);
         }
 

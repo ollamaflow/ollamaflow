@@ -62,6 +62,7 @@
                 + "logrequestfull INT NOT NULL, "
                 + "logrequestbody INT NOT NULL, "
                 + "logresponsebody INT NOT NULL, "
+                + "apiformat VARCHAR(32) DEFAULT 'Ollama', "
                 + "active INT NOT NULL, "
                 + "createdutc VARCHAR(64), "
                 + "lastupdateutc VARCHAR(64) "

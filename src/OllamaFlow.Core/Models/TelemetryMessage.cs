@@ -37,6 +37,11 @@
         /// </summary>
         public string ClientId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the transformation identifier if request/response transformation was performed.
+        /// </summary>
+        public string TransformationId { get; set; }
+
         // Public Properties - Request Configuration
 
         /// <summary>

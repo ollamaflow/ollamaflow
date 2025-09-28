@@ -8,6 +8,8 @@
     using OllamaFlow.Core.Database.Sqlite;
     using OllamaFlow.Core.Serialization;
     using OllamaFlow.Core.Services;
+    using OllamaFlow.Core.Services.Transformation;
+    using OllamaFlow.Core.Services.Transformation.Interfaces;
     using SyslogLogging;
     using WatsonWebserver;
 
@@ -51,6 +53,7 @@
         private SessionStickinessService _SessionStickinessService = null;
         private HealthCheckService _HealthCheckService = null;
         private ModelSynchronizationService _ModelSynchronizationService = null;
+        private ITransformationPipeline _TransformationPipeline = null;
         private GatewayService _GatewayService = null;
         private Webserver _Webserver = null;
 
@@ -296,6 +299,8 @@
                 _HealthCheckService,
                 _TokenSource);
 
+            _TransformationPipeline = new TransformationPipeline(_Serializer);
+
             _GatewayService = new GatewayService(
                 _Settings,
                 _Callbacks,
@@ -306,6 +311,7 @@
                 _HealthCheckService,
                 _ModelSynchronizationService,
                 _SessionStickinessService,
+                _TransformationPipeline,
                 _TokenSource);
 
             #endregion

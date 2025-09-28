@@ -12,15 +12,15 @@
     using System.Threading.Tasks;
     using RestWrapper;
     using OllamaFlow.Core;
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Helpers;
+    using OllamaFlow.Core.Models;
     using OllamaFlow.Core.Serialization;
+    using OllamaFlow.Core.Services.Transformation.Interfaces;
+    using OllamaFlow.Core.Services.Transformation;
     using SyslogLogging;
     using Timestamps;
-    using UrlMatcher;
-    using WatsonWebserver;
     using WatsonWebserver.Core;
-    using System.Data.Common;
-    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Gateway service.
@@ -49,6 +49,7 @@
         private HealthCheckService _HealthCheck = null;
         private ModelSynchronizationService _ModelSynchronization = null;
         private SessionStickinessService _SessionStickiness = null;
+        private ITransformationPipeline _TransformationPipeline = null;
 
         #endregion
 
@@ -66,6 +67,7 @@
         /// <param name="healthCheck">Healthcheck service.</param>
         /// <param name="modelSynchronization">Model synchronization service.</param>
         /// <param name="sessionStickiness">Session stickiness service.</param>
+        /// <param name="transformationPipeline">Transformation pipeline for API format conversion.</param>
         /// <param name="tokenSource">Cancellation token source.</param>
         public GatewayService(
             OllamaFlowSettings settings,
@@ -77,6 +79,7 @@
             HealthCheckService healthCheck,
             ModelSynchronizationService modelSynchronization,
             SessionStickinessService sessionStickiness,
+            ITransformationPipeline transformationPipeline,
             CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -89,6 +92,7 @@
             _HealthCheck = healthCheck ?? throw new ArgumentNullException(nameof(healthCheck));
             _ModelSynchronization = modelSynchronization ?? throw new ArgumentNullException(nameof(modelSynchronization));
             _SessionStickiness = sessionStickiness ?? throw new ArgumentNullException(nameof(sessionStickiness));
+            _TransformationPipeline = transformationPipeline ?? throw new ArgumentNullException(nameof(transformationPipeline));
 
             _Logging.Debug(_Header + "initialized");
         }
@@ -290,6 +294,7 @@
             Guid requestGuid = Guid.NewGuid();
             ctx.Response.Headers.Add(Constants.RequestIdHeader, requestGuid.ToString());
             ctx.Response.Headers.Add(Constants.ForwardedForHeader, ctx.Request.Source.IpAddress);
+            ctx.Response.Headers.Add(Constants.ExposeHeadersHeader, "*");
 
             TelemetryMessage telemetry = new TelemetryMessage
             {
@@ -300,7 +305,7 @@
 
             try
             {
-                OllamaFrontend frontend = await GetFrontend(ctx);
+                Frontend frontend = await GetFrontend(ctx);
                 if (frontend == null)
                 {
                     _Logging.Warn(_Header + "no frontend found for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.Full);
@@ -348,7 +353,7 @@
                 string clientId = GetClientIdentifier(ctx);
                 telemetry.ClientId = clientId;
 
-                OllamaBackend backend = _HealthCheck.GetNextBackend(frontend, clientId);
+                Backend backend = _HealthCheck.GetNextBackend(frontend, clientId);
                 if (backend == null)
                 {
                     _Logging.Warn(_Header + "no backend found for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.RawWithoutQuery);
@@ -389,7 +394,7 @@
 
                 Interlocked.Increment(ref backend._PendingRequests);
 
-                bool responseReceived = await ProcessRequestWithRetry(
+                bool responseReceived = await ProcessRequestWithTransformation(
                     requestGuid,
                     ctx,
                     frontend,
@@ -421,6 +426,38 @@
         #endregion
 
         #region Private-Methods
+
+        /// <summary>
+        /// Detect the source API format based on the request URL and headers.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Detected API format.</returns>
+        private ApiFormatEnum DetectSourceApiFormat(HttpContextBase ctx)
+        {
+            if (ctx?.Request?.Url?.RawWithoutQuery == null)
+                return ApiFormatEnum.Ollama; // Default fallback
+
+            string path = ctx.Request.Url.RawWithoutQuery.ToLowerInvariant();
+
+            // OpenAI API paths start with /v1/
+            if (path.StartsWith("/v1/"))
+                return ApiFormatEnum.OpenAI;
+
+            // Ollama API paths start with /api/ or root endpoints
+            if (path.StartsWith("/api/") || path == "/" || path == "")
+                return ApiFormatEnum.Ollama;
+
+            // Check User-Agent header for additional hints
+            string userAgent = ctx.Request.Headers?["User-Agent"];
+            if (!string.IsNullOrEmpty(userAgent))
+            {
+                if (userAgent.ToLowerInvariant().Contains("openai"))
+                    return ApiFormatEnum.OpenAI;
+            }
+
+            // Default to Ollama for backward compatibility
+            return ApiFormatEnum.Ollama;
+        }
 
         private string GetClientIdentifier(HttpContextBase ctx)
         {
@@ -464,13 +501,13 @@
             await ctx.Response.Send();
         }
 
-        private async Task<OllamaFrontend> GetFrontend(HttpContextBase ctx)
+        private async Task<Frontend> GetFrontend(HttpContextBase ctx)
         {
             Uri uri = new Uri(ctx.Request.Url.Full);
 
-            List<OllamaFrontend> frontends = _HealthCheck.Frontends;
+            List<Frontend> frontends = _HealthCheck.Frontends;
 
-            foreach (OllamaFrontend ep in frontends)
+            foreach (Frontend ep in frontends)
             {
                 if (ep.Hostname.Equals("*")) return ep;
                 if (ep.Hostname.Equals(uri.Host)) return ep;
@@ -521,6 +558,26 @@
             /// The HTTP status code returned by the backend.
             /// </summary>
             public int StatusCode { get; set; }
+
+            /// <summary>
+            /// The response body as bytes.
+            /// </summary>
+            public byte[] ResponseBody { get; set; }
+
+            /// <summary>
+            /// The response content type.
+            /// </summary>
+            public string ContentType { get; set; }
+
+            /// <summary>
+            /// The response headers.
+            /// </summary>
+            public System.Collections.Specialized.NameValueCollection Headers { get; set; }
+
+            /// <summary>
+            /// Whether the response was sent to the client (for non-transformed responses).
+            /// </summary>
+            public bool AlreadySent { get; set; }
         }
 
         /// <summary>
@@ -536,12 +593,12 @@
         private async Task<bool> ProcessRequestWithRetry(
             Guid requestGuid,
             HttpContextBase ctx,
-            OllamaFrontend frontend,
-            OllamaBackend initialBackend,
+            Frontend frontend,
+            Backend initialBackend,
             string clientId,
             TelemetryMessage telemetry)
         {
-            OllamaBackend currentBackend = initialBackend;
+            Backend currentBackend = initialBackend;
 
             ProxyResult result = await ProxyRequestInternal(requestGuid, ctx, frontend, currentBackend, telemetry);
 
@@ -561,7 +618,7 @@
                 }
 
                 // Get another backend for retry (exclude the failed backend)
-                OllamaBackend retryBackend = GetAlternativeBackend(frontend, initialBackend.Identifier);
+                Backend retryBackend = GetAlternativeBackend(frontend, initialBackend.Identifier);
 
                 if (retryBackend != null)
                 {
@@ -608,14 +665,727 @@
         }
 
         /// <summary>
+        /// Process request using the transformation pipeline for API format compatibility.
+        /// </summary>
+        /// <param name="requestGuid">Request identifier.</param>
+        /// <param name="ctx">HTTP context.</param>
+        /// <param name="frontend">Frontend configuration.</param>
+        /// <param name="backend">Selected backend.</param>
+        /// <param name="clientId">Client identifier.</param>
+        /// <param name="telemetry">Telemetry object.</param>
+        /// <returns>True if response was successfully sent, false otherwise.</returns>
+        private async Task<bool> ProcessRequestWithTransformation(
+            Guid requestGuid,
+            HttpContextBase ctx,
+            Frontend frontend,
+            Backend backend,
+            string clientId,
+            TelemetryMessage telemetry)
+        {
+            try
+            {
+                // Step 1: Detect source and target API formats
+                ApiFormatEnum sourceFormat = DetectSourceApiFormat(ctx);
+                ApiFormatEnum targetFormat = backend.ApiFormat;
+
+                _Logging.Debug(_Header + $"transforming request from {sourceFormat} to {targetFormat} format for backend {backend.Identifier}");
+
+                // Step 2: If formats match, use direct proxy (legacy behavior)
+                if (sourceFormat == targetFormat)
+                {
+                    _Logging.Debug(_Header + "API formats match, using direct proxy");
+                    return await ProcessRequestWithRetry(requestGuid, ctx, frontend, backend, clientId, telemetry);
+                }
+
+                // Step 3: Detect if request is for streaming and determine the request type
+                Models.Agnostic.Base.AgnosticRequest agnosticRequest = await _TransformationPipeline.TransformInboundAsync(ctx, sourceFormat).ConfigureAwait(false);
+                RequestTypeEnum requestType = GetRequestTypeFromAgnosticRequest(agnosticRequest);
+                bool isStreamingRequest = IsStreamingRequest(ctx, agnosticRequest, requestType);
+
+                // Step 4: Choose appropriate processing method based on streaming support
+                if (isStreamingRequest && _TransformationPipeline.SupportsStreamingTransformation(sourceFormat, targetFormat, requestType))
+                {
+                    _Logging.Debug(_Header + "using streaming transformation for request");
+                    return await ProcessRequestWithStreamingTransformation(
+                        requestGuid, ctx, frontend, backend, clientId, telemetry, sourceFormat, targetFormat, requestType);
+                }
+
+                // Step 5: Fall back to non-streaming transformation
+                object backendRequest = await _TransformationPipeline.TransformOutboundAsync(agnosticRequest, targetFormat).ConfigureAwait(false);
+
+                // Create transformation result
+                Services.Transformation.TransformationPipelineResult transformationResult = new Services.Transformation.TransformationPipelineResult
+                {
+                    AgnosticRequest = agnosticRequest,
+                    BackendRequest = backendRequest,
+                    SourceFormat = sourceFormat,
+                    TargetFormat = targetFormat,
+                    RequestType = requestType,
+                    TransformationId = Guid.NewGuid().ToString(),
+                    CompletedUtc = DateTime.UtcNow
+                };
+
+                telemetry.TransformationId = transformationResult.TransformationId;
+
+                // Step 4: Serialize transformed request
+                string transformedRequestBody = _Serializer.SerializeJson(backendRequest, false);
+                byte[] transformedBytes = Encoding.UTF8.GetBytes(transformedRequestBody);
+
+                // Step 5: Determine target URL path
+                string targetPath = GetTargetUrlPath(ctx.Request.Url.RawWithoutQuery, sourceFormat, targetFormat);
+
+                // Step 6: Process the transformed request
+                ProxyResult proxyResult = await ProxyTransformedRequest(
+                    requestGuid, ctx, frontend, backend, telemetry, transformationResult, transformedBytes, targetPath);
+
+                // Step 6: Transform response back to source format if needed
+                if (proxyResult.ResponseReceived && sourceFormat != targetFormat)
+                {
+                    await TransformAndSendResponse(ctx, proxyResult, sourceFormat, targetFormat, backend);
+                }
+
+                return proxyResult.ResponseReceived;
+            }
+            catch (TransformationException tex)
+            {
+                _Logging.Error(_Header + $"transformation failed:{Environment.NewLine}{tex.ToString()}");
+
+                // Send error response in the expected format
+                object errorResponse = tex.GenerateErrorResponse();
+                ctx.Response.StatusCode = 400;
+                ctx.Response.ContentType = Constants.JsonContentType;
+                await ctx.Response.Send(_Serializer.SerializeJson(errorResponse, true));
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _Logging.Error(_Header + $"request processing failed:{Environment.NewLine}{ex.ToString()}");
+
+                ctx.Response.StatusCode = 500;
+                ctx.Response.ContentType = Constants.JsonContentType;
+                await ctx.Response.Send(_Serializer.SerializeJson(
+                    new ApiErrorResponse(ApiErrorEnum.InternalError, null, "Internal server error"), true));
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get the target URL path based on API format conversion.
+        /// </summary>
+        /// <param name="sourcePath">Source URL path.</param>
+        /// <param name="sourceFormat">Source API format.</param>
+        /// <param name="targetFormat">Target API format.</param>
+        /// <returns>Target URL path.</returns>
+        private string GetTargetUrlPath(string sourcePath, ApiFormatEnum sourceFormat, ApiFormatEnum targetFormat)
+        {
+            // If formats match, no transformation needed
+            if (sourceFormat == targetFormat)
+                return sourcePath;
+
+            // Convert between OpenAI and Ollama path conventions
+            if (sourceFormat == ApiFormatEnum.OpenAI && targetFormat == ApiFormatEnum.Ollama)
+            {
+                return sourcePath switch
+                {
+                    "/v1/chat/completions" => "/api/chat",
+                    "/v1/completions" => "/api/generate",
+                    "/v1/embeddings" => "/api/embeddings",
+                    "/v1/models" => "/api/tags",
+                    string path when path.StartsWith("/v1/models/") => "/api/show",
+                    _ => sourcePath
+                };
+            }
+            else if (sourceFormat == ApiFormatEnum.Ollama && targetFormat == ApiFormatEnum.OpenAI)
+            {
+                return sourcePath switch
+                {
+                    "/api/chat" => "/v1/chat/completions",
+                    "/api/generate" => "/v1/completions",
+                    "/api/embeddings" => "/v1/embeddings",
+                    "/api/tags" => "/v1/models",
+                    "/api/show" => "/v1/models",
+                    _ => sourcePath
+                };
+            }
+
+            return sourcePath;
+        }
+
+
+        /// <summary>
+        /// Proxy the transformed request to the backend server.
+        /// </summary>
+        /// <param name="requestGuid">Request identifier.</param>
+        /// <param name="originalContext">Original HTTP context.</param>
+        /// <param name="frontend">Frontend configuration.</param>
+        /// <param name="backend">Backend server.</param>
+        /// <param name="telemetry">Telemetry object.</param>
+        /// <param name="transformationResult">Transformation result for logging.</param>
+        /// <param name="transformedRequestBody">Transformed request body bytes.</param>
+        /// <param name="targetUrlPath">Target URL path.</param>
+        /// <returns>Proxy result.</returns>
+        private async Task<ProxyResult> ProxyTransformedRequest(
+            Guid requestGuid,
+            HttpContextBase originalContext,
+            Frontend frontend,
+            Backend backend,
+            TelemetryMessage telemetry,
+            TransformationPipelineResult transformationResult,
+            byte[] transformedRequestBody,
+            string targetUrlPath)
+        {
+            _Logging.Debug(_Header + $"proxying transformed request (ID: {transformationResult.TransformationId}) to backend {backend.Identifier}");
+
+            // Use the existing ProxyRequestInternal method with transformed data
+            // captureResponseForTransformation=true so we can transform the response before sending to client
+            return await ProxyRequestInternal(requestGuid, originalContext, frontend, backend, telemetry, transformedRequestBody, targetUrlPath, captureResponseForTransformation: true);
+        }
+
+        /// <summary>
+        /// Transform the backend response and send it to the client.
+        /// </summary>
+        /// <param name="originalContext">Original HTTP context for the client response.</param>
+        /// <param name="proxyResult">Result from the backend proxy operation.</param>
+        /// <param name="sourceFormat">Source API format (client).</param>
+        /// <param name="targetFormat">Target API format (backend).</param>
+        /// <param name="backend">Backend server information.</param>
+        private async Task TransformAndSendResponse(
+            HttpContextBase originalContext,
+            ProxyResult proxyResult,
+            ApiFormatEnum sourceFormat,
+            ApiFormatEnum targetFormat,
+            Backend backend)
+        {
+            try
+            {
+                _Logging.Debug(_Header + $"transforming response from {targetFormat} back to {sourceFormat} format");
+
+                // If response was already sent (non-transformed path), nothing to do
+                if (proxyResult.AlreadySent)
+                {
+                    _Logging.Debug(_Header + "response already sent, skipping transformation");
+                    return;
+                }
+
+                // Step 1: Transform backend response (targetFormat) to agnostic format
+                Services.Transformation.Response.OpenAIToAgnosticResponseTransformer backendTransformer =
+                    new Services.Transformation.Response.OpenAIToAgnosticResponseTransformer();
+
+                Models.Agnostic.Base.AgnosticResponse agnosticResponse = await backendTransformer.TransformToAgnosticAsync(
+                    proxyResult.ResponseBody,
+                    targetFormat).ConfigureAwait(false);
+
+                // Step 2: Transform agnostic format to client format (sourceFormat)
+                Services.Transformation.Response.AgnosticToOllamaResponseTransformer clientTransformer =
+                    new Services.Transformation.Response.AgnosticToOllamaResponseTransformer();
+
+                object clientResponse = await clientTransformer.TransformFromAgnosticAsync(
+                    agnosticResponse,
+                    sourceFormat).ConfigureAwait(false);
+
+                // Step 3: Serialize and send response to client
+                string responseJson = _Serializer.SerializeJson(clientResponse, false);
+                byte[] responseBytes = Encoding.UTF8.GetBytes(responseJson);
+
+                // Set response headers
+                if (proxyResult.Headers != null && proxyResult.Headers.Count > 0)
+                {
+                    foreach (string headerName in proxyResult.Headers.AllKeys)
+                    {
+                        if (headerName != null && originalContext.Response.Headers[headerName] == null &&
+                            !headerName.Equals("content-length", StringComparison.OrdinalIgnoreCase) &&
+                            !headerName.Equals("content-type", StringComparison.OrdinalIgnoreCase))
+                        {
+                            originalContext.Response.Headers.Add(headerName, proxyResult.Headers[headerName]);
+                        }
+                    }
+                }
+
+                originalContext.Response.StatusCode = proxyResult.StatusCode;
+                originalContext.Response.ContentType = Constants.JsonContentType;
+                originalContext.Response.Headers.Add(Constants.BackendServerHeader, backend.Identifier);
+
+                await originalContext.Response.Send(responseBytes);
+
+                _Logging.Debug(_Header + $"response transformation completed (status: {proxyResult.StatusCode})");
+            }
+            catch (TransformationException tex)
+            {
+                _Logging.Error(_Header + $"response transformation failed: {tex.Message}");
+
+                // Send transformation error to client
+                object errorResponse = tex.GenerateErrorResponse();
+                originalContext.Response.StatusCode = 500;
+                originalContext.Response.ContentType = Constants.JsonContentType;
+                await originalContext.Response.Send(_Serializer.SerializeJson(errorResponse, true));
+            }
+            catch (Exception ex)
+            {
+                _Logging.Error(_Header + $"response transformation failed: {ex.Message}");
+
+                // Send generic error to client
+                originalContext.Response.StatusCode = 500;
+                originalContext.Response.ContentType = Constants.JsonContentType;
+                await originalContext.Response.Send(_Serializer.SerializeJson(new { error = "Response transformation failed" }, true));
+            }
+        }
+
+        /// <summary>
+        /// Process a request with streaming transformation support.
+        /// This method handles streaming responses and transforms them between API formats in real-time.
+        /// </summary>
+        /// <param name="requestGuid">Request identifier.</param>
+        /// <param name="ctx">HTTP context.</param>
+        /// <param name="frontend">Frontend configuration.</param>
+        /// <param name="backend">Backend server.</param>
+        /// <param name="clientId">Client identifier.</param>
+        /// <param name="telemetry">Telemetry message.</param>
+        /// <param name="sourceFormat">Source API format (client).</param>
+        /// <param name="targetFormat">Target API format (backend).</param>
+        /// <param name="requestType">Type of request being processed.</param>
+        /// <returns>True if request was processed successfully.</returns>
+        private async Task<bool> ProcessRequestWithStreamingTransformation(
+            Guid requestGuid,
+            HttpContextBase ctx,
+            Frontend frontend,
+            Backend backend,
+            string clientId,
+            TelemetryMessage telemetry,
+            ApiFormatEnum sourceFormat,
+            ApiFormatEnum targetFormat,
+            RequestTypeEnum requestType)
+        {
+            try
+            {
+                _Logging.Debug(_Header + $"processing request with streaming transformation (source: {sourceFormat}, target: {targetFormat})");
+
+                // Step 1: Check if streaming transformation is supported
+                if (!_TransformationPipeline.SupportsStreamingTransformation(sourceFormat, targetFormat, requestType))
+                {
+                    _Logging.Warn(_Header + $"streaming transformation not supported for {sourceFormat} -> {targetFormat} ({requestType})");
+                    // Fall back to non-streaming transformation
+                    return await ProcessRequestWithTransformation(requestGuid, ctx, frontend, backend, clientId, telemetry);
+                }
+
+                // Step 2: Transform the request (same as non-streaming)
+                Models.Agnostic.Base.AgnosticRequest agnosticRequest = await _TransformationPipeline.TransformInboundAsync(ctx, sourceFormat).ConfigureAwait(false);
+                object backendRequest = await _TransformationPipeline.TransformOutboundAsync(agnosticRequest, targetFormat).ConfigureAwait(false);
+
+                // Create transformation result
+                Services.Transformation.TransformationPipelineResult transformationResult = new Services.Transformation.TransformationPipelineResult
+                {
+                    AgnosticRequest = agnosticRequest,
+                    BackendRequest = backendRequest,
+                    SourceFormat = sourceFormat,
+                    TargetFormat = targetFormat,
+                    RequestType = GetRequestTypeFromAgnosticRequest(agnosticRequest),
+                    TransformationId = Guid.NewGuid().ToString(),
+                    CompletedUtc = DateTime.UtcNow
+                };
+
+                telemetry.TransformationId = transformationResult.TransformationId;
+
+                // Step 3: Serialize transformed request and determine target path
+                string transformedRequestBody = _Serializer.SerializeJson(backendRequest, false);
+                byte[] transformedBytes = Encoding.UTF8.GetBytes(transformedRequestBody);
+                string targetPath = GetTargetUrlPath(ctx.Request.Url.RawWithoutQuery, sourceFormat, targetFormat);
+
+                // Step 4: Proxy request with streaming transformation
+                return await ProxyRequestWithStreamingTransformation(
+                    requestGuid, ctx, frontend, backend, telemetry,
+                    transformationResult, sourceFormat, targetFormat, requestType, transformedBytes, targetPath);
+            }
+            catch (Exception ex)
+            {
+                _Logging.Error(_Header + $"streaming transformation request failed: {ex.Message}");
+
+                try
+                {
+                    ctx.Response.StatusCode = 500;
+                    ctx.Response.ContentType = Constants.JsonContentType;
+
+                    byte[] errorResponseBytes = Encoding.UTF8.GetBytes(_Serializer.SerializeJson(
+                        new ApiErrorResponse(ApiErrorEnum.InternalError, null, "Streaming transformation failed"), true));
+
+                    // Check if response is configured for chunked transfer
+                    if (ctx.Response.ChunkedTransfer)
+                    {
+                        await ctx.Response.SendChunk(errorResponseBytes, true);
+                    }
+                    else
+                    {
+                        await ctx.Response.Send(errorResponseBytes);
+                    }
+                }
+                catch (Exception sendEx)
+                {
+                    _Logging.Error(_Header + $"error sending streaming transformation failure response: {sendEx.Message}");
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Proxy request to backend with real-time streaming transformation support.
+        /// </summary>
+        /// <param name="requestGuid">Request identifier.</param>
+        /// <param name="originalContext">Original HTTP context from client.</param>
+        /// <param name="frontend">Frontend configuration.</param>
+        /// <param name="backend">Backend server.</param>
+        /// <param name="telemetry">Telemetry message.</param>
+        /// <param name="transformationResult">Transformation pipeline result.</param>
+        /// <param name="sourceFormat">Source API format (client).</param>
+        /// <param name="targetFormat">Target API format (backend).</param>
+        /// <param name="requestType">Type of request being processed.</param>
+        /// <param name="transformedRequestBody">Transformed request body bytes.</param>
+        /// <param name="targetUrlPath">Target URL path for backend.</param>
+        /// <returns>True if request was processed successfully.</returns>
+        private async Task<bool> ProxyRequestWithStreamingTransformation(
+            Guid requestGuid,
+            HttpContextBase originalContext,
+            Frontend frontend,
+            Backend backend,
+            TelemetryMessage telemetry,
+            Services.Transformation.TransformationPipelineResult transformationResult,
+            ApiFormatEnum sourceFormat,
+            ApiFormatEnum targetFormat,
+            RequestTypeEnum requestType,
+            byte[] transformedRequestBody,
+            string targetUrlPath)
+        {
+            _Logging.Debug(_Header + $"proxying request with streaming transformation to {backend.Identifier}");
+
+            RestResponse resp = null;
+
+            using (Timestamp ts = new Timestamp())
+            {
+                string url = backend.UrlPrefix + targetUrlPath;
+
+                try
+                {
+                    await backend.Semaphore.WaitAsync().ConfigureAwait(false);
+                    Interlocked.Increment(ref backend._ActiveRequests);
+                    Interlocked.Decrement(ref backend._PendingRequests);
+
+                    using (RestRequest req = new RestRequest(url, ConvertHttpMethod(originalContext.Request.Method)))
+                    {
+                        if (frontend.TimeoutMs > 0) req.TimeoutMilliseconds = frontend.TimeoutMs;
+
+                        req.Headers.Add(Constants.ForwardedForHeader, originalContext.Request.Source.IpAddress);
+
+                        // Copy headers
+                        if (originalContext.Request.Headers != null && originalContext.Request.Headers.Count > 0)
+                        {
+                            foreach (string key in originalContext.Request.Headers.Keys)
+                            {
+                                if (!req.Headers.AllKeys.Contains(key))
+                                {
+                                    string val = originalContext.Request.Headers.Get(key);
+                                    req.Headers.Add(key, val);
+                                }
+                            }
+                        }
+
+                        // Set correct host header for backend
+                        foreach (string key in req.Headers.AllKeys)
+                        {
+                            if (key.ToLower().Equals("host"))
+                            {
+                                req.Headers.Remove(key);
+                                req.Headers.Add("Host", backend.Hostname + ":" + backend.Port.ToString());
+                            }
+                        }
+
+                        telemetry.BackendRequestSentUtc = DateTime.UtcNow;
+
+                        if (transformedRequestBody != null && transformedRequestBody.Length > 0)
+                        {
+                            req.ContentType = Constants.JsonContentType;
+
+                            resp = await req.SendAsync(transformedRequestBody);
+                        }
+                        else
+                        {
+                            resp = await req.SendAsync();
+                        }
+
+                        if (resp != null)
+                        {
+                            // Setup client response headers
+                            if (resp.Headers != null && resp.Headers.Count > 0)
+                            {
+                                foreach (string headerName in resp.Headers.AllKeys)
+                                {
+                                    if (headerName != null && originalContext.Response.Headers[headerName] == null)
+                                    {
+                                        originalContext.Response.Headers.Add(headerName, resp.Headers[headerName]);
+                                    }
+                                }
+                            }
+
+                            originalContext.Response.StatusCode = resp.StatusCode;
+                            originalContext.Response.Headers.Add(Constants.BackendServerHeader, backend.Identifier);
+
+                            // Handle streaming response with transformation
+                            return await ProcessStreamingResponseWithTransformation(
+                                resp, originalContext, telemetry, sourceFormat, targetFormat, requestType);
+                        }
+                        else
+                        {
+                            _Logging.Warn(_Header + "no response from backend " + url);
+                            return false;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _Logging.Error(_Header + $"error proxying streaming request: {ex.Message}");
+                    return false;
+                }
+                finally
+                {
+                    ts.End = DateTime.UtcNow;
+                    _Logging.Debug(_Header + $"completed streaming request {requestGuid} to {backend.Identifier} ({ts.TotalMs}ms)");
+
+                    if (resp != null) resp.Dispose();
+                    backend.Semaphore.Release();
+                    Interlocked.Decrement(ref backend._ActiveRequests);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process streaming response with real-time transformation between API formats.
+        /// </summary>
+        /// <param name="backendResponse">Response from backend server.</param>
+        /// <param name="clientContext">HTTP context for client response.</param>
+        /// <param name="telemetry">Telemetry message.</param>
+        /// <param name="sourceFormat">Source API format (client).</param>
+        /// <param name="targetFormat">Target API format (backend).</param>
+        /// <param name="requestType">Type of request being processed.</param>
+        /// <returns>True if streaming was processed successfully.</returns>
+        private async Task<bool> ProcessStreamingResponseWithTransformation(
+            RestResponse backendResponse,
+            HttpContextBase clientContext,
+            TelemetryMessage telemetry,
+            ApiFormatEnum sourceFormat,
+            ApiFormatEnum targetFormat,
+            RequestTypeEnum requestType)
+        {
+            try
+            {
+                IStreamingTransformer streamingTransformer = _TransformationPipeline.GetStreamingTransformer();
+
+                // Setup client response based on source format
+                if (sourceFormat == ApiFormatEnum.OpenAI)
+                {
+                    clientContext.Response.ContentType = "text/plain";
+                    clientContext.Response.ServerSentEvents = true;
+                    clientContext.Response.ProtocolVersion = "HTTP/1.1";
+                }
+                else
+                {
+                    clientContext.Response.ContentType = "application/x-ndjson";
+                    clientContext.Response.ChunkedTransfer = true;
+                }
+
+                if (!backendResponse.ServerSentEvents)
+                {
+                    #region Chunked-Transfer-Encoding
+
+                    if (!backendResponse.ChunkedTransferEncoding)
+                    {
+                        // Non-streaming response - handle as single chunk
+                        if (backendResponse.DataAsBytes != null && backendResponse.DataAsBytes.Length > 0)
+                        {
+                            StreamingChunkResult chunkResult = await streamingTransformer.TransformChunkAsync(
+                                backendResponse.DataAsBytes, targetFormat, sourceFormat, requestType);
+
+                            if (!string.IsNullOrEmpty(chunkResult.Error))
+                            {
+                                _Logging.Error(_Header + $"transformation error: {chunkResult.Error}");
+                                return false;
+                            }
+
+                            if (chunkResult.IsServerSentEvent && sourceFormat == ApiFormatEnum.OpenAI)
+                            {
+                                await clientContext.Response.SendEvent(Encoding.UTF8.GetString(chunkResult.ChunkData), true);
+                            }
+                            else
+                            {
+                                await clientContext.Response.Send(chunkResult.ChunkData);
+                            }
+                        }
+
+                        telemetry.LastTokenTimeUtc = DateTime.UtcNow;
+                        return true;
+                    }
+                    else
+                    {
+                        // Chunked streaming response
+                        while (true)
+                        {
+                            ChunkData chunk = await backendResponse.ReadChunkAsync().ConfigureAwait(false);
+                            if (telemetry.FirstTokenTimeUtc == null) telemetry.FirstTokenTimeUtc = DateTime.UtcNow;
+
+                            if (chunk == null || chunk.IsFinal)
+                            {
+                                // Handle final chunk
+                                if (chunk?.Data != null && chunk.Data.Length > 0)
+                                {
+                                    StreamingChunkResult finalChunkResult = await streamingTransformer.TransformChunkAsync(
+                                        chunk.Data, targetFormat, sourceFormat, requestType);
+
+                                    if (!string.IsNullOrEmpty(finalChunkResult.Error))
+                                    {
+                                        _Logging.Error(_Header + $"final chunk transformation error: {finalChunkResult.Error}");
+                                    }
+                                    else
+                                    {
+                                        await SendTransformedChunk(clientContext, finalChunkResult, sourceFormat, true);
+                                    }
+                                }
+
+                                // Send final chunk indicating end of stream
+                                StreamingChunkResult endChunkResult = await streamingTransformer.CreateFinalChunkAsync(sourceFormat, requestType);
+                                await SendTransformedChunk(clientContext, endChunkResult, sourceFormat, true);
+                                break;
+                            }
+                            else if (chunk.Data != null && chunk.Data.Length > 0)
+                            {
+                                StreamingChunkResult chunkResult = await streamingTransformer.TransformChunkAsync(
+                                    chunk.Data, targetFormat, sourceFormat, requestType);
+
+                                if (!string.IsNullOrEmpty(chunkResult.Error))
+                                {
+                                    _Logging.Warn(_Header + $"chunk transformation error: {chunkResult.Error}");
+                                    continue; // Skip malformed chunks
+                                }
+
+                                await SendTransformedChunk(clientContext, chunkResult, sourceFormat, false);
+                            }
+                        }
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    #region Server-Sent-Events
+
+                    while (true)
+                    {
+                        ServerSentEvent sse = await backendResponse.ReadEventAsync();
+                        if (telemetry.FirstTokenTimeUtc == null) telemetry.FirstTokenTimeUtc = DateTime.UtcNow;
+
+                        if (sse == null)
+                        {
+                            // End of stream - send final chunk
+                            StreamingChunkResult endChunkResult = await streamingTransformer.CreateFinalChunkAsync(sourceFormat, requestType);
+                            await SendTransformedChunk(clientContext, endChunkResult, sourceFormat, true);
+                            break;
+                        }
+                        else if (!String.IsNullOrEmpty(sse.Data))
+                        {
+                            StreamingChunkResult chunkResult = await streamingTransformer.TransformChunkAsync(
+                                sse.Data, targetFormat, sourceFormat, requestType);
+
+                            if (!string.IsNullOrEmpty(chunkResult.Error))
+                            {
+                                _Logging.Warn(_Header + $"SSE transformation error: {chunkResult.Error}");
+                                continue; // Skip malformed events
+                            }
+
+                            await SendTransformedChunk(clientContext, chunkResult, sourceFormat, false);
+                        }
+                    }
+
+                    #endregion
+                }
+
+                telemetry.LastTokenTimeUtc = DateTime.UtcNow;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _Logging.Error(_Header + $"streaming transformation failed: {ex.Message}");
+
+                try
+                {
+                    // Send error response using appropriate method based on transfer encoding
+                    byte[] errorResponseBytes = Encoding.UTF8.GetBytes(_Serializer.SerializeJson(
+                        new ApiErrorResponse(ApiErrorEnum.InternalError, null, "Streaming response transformation failed"), true));
+
+                    if (clientContext.Response.ChunkedTransfer)
+                    {
+                        await clientContext.Response.SendChunk(errorResponseBytes, true);
+                    }
+                    else if (clientContext.Response.ServerSentEvents)
+                    {
+                        await clientContext.Response.SendEvent(Encoding.UTF8.GetString(errorResponseBytes), true);
+                    }
+                    else
+                    {
+                        await clientContext.Response.Send(errorResponseBytes);
+                    }
+                }
+                catch (Exception sendEx)
+                {
+                    _Logging.Error(_Header + $"error sending streaming transformation error response: {sendEx.Message}");
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Send a transformed chunk to the client in the appropriate format.
+        /// </summary>
+        /// <param name="context">Client HTTP context.</param>
+        /// <param name="chunkResult">Transformed chunk result.</param>
+        /// <param name="targetFormat">Target format for the client.</param>
+        /// <param name="isFinal">Whether this is the final chunk.</param>
+        private async Task SendTransformedChunk(
+            HttpContextBase context,
+            Services.Transformation.Interfaces.StreamingChunkResult chunkResult,
+            ApiFormatEnum targetFormat,
+            bool isFinal)
+        {
+            if (chunkResult.ChunkData == null || chunkResult.ChunkData.Length == 0)
+                return;
+
+            try
+            {
+                if (targetFormat == ApiFormatEnum.OpenAI && chunkResult.IsServerSentEvent)
+                {
+                    // Send as Server-Sent Event
+                    string eventData = Encoding.UTF8.GetString(chunkResult.ChunkData);
+                    await context.Response.SendEvent(eventData, isFinal);
+                }
+                else
+                {
+                    // Send as chunked data
+                    await context.Response.SendChunk(chunkResult.ChunkData, isFinal);
+                }
+            }
+            catch (Exception ex)
+            {
+                _Logging.Error(_Header + $"error sending transformed chunk: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Get an alternative backend excluding a specific backend.
         /// </summary>
         /// <param name="frontend">Frontend configuration.</param>
         /// <param name="excludeBackendId">Backend to exclude from selection.</param>
         /// <returns>Alternative backend or null if none available.</returns>
-        private OllamaBackend GetAlternativeBackend(OllamaFrontend frontend, string excludeBackendId)
+        private Backend GetAlternativeBackend(Frontend frontend, string excludeBackendId)
         {
-            List<OllamaBackend> healthyBackends = _HealthCheck.Backends.Where(b =>
+            List<Backend> healthyBackends = _HealthCheck.Backends.Where(b =>
                 frontend.Backends.Contains(b.Identifier) &&
                 b.Healthy &&
                 b.Identifier != excludeBackendId).ToList();
@@ -627,7 +1397,7 @@
             }
 
             // Use load balancing to select from available backends
-            OllamaBackend selected = null;
+            Backend selected = null;
 
             switch (frontend.LoadBalancing)
             {
@@ -660,9 +1430,12 @@
         private async Task<ProxyResult> ProxyRequestInternal(
             Guid requestGuid,
             HttpContextBase ctx,
-            OllamaFrontend frontend,
-            OllamaBackend backend,
-            TelemetryMessage telemetry)
+            Frontend frontend,
+            Backend backend,
+            TelemetryMessage telemetry,
+            byte[] overrideRequestBody = null,
+            string overrideUrlPath = null,
+            bool captureResponseForTransformation = false)
         {
             _Logging.Debug(_Header + "proxying request to " + backend.Identifier + " for Ollama endpoint " + frontend.Identifier + " for request " + requestGuid.ToString());
 
@@ -670,7 +1443,8 @@
 
             using (Timestamp ts = new Timestamp())
             {
-                string url = backend.UrlPrefix + ctx.Request.Url.RawWithQuery;
+                string urlPath = overrideUrlPath ?? ctx.Request.Url.RawWithQuery;
+                string url = backend.UrlPrefix + urlPath;
 
                 try
                 {
@@ -707,8 +1481,8 @@
 
                         if (frontend.LogRequestBody || backend.LogRequestBody)
                         {
-                            int length = ctx.Request.DataAsBytes?.Length ?? 0;
-                            byte[] dataBytes =  ctx.Request.DataAsBytes ?? Array.Empty<byte>();
+                            byte[] dataBytes = overrideRequestBody ?? ctx.Request.DataAsBytes ?? Array.Empty<byte>();
+                            int length = dataBytes.Length;
 
                             _Logging.Debug(
                                 _Header
@@ -720,12 +1494,25 @@
                         }
 
                         telemetry.BackendRequestSentUtc = DateTime.UtcNow;
-                        if (ctx.Request.DataAsBytes != null && ctx.Request.DataAsBytes.Length > 0)
-                        {
-                            if (!String.IsNullOrEmpty(ctx.Request.ContentType)) req.ContentType = ctx.Request.ContentType;
-                            else req.ContentType = Constants.BinaryContentType;
+                        byte[] requestBody = overrideRequestBody ?? ctx.Request.DataAsBytes;
 
-                            resp = await req.SendAsync(ctx.Request.DataAsBytes);
+                        if (requestBody != null && requestBody.Length > 0)
+                        {
+                            if (overrideRequestBody != null)
+                            {
+                                // Transformed request, always JSON
+                                req.ContentType = Constants.JsonContentType;
+                            }
+                            else if (!String.IsNullOrEmpty(ctx.Request.ContentType))
+                            {
+                                req.ContentType = ctx.Request.ContentType;
+                            }
+                            else
+                            {
+                                req.ContentType = Constants.BinaryContentType;
+                            }
+
+                            resp = await req.SendAsync(requestBody);
                         }
                         else
                         {
@@ -752,6 +1539,24 @@
                                         _Header
                                         + "response body (0 bytes) status " + resp.StatusCode);
                                 }
+                            }
+
+                            #endregion
+
+                            #region Capture-Response-For-Transformation
+
+                            // If capturing for transformation, store response and return without sending
+                            if (captureResponseForTransformation && !resp.ServerSentEvents && !resp.ChunkedTransferEncoding)
+                            {
+                                return new ProxyResult
+                                {
+                                    ResponseReceived = true,
+                                    StatusCode = resp.StatusCode,
+                                    ResponseBody = resp.DataAsBytes,
+                                    ContentType = resp.ContentType,
+                                    Headers = resp.Headers,
+                                    AlreadySent = false
+                                };
                             }
 
                             #endregion
@@ -868,7 +1673,7 @@
 
                             #endregion
 
-                            return new ProxyResult { ResponseReceived = true, StatusCode = resp.StatusCode };
+                            return new ProxyResult { ResponseReceived = true, StatusCode = resp.StatusCode, AlreadySent = true };
                         }
                         else
                         {
@@ -933,8 +1738,8 @@
         private async Task<bool> ProxyRequest(
             Guid requestGuid,
             HttpContextBase ctx,
-            OllamaFrontend frontend,
-            OllamaBackend backend,
+            Frontend frontend,
+            Backend backend,
             TelemetryMessage telemetry)
         {
             _Logging.Debug(_Header + "proxying request to " + backend.Identifier + " for Ollama endpoint " + frontend.Identifier + " for request " + requestGuid.ToString());
@@ -1222,7 +2027,7 @@
         private async Task GetFrontendsRoute(HttpContextBase ctx)
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            List<OllamaFrontend> objs = _FrontendService.GetAll().ToList();
+            List<Frontend> objs = _FrontendService.GetAll().ToList();
             await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
         }
 
@@ -1230,7 +2035,7 @@
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
             string identifier = ctx.Request.Url.Parameters["identifier"];
-            OllamaFrontend obj = _FrontendService.GetByIdentifier(identifier);
+            Frontend obj = _FrontendService.GetByIdentifier(identifier);
             if (obj == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
             await ctx.Response.Send(_Serializer.SerializeJson(obj, true));
         }
@@ -1254,11 +2059,11 @@
         private async Task CreateFrontendRoute(HttpContextBase ctx)
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            OllamaFrontend obj = _Serializer.DeserializeJson<OllamaFrontend>(ctx.Request.DataAsString);
-            OllamaFrontend existing = _FrontendService.GetByIdentifier(obj.Identifier);
+            Frontend obj = _Serializer.DeserializeJson<Frontend>(ctx.Request.DataAsString);
+            Frontend existing = _FrontendService.GetByIdentifier(obj.Identifier);
             if (existing != null) throw new ArgumentException("An object with identifier " + obj.Identifier + " already exists.");
 
-            OllamaFrontend created = _FrontendService.Create(obj);
+            Frontend created = _FrontendService.Create(obj);
 
             // Notify all services of new frontend
             _HealthCheck.AddFrontend(created);
@@ -1272,10 +2077,10 @@
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
             string identifier = ctx.Request.Url.Parameters["identifier"];
-            OllamaFrontend original = _FrontendService.GetByIdentifier(identifier);
+            Frontend original = _FrontendService.GetByIdentifier(identifier);
             if (original == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
 
-            OllamaFrontend updated = _Serializer.DeserializeJson<OllamaFrontend>(ctx.Request.DataAsString);
+            Frontend updated = _Serializer.DeserializeJson<Frontend>(ctx.Request.DataAsString);
             updated.Identifier = identifier;
             updated = _FrontendService.Update(updated);
 
@@ -1289,14 +2094,14 @@
         private async Task GetBackendsRoute(HttpContextBase ctx)
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            List<OllamaBackend> objs = _BackendService.GetAll().ToList();
+            List<Backend> objs = _BackendService.GetAll().ToList();
             await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
         }
 
         private async Task GetBackendsHealthRoute(HttpContextBase ctx)
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            List<OllamaBackend> objs = new List<OllamaBackend>(_HealthCheck.Backends);
+            List<Backend> objs = new List<Backend>(_HealthCheck.Backends);
             await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
         }
 
@@ -1304,7 +2109,7 @@
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
             string identifier = ctx.Request.Url.Parameters["identifier"];
-            OllamaBackend obj = _BackendService.GetByIdentifier(identifier);
+            Backend obj = _BackendService.GetByIdentifier(identifier);
             if (obj == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
             await ctx.Response.Send(_Serializer.SerializeJson(obj, true));
         }
@@ -1313,10 +2118,10 @@
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
             string identifier = ctx.Request.Url.Parameters["identifier"];
-            List<OllamaBackend> backends = new List<OllamaBackend>(_HealthCheck.Backends);
+            List<Backend> backends = new List<Backend>(_HealthCheck.Backends);
             if (backends.Any(b => b.Identifier.Equals(identifier)))
             {
-                OllamaBackend backend = backends.First(b => b.Identifier.Equals(identifier));
+                Backend backend = backends.First(b => b.Identifier.Equals(identifier));
                 await ctx.Response.Send(_Serializer.SerializeJson(backend, true));
             }
             else
@@ -1344,11 +2149,11 @@
         private async Task CreateBackendRoute(HttpContextBase ctx)
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            OllamaBackend obj = _Serializer.DeserializeJson<OllamaBackend>(ctx.Request.DataAsString);
-            OllamaBackend existing = _BackendService.GetByIdentifier(obj.Identifier);
+            Backend obj = _Serializer.DeserializeJson<Backend>(ctx.Request.DataAsString);
+            Backend existing = _BackendService.GetByIdentifier(obj.Identifier);
             if (existing != null) throw new ArgumentException("An object with identifier " + obj.Identifier + " already exists.");
 
-            OllamaBackend created = _BackendService.Create(obj);
+            Backend created = _BackendService.Create(obj);
 
             // Notify all services of new backend
             _HealthCheck.AddBackend(created);
@@ -1362,10 +2167,10 @@
         {
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
             string identifier = ctx.Request.Url.Parameters["identifier"];
-            OllamaBackend original = _BackendService.GetByIdentifier(identifier);
+            Backend original = _BackendService.GetByIdentifier(identifier);
             if (original == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
 
-            OllamaBackend updated = _Serializer.DeserializeJson<OllamaBackend>(ctx.Request.DataAsString);
+            Backend updated = _Serializer.DeserializeJson<Backend>(ctx.Request.DataAsString);
             updated.Identifier = identifier;
             updated = _BackendService.Update(updated);
 
@@ -1421,6 +2226,53 @@
 
             ctx.Response.StatusCode = 200;
             await ctx.Response.Send(_Serializer.SerializeJson(result, true));
+        }
+
+        private RequestTypeEnum GetRequestTypeFromAgnosticRequest(Models.Agnostic.Base.AgnosticRequest request)
+        {
+            return request switch
+            {
+                Models.Agnostic.Requests.AgnosticChatRequest => RequestTypeEnum.GenerateChatCompletion,
+                Models.Agnostic.Requests.AgnosticCompletionRequest => RequestTypeEnum.GenerateCompletion,
+                Models.Agnostic.Requests.AgnosticEmbeddingRequest => RequestTypeEnum.GenerateEmbeddings,
+                Models.Agnostic.Requests.AgnosticModelListRequest => RequestTypeEnum.ListModels,
+                Models.Agnostic.Requests.AgnosticModelInfoRequest => RequestTypeEnum.ShowModelInformation,
+                _ => RequestTypeEnum.GenerateChatCompletion // Default fallback
+            };
+        }
+
+        /// <summary>
+        /// Determines if the request is asking for streaming responses.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <param name="agnosticRequest">Agnostic request.</param>
+        /// <param name="requestType">Request type.</param>
+        /// <returns>True if streaming is requested.</returns>
+        private bool IsStreamingRequest(HttpContextBase ctx, Models.Agnostic.Base.AgnosticRequest agnosticRequest, RequestTypeEnum requestType)
+        {
+            // Only chat completions and completions support streaming
+            if (requestType != RequestTypeEnum.GenerateChatCompletion && requestType != RequestTypeEnum.GenerateCompletion)
+                return false;
+
+            // Check stream parameter in agnostic request
+            if (agnosticRequest is Models.Agnostic.Requests.AgnosticChatRequest chatRequest)
+            {
+                return chatRequest.Stream == true;
+            }
+            else if (agnosticRequest is Models.Agnostic.Requests.AgnosticCompletionRequest completionRequest)
+            {
+                return completionRequest.Stream == true;
+            }
+
+            // Fall back to checking headers for streaming indicators
+            string acceptHeader = ctx.Request.Headers?["Accept"];
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                if (acceptHeader.Contains("text/event-stream") || acceptHeader.Contains("application/x-ndjson"))
+                    return true;
+            }
+
+            return false;
         }
 
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously

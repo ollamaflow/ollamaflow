@@ -128,7 +128,7 @@
                 SqliteDatabaseDriver driver = new SqliteDatabaseDriver(_Settings, new LoggingModule(), _Serializer, _Settings.DatabaseFilename);
                 driver.InitializeRepository();
 
-                driver.Frontend.Create(new OllamaFrontend
+                driver.Frontend.Create(new Frontend
                 {
                     Identifier = "frontend1",
                     Name = "My first virtual Ollama",
@@ -136,7 +136,7 @@
                     Backends = new List<string> { "backend1" }                    
                 });
 
-                driver.Backend.Create(new OllamaBackend
+                driver.Backend.Create(new Backend
                 {
                     Identifier = "backend1",
                     Name = "My localhost Ollama instance",

@@ -39,11 +39,11 @@ namespace OllamaFlow.Core.Services
         /// <summary>
         /// Retrieve the list of frontends in memory.
         /// </summary>
-        public List<OllamaFrontend> Frontends
+        public List<Frontend> Frontends
         {
             get
             {
-                if (_Frontends == null) return new List<OllamaFrontend>();
+                if (_Frontends == null) return new List<Frontend>();
                 return _Frontends.Values.ToList();
             }
         }
@@ -51,11 +51,11 @@ namespace OllamaFlow.Core.Services
         /// <summary>
         /// Retrieve the list of backends in memory.
         /// </summary>
-        public List<OllamaBackend> Backends
+        public List<Backend> Backends
         {
             get
             {
-                if (_Backends == null) return new List<OllamaBackend>();
+                if (_Backends == null) return new List<Backend>();
                 return _Backends.Values.ToList();
             }
         }
@@ -79,8 +79,8 @@ namespace OllamaFlow.Core.Services
 
         private int _IntervalMs = 5000;
 
-        private ConcurrentDictionary<string, OllamaFrontend> _Frontends = new ConcurrentDictionary<string, OllamaFrontend>();
-        private ConcurrentDictionary<string, OllamaBackend> _Backends = new ConcurrentDictionary<string, OllamaBackend>();
+        private ConcurrentDictionary<string, Frontend> _Frontends = new ConcurrentDictionary<string, Frontend>();
+        private ConcurrentDictionary<string, Backend> _Backends = new ConcurrentDictionary<string, Backend>();
 
         // Per-backend task management
         private ConcurrentDictionary<string, Task> _BackendTasks = new ConcurrentDictionary<string, Task>();
@@ -176,17 +176,17 @@ namespace OllamaFlow.Core.Services
         /// <param name="frontend">Frontend.</param>
         /// <returns>Backend.</returns>
         /// <exception cref="ArgumentNullException">Thrown when frontend is null.</exception>
-        public OllamaBackend GetNextBackend(OllamaFrontend frontend)
+        public Backend GetNextBackend(Frontend frontend)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
 
-            List<OllamaBackend> candidates = new List<OllamaBackend>();
+            List<Backend> candidates = new List<Backend>();
 
             if (frontend.Backends != null && frontend.Backends.Count > 0)
             {
                 foreach (string backendId in frontend.Backends)
                 {
-                    if (_Backends.TryGetValue(backendId, out OllamaBackend backend))
+                    if (_Backends.TryGetValue(backendId, out Backend backend))
                     {
                         if (backend.Active && backend.Healthy) candidates.Add(backend);
                     }
@@ -226,7 +226,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="clientId">Client identifier for sticky session lookup.</param>
         /// <returns>Backend.</returns>
         /// <exception cref="ArgumentNullException">Thrown when frontend or clientId is null.</exception>
-        public OllamaBackend GetNextBackend(OllamaFrontend frontend, string clientId)
+        public Backend GetNextBackend(Frontend frontend, string clientId)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
             if (String.IsNullOrEmpty(clientId)) throw new ArgumentNullException(nameof(clientId));
@@ -240,7 +240,7 @@ namespace OllamaFlow.Core.Services
                 if (!String.IsNullOrEmpty(stickyBackendId))
                 {
                     // Verify the sticky backend is still available and healthy
-                    if (_Backends.TryGetValue(stickyBackendId, out OllamaBackend stickyBackend))
+                    if (_Backends.TryGetValue(stickyBackendId, out Backend stickyBackend))
                     {
                         if (stickyBackend.Active && stickyBackend.Healthy)
                         {
@@ -267,7 +267,7 @@ namespace OllamaFlow.Core.Services
                 }
 
                 // No valid sticky session, select a new backend using normal load balancing
-                OllamaBackend selectedBackend = GetNextBackend(frontend);
+                Backend selectedBackend = GetNextBackend(frontend);
 
                 if (selectedBackend != null)
                 {
@@ -290,11 +290,11 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="backend">Backend.</param>
         /// <exception cref="ArgumentNullException">Thrown when backend is null.</exception>
-        public void UpdateBackend(OllamaBackend backend)
+        public void UpdateBackend(Backend backend)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
 
-            if (_Backends.TryGetValue(backend.Identifier, out OllamaBackend cached))
+            if (_Backends.TryGetValue(backend.Identifier, out Backend cached))
             {
                 cached.Name = backend.Name;
                 cached.Hostname = backend.Hostname;
@@ -320,11 +320,11 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="backend">Backend to add.</param>
         /// <exception cref="ArgumentNullException">Thrown when backend is null.</exception>
-        public void AddBackend(OllamaBackend backend)
+        public void AddBackend(Backend backend)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
 
-            OllamaBackend newBackend = new OllamaBackend
+            Backend newBackend = new Backend
             {
                 Identifier = backend.Identifier,
                 Name = backend.Name,
@@ -362,7 +362,7 @@ namespace OllamaFlow.Core.Services
         {
             if (String.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
 
-            if (_Backends.TryRemove(identifier, out OllamaBackend removed))
+            if (_Backends.TryRemove(identifier, out Backend removed))
             {
                 // Stop and cleanup the dedicated health check task for this backend
                 StopBackendHealthCheckTask(identifier);
@@ -379,11 +379,11 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="frontend">Frontend to update.</param>
         /// <exception cref="ArgumentNullException">Thrown when frontend is null.</exception>
-        public void UpdateFrontend(OllamaFrontend frontend)
+        public void UpdateFrontend(Frontend frontend)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
 
-            if (_Frontends.TryGetValue(frontend.Identifier, out OllamaFrontend cached))
+            if (_Frontends.TryGetValue(frontend.Identifier, out Frontend cached))
             {
                 cached.Name = frontend.Name;
                 cached.Hostname = frontend.Hostname;
@@ -400,7 +400,7 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="frontend">Frontend to add.</param>
         /// <exception cref="ArgumentNullException">Thrown when frontend is null.</exception>
-        public void AddFrontend(OllamaFrontend frontend)
+        public void AddFrontend(Frontend frontend)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
 
@@ -417,7 +417,7 @@ namespace OllamaFlow.Core.Services
         {
             if (String.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
 
-            if (_Frontends.TryRemove(identifier, out OllamaFrontend removed))
+            if (_Frontends.TryRemove(identifier, out Frontend removed))
             {
                 // Remove all sticky sessions associated with this frontend
                 int removedSessions = _SessionStickiness.RemoveFrontendSessions(identifier);
@@ -435,15 +435,15 @@ namespace OllamaFlow.Core.Services
             try
             {
                 // Load existing frontends
-                List<OllamaFrontend> frontends = _FrontendService.GetAll()?.ToList() ?? new List<OllamaFrontend>();
-                foreach (OllamaFrontend frontend in frontends)
+                List<Frontend> frontends = _FrontendService.GetAll()?.ToList() ?? new List<Frontend>();
+                foreach (Frontend frontend in frontends)
                 {
                     _Frontends.TryAdd(frontend.Identifier, frontend);
                 }
 
                 // Load existing backends and start health check tasks
-                List<OllamaBackend> backends = _BackendService.GetAll()?.ToList() ?? new List<OllamaBackend>();
-                foreach (OllamaBackend backend in backends)
+                List<Backend> backends = _BackendService.GetAll()?.ToList() ?? new List<Backend>();
+                foreach (Backend backend in backends)
                 {
                     backend.UnhealthySinceUtc = DateTime.UtcNow;
                     backend.Healthy = false;
@@ -462,7 +462,7 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        private void StartBackendHealthCheckTask(OllamaBackend backend)
+        private void StartBackendHealthCheckTask(Backend backend)
         {
             if (backend == null || String.IsNullOrEmpty(backend.Identifier)) return;
 
@@ -518,7 +518,7 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"stopped and cleaned up health check task for backend {identifier}");
         }
 
-        private async Task BackendHealthCheckLoop(OllamaBackend backend, CancellationToken token)
+        private async Task BackendHealthCheckLoop(Backend backend, CancellationToken token)
         {
             string healthCheckUrl = (backend.Ssl ? "https://" : "http://") + backend.Hostname + ":" + backend.Port + backend.HealthCheckUrl;
 
@@ -568,7 +568,7 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"health check terminated for backend {backend.Identifier}");
         }
 
-        private async Task PerformHealthCheck(OllamaBackend backend, string healthCheckUrl, CancellationToken token)
+        private async Task PerformHealthCheck(Backend backend, string healthCheckUrl, CancellationToken token)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -600,9 +600,9 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        private void HandleHealthCheckSuccess(OllamaBackend backend, string healthCheckUrl)
+        private void HandleHealthCheckSuccess(Backend backend, string healthCheckUrl)
         {
-            if (_Backends.TryGetValue(backend.Identifier, out OllamaBackend cached))
+            if (_Backends.TryGetValue(backend.Identifier, out Backend cached))
             {
                 lock (cached.Lock)
                 {
@@ -623,9 +623,9 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"health check success for backend {backend.Identifier} at {healthCheckUrl}");
         }
 
-        private void HandleHealthCheckFailure(OllamaBackend backend, string healthCheckUrl, string reason)
+        private void HandleHealthCheckFailure(Backend backend, string healthCheckUrl, string reason)
         {
-            if (_Backends.TryGetValue(backend.Identifier, out OllamaBackend cached))
+            if (_Backends.TryGetValue(backend.Identifier, out Backend cached))
             {
                 lock (cached.Lock)
                 {

@@ -147,6 +147,11 @@ namespace OllamaFlow.Core
         /// </summary>
         public static string StickyServerHeader = "X-OllamaFlow-Sticky";
 
+        /// <summary>
+        /// Expose headers header.
+        /// </summary>
+        public static string ExposeHeadersHeader = "Access-Control-Expose-Headers";
+
         #endregion
     }
 }

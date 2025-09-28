@@ -15,13 +15,13 @@
 
         internal static Serializer Serializer = new Serializer();
 
-        internal static string Insert(OllamaBackend obj)
+        internal static string Insert(Backend obj)
         {
             string ret =
                 "INSERT INTO 'backends' "
                 + "(identifier, name, hostname, port, ssl, unhealthythreshold, "
                 + "healthythreshold, healthcheckmethod, healthcheckurl, maxparallelrequests, "
-                + "ratelimitthreshold, logrequestfull, logrequestbody, logresponsebody, active, createdutc, lastupdateutc) "
+                + "ratelimitthreshold, logrequestfull, logrequestbody, logresponsebody, apiformat, active, createdutc, lastupdateutc) "
                 + "VALUES ("
                 + "'" + Sanitizer.Sanitize(obj.Identifier) + "',"
                 + "'" + Sanitizer.Sanitize(obj.Name) + "',"
@@ -37,6 +37,7 @@
                 + (obj.LogRequestFull ? "1" : "0") + ","
                 + (obj.LogRequestBody ? "1" : "0") + ","
                 + (obj.LogResponseBody ? "1" : "0") + ","
+                + "'" + Sanitizer.Sanitize(obj.ApiFormat.ToString()) + "',"
                 + (obj.Active ? "1" : "0") + ","
                 + "'" + Sanitizer.Sanitize(obj.CreatedUtc.ToString(TimestampFormat)) + "',"
                 + "'" + Sanitizer.Sanitize(obj.LastUpdateUtc.ToString(TimestampFormat)) + "'"
@@ -92,7 +93,7 @@
             int batchSize = 100,
             int skip = 0,
             EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending,
-            OllamaBackend marker = null)
+            Backend marker = null)
         {
             string ret = "SELECT * FROM 'backends' WHERE identifier IS NOT NULL ";
 
@@ -108,7 +109,7 @@
 
         internal static string GetRecordCount(
             EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending,
-            OllamaBackend marker = null)
+            Backend marker = null)
         {
             string ret = "SELECT COUNT(*) AS record_count FROM 'backends' WHERE identifier IS NOT NULL ";
 
@@ -120,7 +121,7 @@
             return ret;
         }
 
-        internal static string Update(OllamaBackend obj)
+        internal static string Update(Backend obj)
         {
             return
                 "UPDATE 'backends' SET "
@@ -138,6 +139,7 @@
                 + "logrequestfull = " + (obj.LogRequestFull ? "1" : "0") + ","
                 + "logrequestbody = " + (obj.LogRequestBody ? "1" : "0") + ","
                 + "logresponsebody = " + (obj.LogResponseBody ? "1" : "0") + ","
+                + "apiformat = '" + Sanitizer.Sanitize(obj.ApiFormat.ToString()) + "',"
                 + "active = " + (obj.Active ? "1" : "0") + " "
                 + "WHERE identifier = '" + Sanitizer.Sanitize(obj.Identifier) + "' "
                 + "RETURNING *;";
@@ -165,7 +167,7 @@
             }
         }
 
-        private static string ContinuationTokenWhereClause(EnumerationOrderEnum order, OllamaBackend obj)
+        private static string ContinuationTokenWhereClause(EnumerationOrderEnum order, Backend obj)
         {
             switch (order)
             {

@@ -9,7 +9,12 @@
       "Bash(curl:*)",
       "Bash(xxd:*)",
       "Bash(git checkout:*)",
-      "Bash(dotnet test)"
+      "Bash(dotnet test)",
+      "Bash(dotnet build:*)",
+      "Bash(dir:*)",
+      "Read(//c/Code/OllamaFlow/**)",
+      "Bash(dotnet run:*)",
+      "Bash(dotnet clean:*)"
     ],
     "deny": [],
     "ask": []
