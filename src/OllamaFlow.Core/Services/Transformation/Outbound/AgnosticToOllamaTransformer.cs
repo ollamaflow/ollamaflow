@@ -5,6 +5,7 @@
     using System.Text.Json.Serialization;
     using System.Threading.Tasks;
     using OllamaFlow.Core.Enums;
+    using OllamaFlow.Core.Models;
     using OllamaFlow.Core.Models.Agnostic.Base;
     using OllamaFlow.Core.Models.Agnostic.Requests;
     using OllamaFlow.Core.Services.Transformation.Interfaces;

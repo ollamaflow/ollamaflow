@@ -2,17 +2,18 @@ namespace Test.Transformation
 {
     using System.Linq;
     using System.Text.Json;
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Services.Transformation.Outbound;
     using OllamaFlow.Core.Services.Transformation.Inbound;
     using OllamaFlow.Core.Services.Transformation.Streaming;
     using OllamaFlow.Core.Services.Transformation;
     using OllamaFlow.Core.Services.Transformation.Interfaces;
     using OllamaFlow.Core.Serialization;
-    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Helpers;
     using OllamaFlow.Core.Models.Agnostic.Requests;
     using OllamaFlow.Core.Models.Agnostic.Common;
     using OllamaFlow.Core.Models.Agnostic.Base;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Comprehensive tests for transformation services.
@@ -248,12 +249,13 @@ namespace Test.Transformation
             AssertEqual("system", agnosticRequest.Messages[0].Role);
             AssertEqual("You are a helpful assistant.", agnosticRequest.Messages[0].Content);
             AssertTrue(agnosticRequest.Stream);
-            AssertEqual(0.7, agnosticRequest.Temperature.Value, 0.01);
-            AssertEqual(150, agnosticRequest.MaxTokens.Value);
-            AssertEqual(0.9, agnosticRequest.TopP.Value, 0.01);
-            AssertEqual(12345, agnosticRequest.Seed.Value);
+            AssertEqual(0.7, agnosticRequest.Temperature!.Value, 0.01);
+            AssertEqual(150, agnosticRequest.MaxTokens!.Value);
+            AssertEqual(0.9, agnosticRequest.TopP!.Value, 0.01);
+            AssertEqual(12345, agnosticRequest.Seed!.Value);
 
             Console.WriteLine("✅ OpenAI to Agnostic transformation verified successfully!");
+            await Task.CompletedTask;
         }
 
         private static AgnosticChatRequest TransformOpenAIToAgnostic(OpenAIChatRequest openAIRequest)
@@ -285,10 +287,10 @@ namespace Test.Transformation
         private class OpenAIChatRequest
         {
             [System.Text.Json.Serialization.JsonPropertyName("model")]
-            public string Model { get; set; }
+            public required string Model { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("messages")]
-            public List<OpenAIMessage> Messages { get; set; }
+            public required List<OpenAIMessage> Messages { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("stream")]
             public bool Stream { get; set; }
@@ -306,7 +308,7 @@ namespace Test.Transformation
             public int? N { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("stop")]
-            public string[] Stop { get; set; }
+            public required string[] Stop { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("frequency_penalty")]
             public double? FrequencyPenalty { get; set; }
@@ -321,13 +323,13 @@ namespace Test.Transformation
         private class OpenAIMessage
         {
             [System.Text.Json.Serialization.JsonPropertyName("role")]
-            public string Role { get; set; }
+            public required string Role { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("content")]
-            public string Content { get; set; }
+            public required string Content { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("name")]
-            public string Name { get; set; }
+            public required string Name { get; set; }
         }
 
         public static async Task OllamaTransformer_TransformChatRequest_CompleteMapping()
@@ -370,12 +372,13 @@ namespace Test.Transformation
             AssertEqual("user", agnosticRequest.Messages[0].Role);
             AssertEqual("What is the capital of France?", agnosticRequest.Messages[0].Content);
             AssertTrue(agnosticRequest.Stream);
-            AssertEqual(0.6, agnosticRequest.Temperature.Value, 0.01);
-            AssertEqual(0.8, agnosticRequest.TopP.Value, 0.01);
-            AssertEqual(42, agnosticRequest.Seed.Value);
-            AssertEqual(100, agnosticRequest.MaxTokens.Value);
+            AssertEqual(0.6, agnosticRequest.Temperature!.Value, 0.01);
+            AssertEqual(0.8, agnosticRequest.TopP!.Value, 0.01);
+            AssertEqual(42, agnosticRequest.Seed!.Value);
+            AssertEqual(100, agnosticRequest.MaxTokens!.Value);
 
             Console.WriteLine("✅ Ollama to Agnostic transformation verified successfully!");
+            await Task.CompletedTask;
         }
 
         private static AgnosticChatRequest TransformOllamaToAgnostic(OllamaChatRequest ollamaRequest)
@@ -403,26 +406,26 @@ namespace Test.Transformation
 
                 foreach (JsonProperty prop in optionsDoc.RootElement.EnumerateObject())
                 {
-                    options[prop.Name] = prop.Value.ValueKind switch
+                    options[prop.Name ?? ""] = prop.Value.ValueKind switch
                     {
                         JsonValueKind.Number => prop.Value.TryGetInt32(out int intVal) ? (object)intVal : prop.Value.GetDouble(),
-                        JsonValueKind.String => prop.Value.GetString(),
+                        JsonValueKind.String => prop.Value.GetString() ?? "",
                         JsonValueKind.True => true,
                         JsonValueKind.False => false,
                         _ => prop.Value.ToString()
                     };
                 }
 
-                if (options.TryGetValue("temperature", out object temp))
+                if (options.TryGetValue("temperature", out object? temp))
                     agnosticRequest.Temperature = Convert.ToDouble(temp);
 
-                if (options.TryGetValue("top_p", out object topP))
+                if (options.TryGetValue("top_p", out object? topP))
                     agnosticRequest.TopP = Convert.ToDouble(topP);
 
-                if (options.TryGetValue("seed", out object seed))
+                if (options.TryGetValue("seed", out object? seed))
                     agnosticRequest.Seed = Convert.ToInt32(seed);
 
-                if (options.TryGetValue("num_predict", out object numPredict))
+                if (options.TryGetValue("num_predict", out object? numPredict))
                     agnosticRequest.MaxTokens = Convert.ToInt32(numPredict);
 
                 agnosticRequest.Options = options;
@@ -434,31 +437,31 @@ namespace Test.Transformation
         private class OllamaChatRequest
         {
             [System.Text.Json.Serialization.JsonPropertyName("model")]
-            public string Model { get; set; }
+            public required string Model { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("messages")]
-            public List<OllamaMessage> Messages { get; set; }
+            public required List<OllamaMessage> Messages { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("stream")]
             public bool Stream { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("system")]
-            public string System { get; set; }
+            public required string System { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("template")]
-            public string Template { get; set; }
+            public required string Template { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("options")]
-            public object Options { get; set; }
+            public required object Options { get; set; }
         }
 
         private class OllamaMessage
         {
             [System.Text.Json.Serialization.JsonPropertyName("role")]
-            public string Role { get; set; }
+            public required string Role { get; set; }
 
             [System.Text.Json.Serialization.JsonPropertyName("content")]
-            public string Content { get; set; }
+            public required string Content { get; set; }
         }
 
         #endregion
@@ -624,8 +627,8 @@ namespace Test.Transformation
             AssertNotNull(agnosticRequest);
             AssertEqual("gpt-3.5-turbo", agnosticRequest.Model);
             AssertTrue(agnosticRequest.Stream);
-            AssertEqual(0.7, agnosticRequest.Temperature.Value, 0.01);
-            AssertEqual(100, agnosticRequest.MaxTokens.Value);
+            AssertEqual(0.7, agnosticRequest.Temperature!.Value, 0.01);
+            AssertEqual(100, agnosticRequest.MaxTokens!.Value);
             AssertEqual(2, agnosticRequest.Messages.Count);
 
             Console.WriteLine("\nINTERMEDIATE (Agnostic Format):");

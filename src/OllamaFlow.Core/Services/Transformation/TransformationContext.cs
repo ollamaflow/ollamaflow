@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Helpers;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Context information for transformation operations.

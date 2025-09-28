@@ -1,15 +1,16 @@
 using System.Text;
 using Xunit;
 using Moq;
+using OllamaFlow.Core.Enums;
 using OllamaFlow.Core.Services.Transformation;
 using OllamaFlow.Core.Services.Transformation.Interfaces;
 using OllamaFlow.Core.Serialization;
-using OllamaFlow.Core.Enums;
 using OllamaFlow.Core.Helpers;
 using OllamaFlow.Core.Models.Agnostic.Base;
 using OllamaFlow.Core.Models.Agnostic.Requests;
 using WatsonWebserver.Core;
 using HttpMethod = WatsonWebserver.Core.HttpMethod;
+using OllamaFlow.Core.Models;
 
 namespace Test
 {

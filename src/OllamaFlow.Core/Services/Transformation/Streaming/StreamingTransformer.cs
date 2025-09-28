@@ -13,6 +13,7 @@
     using OllamaFlow.Core.Services.Transformation.Interfaces;
     using OllamaFlow.Core.Models.Agnostic.Responses;
     using OllamaFlow.Core.Models.Agnostic.Common;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Universal streaming transformer that handles bidirectional streaming transformations

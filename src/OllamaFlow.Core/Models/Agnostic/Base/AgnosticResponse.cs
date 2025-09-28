@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using OllamaFlow.Core.Enums;
+    using OllamaFlow.Core.Helpers;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Base class for all agnostic responses.
@@ -28,6 +30,11 @@
         /// The API format this response should be transformed to.
         /// </summary>
         public ApiFormatEnum TargetFormat { get; set; }
+
+        /// <summary>
+        /// The generic request type this response is for, independent of API format.
+        /// </summary>
+        public RequestTypeEnum RequestType { get; set; }
 
         /// <summary>
         /// Timestamp when the response was created.

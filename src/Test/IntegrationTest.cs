@@ -36,7 +36,7 @@
 
         private static int _NumRequests = 8;
 
-        public static async Task Main(string[] args)
+        public static async Task IntegrationMain(string[] args)
         {
             Console.WriteLine("");
             Console.WriteLine("Use typical Ollama requests, but use server port 43411");

@@ -11,6 +11,7 @@
     using OllamaFlow.Core.Services.Transformation.Interfaces;
     using OllamaFlow.Core.Serialization;
     using System.Collections.Generic;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Transforms OpenAI API requests to agnostic format.
@@ -191,7 +192,7 @@
         private Task<AgnosticModelInfoRequest> TransformModelInfoAsync(HttpContextBase context)
         {
             // Use the existing RequestTypeHelper to extract model from URL
-            string modelId = RequestTypeHelper.GetModelFromRequest(context.Request, RequestTypeEnum.OpenAIRetrieveModel);
+            string modelId = RequestTypeHelper.GetModelFromRequest(context.Request, RequestTypeEnum.ShowModelInformation);
 
             AgnosticModelInfoRequest result = new AgnosticModelInfoRequest
             {

@@ -4,7 +4,8 @@
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// Represents the different types of requests that can be proxied to Ollama.
+    /// Represents the different types of requests in a format-agnostic way.
+    /// Used to categorize requests regardless of the source API format (Ollama, OpenAI, etc.).
     /// </summary>
     public enum RequestTypeEnum
     {
@@ -114,38 +115,5 @@
 
         #endregion
 
-        #region OpenAI-Compatibility
-
-        /// <summary>
-        /// OpenAI-compatible chat completions endpoint.
-        /// </summary>
-        [EnumMember(Value = "OpenAIChatCompletions")]
-        OpenAIChatCompletions,
-
-        /// <summary>
-        /// OpenAI-compatible completions endpoint.
-        /// </summary>
-        [EnumMember(Value = "OpenAICompletions")]
-        OpenAICompletions,
-
-        /// <summary>
-        /// OpenAI-compatible embeddings endpoint.
-        /// </summary>
-        [EnumMember(Value = "OpenAIEmbeddings")]
-        OpenAIEmbeddings,
-
-        /// <summary>
-        /// OpenAI-compatible models list endpoint.
-        /// </summary>
-        [EnumMember(Value = "OpenAIListModels")]
-        OpenAIListModels,
-
-        /// <summary>
-        /// OpenAI-compatible model retrieval endpoint.
-        /// </summary>
-        [EnumMember(Value = "OpenAIRetrieveModel")]
-        OpenAIRetrieveModel,
-
-        #endregion
     }
 }

@@ -13,6 +13,7 @@
     using OllamaFlow.Core.Services.Transformation.Outbound;
     using OllamaFlow.Core.Services.Transformation.Streaming;
     using OllamaFlow.Core.Serialization;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Orchestrates the complete transformation pipeline for API requests and responses.
@@ -414,7 +415,7 @@
         private RequestTypeEnum DetectRequestType(HttpContextBase context)
         {
             // Use the existing RequestTypeHelper which already handles both Ollama and OpenAI URL patterns
-            return RequestTypeHelper.DetermineRequestType(context.Request.Method, context.Request.Url?.RawWithoutQuery);
+            return RequestTypeHelper.GetRequestTypeFromRequest(context.Request.Method, context.Request.Url?.RawWithoutQuery);
         }
 
         private RequestTypeEnum GetRequestTypeFromAgnosticRequest(AgnosticRequest request)

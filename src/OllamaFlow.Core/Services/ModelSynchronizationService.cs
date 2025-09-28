@@ -10,8 +10,10 @@ namespace OllamaFlow.Core.Services
     using System.Threading;
     using System.Threading.Tasks;
     using OllamaFlow.Core;
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Serialization;
     using SyslogLogging;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Model synchronization service.
@@ -191,7 +193,7 @@ namespace OllamaFlow.Core.Services
             if (backend == null) throw new ArgumentNullException(nameof(backend));
 
             // Only start synchronization for Ollama backends
-            if (backend.ApiFormat != Enums.ApiFormatEnum.Ollama)
+            if (backend.ApiFormat != ApiFormatEnum.Ollama)
             {
                 _Logging.Debug(_Header + $"skipping model synchronization for non-Ollama backend {backend.Identifier} (format: {backend.ApiFormat})");
                 return;
@@ -319,7 +321,7 @@ namespace OllamaFlow.Core.Services
                 // Load existing backends and start synchronization tasks
                 // Only synchronize models for Ollama backends since OpenAI/vLLM don't support runtime model pulling
                 List<Backend> allBackends = _BackendService.GetAll()?.ToList() ?? new List<Backend>();
-                List<Backend> backends = allBackends.Where(b => b.ApiFormat == Enums.ApiFormatEnum.Ollama).ToList();
+                List<Backend> backends = allBackends.Where(b => b.ApiFormat == ApiFormatEnum.Ollama).ToList();
 
                 _Logging.Debug(_Header + $"found {allBackends.Count} total backends, {backends.Count} Ollama backends for model synchronization");
 

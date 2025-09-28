@@ -315,7 +315,7 @@
                     return;
                 }
 
-                RequestTypeEnum requestType = RequestTypeHelper.DetermineRequestType(ctx.Request.Method, ctx.Request.Url.RawWithQuery);
+                RequestTypeEnum requestType = RequestTypeHelper.GetRequestTypeFromRequest(ctx.Request.Method, ctx.Request.Url.RawWithQuery);
                 telemetry.RequestType = requestType;
 
                 if (requestType == RequestTypeEnum.PullModel)
@@ -437,26 +437,21 @@
             if (ctx?.Request?.Url?.RawWithoutQuery == null)
                 return ApiFormatEnum.Ollama; // Default fallback
 
-            string path = ctx.Request.Url.RawWithoutQuery.ToLowerInvariant();
+            // Use the centralized detection logic from RequestTypeHelper
+            ApiFormatEnum detectedFormat = RequestTypeHelper.GetApiFormatFromRequest(ctx.Request.Method, ctx.Request.Url.RawWithoutQuery);
 
-            // OpenAI API paths start with /v1/
-            if (path.StartsWith("/v1/"))
-                return ApiFormatEnum.OpenAI;
-
-            // Ollama API paths start with /api/ or root endpoints
-            if (path.StartsWith("/api/") || path == "/" || path == "")
-                return ApiFormatEnum.Ollama;
-
-            // Check User-Agent header for additional hints
-            string userAgent = ctx.Request.Headers?["User-Agent"];
-            if (!string.IsNullOrEmpty(userAgent))
+            // If still uncertain, check User-Agent header for additional hints
+            if (detectedFormat == ApiFormatEnum.Ollama)
             {
-                if (userAgent.ToLowerInvariant().Contains("openai"))
-                    return ApiFormatEnum.OpenAI;
+                string userAgent = ctx.Request.Headers?["User-Agent"];
+                if (!string.IsNullOrEmpty(userAgent))
+                {
+                    if (userAgent.ToLowerInvariant().Contains("openai"))
+                        return ApiFormatEnum.OpenAI;
+                }
             }
 
-            // Default to Ollama for backward compatibility
-            return ApiFormatEnum.Ollama;
+            return detectedFormat;
         }
 
         private string GetClientIdentifier(HttpContextBase ctx)

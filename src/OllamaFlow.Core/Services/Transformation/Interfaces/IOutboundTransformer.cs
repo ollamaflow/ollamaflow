@@ -2,6 +2,7 @@
 {
     using System.Threading.Tasks;
     using OllamaFlow.Core.Enums;
+    using OllamaFlow.Core.Models;
     using OllamaFlow.Core.Models.Agnostic.Base;
 
     /// <summary>

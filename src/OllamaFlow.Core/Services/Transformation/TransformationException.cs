@@ -2,6 +2,7 @@
 {
     using System;
     using OllamaFlow.Core.Enums;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Exception thrown when transformation between API formats fails.

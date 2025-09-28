@@ -5,8 +5,9 @@
     using System.Collections.Generic;
     using System.Data;
     using ExpressionTree;
-    using OllamaFlow.Core.Serialization;
     using OllamaFlow.Core.Enums;
+    using OllamaFlow.Core.Serialization;
+    using OllamaFlow.Core.Models;
 
     internal static class Converters
     {

@@ -471,24 +471,10 @@
             Finalizer for SqliteDatabaseDriver.
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.Enums.ApiFormatEnum">
-            <summary>
-            API format supported by backends.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.Enums.ApiFormatEnum.Ollama">
-            <summary>
-            Ollama native API format.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.Enums.ApiFormatEnum.OpenAI">
-            <summary>
-            OpenAI compatible API format.
-            </summary>
-        </member>
         <member name="T:OllamaFlow.Core.Helpers.RequestTypeEnum">
             <summary>
-            Represents the different types of requests that can be proxied to Ollama.
+            Represents the different types of requests in a format-agnostic way.
+            Used to categorize requests regardless of the source API format (Ollama, OpenAI, etc.).
             </summary>
         </member>
         <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.Root">
@@ -571,30 +557,29 @@
             Generate embeddings for a single input.
             </summary>
         </member>
-        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAIChatCompletions">
+        <member name="M:OllamaFlow.Core.Helpers.RequestTypeHelper.GetApiFormatFromRequest(WatsonWebserver.Core.HttpMethod,System.String)">
             <summary>
-            OpenAI-compatible chat completions endpoint.
+            Determines the API format from a request based on the URL path.
             </summary>
+            <param name="method">HTTP method.</param>
+            <param name="url">Request URL path.</param>
+            <returns>The detected API format.</returns>
         </member>
-        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAICompletions">
+        <member name="M:OllamaFlow.Core.Helpers.RequestTypeHelper.GetRequestTypeFromRequest(WatsonWebserver.Core.HttpMethod,System.String)">
             <summary>
-            OpenAI-compatible completions endpoint.
+            Determines the generic request type from a request, regardless of API format.
             </summary>
+            <param name="method">HTTP method.</param>
+            <param name="url">Request URL path.</param>
+            <returns>The generic request type.</returns>
         </member>
-        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAIEmbeddings">
+        <member name="M:OllamaFlow.Core.Helpers.RequestTypeHelper.DetermineRequestType(WatsonWebserver.Core.HttpMethod,System.String)">
             <summary>
-            OpenAI-compatible embeddings endpoint.
+            Determines the request type from a request (legacy method, use GetRequestTypeFromRequest instead).
             </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAIListModels">
-            <summary>
-            OpenAI-compatible models list endpoint.
-            </summary>
-        </member>
-        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.OpenAIRetrieveModel">
-            <summary>
-            OpenAI-compatible model retrieval endpoint.
-            </summary>
+            <param name="method">HTTP method.</param>
+            <param name="url">Request URL path.</param>
+            <returns>The generic request type.</returns>
         </member>
         <member name="T:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest">
             <summary>
@@ -609,6 +594,11 @@
         <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest.SourceFormat">
             <summary>
             The API format this request originated from.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest.RequestType">
+            <summary>
+            The generic request type, independent of API format.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest.CreatedUtc">
@@ -649,6 +639,11 @@
         <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.TargetFormat">
             <summary>
             The API format this response should be transformed to.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.RequestType">
+            <summary>
+            The generic request type this response is for, independent of API format.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Models.Agnostic.Base.AgnosticResponse.CreatedUtc">
@@ -1715,6 +1710,21 @@
             <param name="context">Context.</param>
             <param name="description">Description.</param>
             
+        </member>
+        <member name="T:OllamaFlow.Core.Enums.ApiFormatEnum">
+            <summary>
+            API format supported by backends.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Enums.ApiFormatEnum.Ollama">
+            <summary>
+            Ollama native API format.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Enums.ApiFormatEnum.OpenAI">
+            <summary>
+            OpenAI compatible API format.
+            </summary>
         </member>
         <member name="T:OllamaFlow.Core.Backend">
             <summary>

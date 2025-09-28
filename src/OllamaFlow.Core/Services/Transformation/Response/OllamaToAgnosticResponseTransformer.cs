@@ -6,6 +6,7 @@ namespace OllamaFlow.Core.Services.Transformation.Response
     using System.Threading.Tasks;
     using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Helpers;
+    using OllamaFlow.Core.Models;
     using OllamaFlow.Core.Models.Agnostic.Base;
     using OllamaFlow.Core.Models.Agnostic.Common;
     using OllamaFlow.Core.Models.Agnostic.Responses;

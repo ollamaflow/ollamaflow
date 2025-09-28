@@ -1,13 +1,14 @@
 using System.Text;
 using Xunit;
+using OllamaFlow.Core.Enums;
 using OllamaFlow.Core.Services.Transformation.Inbound;
 using OllamaFlow.Core.Services.Transformation.Outbound;
 using OllamaFlow.Core.Services.Transformation.Streaming;
 using OllamaFlow.Core.Serialization;
-using OllamaFlow.Core.Enums;
 using OllamaFlow.Core.Helpers;
 using OllamaFlow.Core.Models.Agnostic.Requests;
 using OllamaFlow.Core.Models.Agnostic.Common;
+using OllamaFlow.Core.Models;
 
 namespace Test
 {

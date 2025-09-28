@@ -6,6 +6,7 @@
     using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Helpers;
     using OllamaFlow.Core.Models.Agnostic.Base;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Main transformation pipeline interface for converting between API formats and agnostic format.

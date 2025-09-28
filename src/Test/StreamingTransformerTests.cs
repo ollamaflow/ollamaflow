@@ -1,9 +1,10 @@
 using System.Text;
 using Xunit;
+using OllamaFlow.Core.Enums;
 using OllamaFlow.Core.Services.Transformation.Streaming;
 using OllamaFlow.Core.Serialization;
-using OllamaFlow.Core.Enums;
 using OllamaFlow.Core.Helpers;
+using OllamaFlow.Core.Models;
 
 namespace Test
 {

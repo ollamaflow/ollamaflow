@@ -1,12 +1,13 @@
 using System.Text;
 using Xunit;
 using Moq;
+using OllamaFlow.Core.Enums;
 using OllamaFlow.Core.Services.Transformation.Inbound;
 using OllamaFlow.Core.Serialization;
-using OllamaFlow.Core.Enums;
 using OllamaFlow.Core.Helpers;
 using OllamaFlow.Core.Models.Agnostic.Requests;
 using WatsonWebserver.Core;
+using OllamaFlow.Core.Models;
 
 namespace Test
 {
