@@ -607,10 +607,18 @@
             NameValueCollection vals = null;
 
             // Route to appropriate admin handler based on path and method
+            // Note: Check literal paths before parameterized patterns to avoid false matches
             try
             {
+                // Frontends collection
+                if (Matcher.Match(path, "/v1.0/frontends", out _) || Matcher.Match(path, "/v1.0/frontends/", out _))
+                {
+                    if (method == "GET") await GetFrontendsRoute(ctx);
+                    else if (method == "PUT") await CreateFrontendRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
                 // Frontends with identifier
-                if (Matcher.Match(path, "/v1.0/frontends/{identifier}", out vals))
+                else if (Matcher.Match(path, "/v1.0/frontends/{identifier}", out vals))
                 {
                     SetUrlParameter(ctx, "identifier", vals["identifier"]);
                     if (method == "GET") await GetFrontendRoute(ctx);
@@ -618,11 +626,17 @@
                     else if (method == "DELETE") await DeleteFrontendRoute(ctx);
                     else await SendMethodNotAllowed(ctx);
                 }
-                // Frontends collection
-                else if (Matcher.Match(path, "/v1.0/frontends", out _) || Matcher.Match(path, "/v1.0/frontends/", out _))
+                // Backends health collection (literal path - must check before parameterized)
+                else if (Matcher.Match(path, "/v1.0/backends/health", out _))
                 {
-                    if (method == "GET") await GetFrontendsRoute(ctx);
-                    else if (method == "PUT") await CreateFrontendRoute(ctx);
+                    if (method == "GET") await GetBackendsHealthRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
+                // Backends collection
+                else if (Matcher.Match(path, "/v1.0/backends", out _) || Matcher.Match(path, "/v1.0/backends/", out _))
+                {
+                    if (method == "GET") await GetBackendsRoute(ctx);
+                    else if (method == "PUT") await CreateBackendRoute(ctx);
                     else await SendMethodNotAllowed(ctx);
                 }
                 // Backends with identifier and health
@@ -641,17 +655,11 @@
                     else if (method == "DELETE") await DeleteBackendRoute(ctx);
                     else await SendMethodNotAllowed(ctx);
                 }
-                // Backends health collection
-                else if (Matcher.Match(path, "/v1.0/backends/health", out _))
+                // Sessions collection
+                else if (Matcher.Match(path, "/v1.0/sessions", out _) || Matcher.Match(path, "/v1.0/sessions/", out _))
                 {
-                    if (method == "GET") await GetBackendsHealthRoute(ctx);
-                    else await SendMethodNotAllowed(ctx);
-                }
-                // Backends collection
-                else if (Matcher.Match(path, "/v1.0/backends", out _) || Matcher.Match(path, "/v1.0/backends/", out _))
-                {
-                    if (method == "GET") await GetBackendsRoute(ctx);
-                    else if (method == "PUT") await CreateBackendRoute(ctx);
+                    if (method == "GET") await GetSessionsRoute(ctx);
+                    else if (method == "DELETE") await DeleteAllSessionsRoute(ctx);
                     else await SendMethodNotAllowed(ctx);
                 }
                 // Sessions with client identifier
@@ -660,13 +668,6 @@
                     SetUrlParameter(ctx, "identifier", vals["identifier"]);
                     if (method == "GET") await GetClientSessionsRoute(ctx);
                     else if (method == "DELETE") await DeleteClientSessionsRoute(ctx);
-                    else await SendMethodNotAllowed(ctx);
-                }
-                // Sessions collection
-                else if (Matcher.Match(path, "/v1.0/sessions", out _) || Matcher.Match(path, "/v1.0/sessions/", out _))
-                {
-                    if (method == "GET") await GetSessionsRoute(ctx);
-                    else if (method == "DELETE") await DeleteAllSessionsRoute(ctx);
                     else await SendMethodNotAllowed(ctx);
                 }
                 // No match found
