@@ -62,7 +62,7 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 
 ```bash
 # Pull the image
-docker pull jchristn/ollamaflow
+docker pull jchristn/ollamaflow:v1.0.0
 
 # Run with default configuration
 docker run -d \
@@ -91,13 +91,15 @@ OllamaFlow uses a simple JSON configuration file. Here's a minimal example:
 ```json
 {
   "Webserver": {
-    "Hostname": "localhost",
+    "Hostname": "*",
     "Port": 43411
   },
   "Logging": {
-    "MinimumSeverity": "Info",
+    "MinimumSeverity": 6,
     "ConsoleLogging": true
-  }
+  },
+  "Frontends": ["..."],
+  "Backends": ["..."]
 }
 ```
 
