@@ -127,7 +127,7 @@ namespace OllamaFlow.Core.Services
             // Initialize existing backends from database
             InitializeExistingBackends();
 
-            _Logging.Debug(_Header + "initialized");
+            _Logging.Debug(_Header + "initialization complete");
         }
 
         #endregion

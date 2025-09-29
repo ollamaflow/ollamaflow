@@ -1,5 +1,6 @@
 ﻿namespace OllamaFlow.Core.Models
 {
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Helpers;
     using System;
     using System.Collections.Generic;
@@ -21,6 +22,11 @@
         /// Request type.
         /// </summary>
         public RequestTypeEnum RequestType { get; set; } = RequestTypeEnum.Unknown;
+
+        /// <summary>
+        /// API format of the incoming request.
+        /// </summary>
+        public ApiFormatEnum ApiFormat { get; set; } = ApiFormatEnum.Ollama;
 
         /// <summary>
         /// Gets or sets the conversation/session identifier this request belongs to.

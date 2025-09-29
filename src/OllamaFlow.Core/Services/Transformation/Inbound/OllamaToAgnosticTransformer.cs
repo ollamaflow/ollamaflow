@@ -2,6 +2,7 @@
 {
     using System;
     using System.Text.Json;
+    using System.Text.Json.Serialization;
     using System.Threading.Tasks;
     using WatsonWebserver.Core;
     using OllamaFlow.Core.Enums;
@@ -364,6 +365,11 @@
         public bool Stream { get; set; }
         public string System { get; set; }
         public string Template { get; set; }
+        public string Format { get; set; }
+
+        [JsonPropertyName("keep_alive")]
+        public string KeepAlive { get; set; }
+
         public System.Collections.Generic.Dictionary<string, object> Options { get; set; }
     }
 

@@ -115,5 +115,105 @@
 
         #endregion
 
+        #region Admin-API
+
+        /// <summary>
+        /// Admin API request to list frontends.
+        /// </summary>
+        [EnumMember(Value = "AdminListFrontends")]
+        AdminListFrontends,
+
+        /// <summary>
+        /// Admin API request to get a specific frontend.
+        /// </summary>
+        [EnumMember(Value = "AdminGetFrontend")]
+        AdminGetFrontend,
+
+        /// <summary>
+        /// Admin API request to create a frontend.
+        /// </summary>
+        [EnumMember(Value = "AdminCreateFrontend")]
+        AdminCreateFrontend,
+
+        /// <summary>
+        /// Admin API request to update a frontend.
+        /// </summary>
+        [EnumMember(Value = "AdminUpdateFrontend")]
+        AdminUpdateFrontend,
+
+        /// <summary>
+        /// Admin API request to delete a frontend.
+        /// </summary>
+        [EnumMember(Value = "AdminDeleteFrontend")]
+        AdminDeleteFrontend,
+
+        /// <summary>
+        /// Admin API request to list backends.
+        /// </summary>
+        [EnumMember(Value = "AdminListBackends")]
+        AdminListBackends,
+
+        /// <summary>
+        /// Admin API request to get a specific backend.
+        /// </summary>
+        [EnumMember(Value = "AdminGetBackend")]
+        AdminGetBackend,
+
+        /// <summary>
+        /// Admin API request to create a backend.
+        /// </summary>
+        [EnumMember(Value = "AdminCreateBackend")]
+        AdminCreateBackend,
+
+        /// <summary>
+        /// Admin API request to update a backend.
+        /// </summary>
+        [EnumMember(Value = "AdminUpdateBackend")]
+        AdminUpdateBackend,
+
+        /// <summary>
+        /// Admin API request to delete a backend.
+        /// </summary>
+        [EnumMember(Value = "AdminDeleteBackend")]
+        AdminDeleteBackend,
+
+        /// <summary>
+        /// Admin API request to get health status of all backends.
+        /// </summary>
+        [EnumMember(Value = "AdminGetBackendsHealth")]
+        AdminGetBackendsHealth,
+
+        /// <summary>
+        /// Admin API request to get health status of a specific backend.
+        /// </summary>
+        [EnumMember(Value = "AdminGetBackendHealth")]
+        AdminGetBackendHealth,
+
+        /// <summary>
+        /// Admin API request to list all sessions.
+        /// </summary>
+        [EnumMember(Value = "AdminListSessions")]
+        AdminListSessions,
+
+        /// <summary>
+        /// Admin API request to get sessions for a specific client.
+        /// </summary>
+        [EnumMember(Value = "AdminGetClientSessions")]
+        AdminGetClientSessions,
+
+        /// <summary>
+        /// Admin API request to delete sessions for a specific client.
+        /// </summary>
+        [EnumMember(Value = "AdminDeleteClientSessions")]
+        AdminDeleteClientSessions,
+
+        /// <summary>
+        /// Admin API request to delete all sessions.
+        /// </summary>
+        [EnumMember(Value = "AdminDeleteAllSessions")]
+        AdminDeleteAllSessions
+
+        #endregion
+
     }
 }

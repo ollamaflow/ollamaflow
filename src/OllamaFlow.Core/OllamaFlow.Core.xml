@@ -557,6 +557,86 @@
             Generate embeddings for a single input.
             </summary>
         </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminListFrontends">
+            <summary>
+            Admin API request to list frontends.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminGetFrontend">
+            <summary>
+            Admin API request to get a specific frontend.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminCreateFrontend">
+            <summary>
+            Admin API request to create a frontend.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminUpdateFrontend">
+            <summary>
+            Admin API request to update a frontend.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminDeleteFrontend">
+            <summary>
+            Admin API request to delete a frontend.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminListBackends">
+            <summary>
+            Admin API request to list backends.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminGetBackend">
+            <summary>
+            Admin API request to get a specific backend.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminCreateBackend">
+            <summary>
+            Admin API request to create a backend.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminUpdateBackend">
+            <summary>
+            Admin API request to update a backend.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminDeleteBackend">
+            <summary>
+            Admin API request to delete a backend.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminGetBackendsHealth">
+            <summary>
+            Admin API request to get health status of all backends.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminGetBackendHealth">
+            <summary>
+            Admin API request to get health status of a specific backend.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminListSessions">
+            <summary>
+            Admin API request to list all sessions.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminGetClientSessions">
+            <summary>
+            Admin API request to get sessions for a specific client.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminDeleteClientSessions">
+            <summary>
+            Admin API request to delete sessions for a specific client.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Helpers.RequestTypeEnum.AdminDeleteAllSessions">
+            <summary>
+            Admin API request to delete all sessions.
+            </summary>
+        </member>
         <member name="M:OllamaFlow.Core.Helpers.RequestTypeHelper.GetApiFormatFromRequest(WatsonWebserver.Core.HttpMethod,System.String)">
             <summary>
             Determines the API format from a request based on the URL path.
@@ -580,6 +660,14 @@
             <param name="method">HTTP method.</param>
             <param name="url">Request URL path.</param>
             <returns>The generic request type.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Helpers.RequestTypeHelper.GetAdminRequestType(WatsonWebserver.Core.HttpMethod,System.String)">
+            <summary>
+            Determine the admin request type from the method and URL.
+            </summary>
+            <param name="method">HTTP method.</param>
+            <param name="url">Request URL path.</param>
+            <returns>The admin request type.</returns>
         </member>
         <member name="T:OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest">
             <summary>
@@ -1502,6 +1590,11 @@
             Request type.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.Models.TelemetryMessage.ApiFormat">
+            <summary>
+            API format of the incoming request.
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.Models.TelemetryMessage.ConversationId">
             <summary>
             Gets or sets the conversation/session identifier this request belongs to.
@@ -1724,6 +1817,11 @@
         <member name="F:OllamaFlow.Core.Enums.ApiFormatEnum.OpenAI">
             <summary>
             OpenAI compatible API format.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Core.Enums.ApiFormatEnum.Admin">
+            <summary>
+            OllamaFlow admin API format.
             </summary>
         </member>
         <member name="T:OllamaFlow.Core.Backend">
@@ -2234,6 +2332,168 @@
         <member name="M:OllamaFlow.Core.Serialization.Serializer.SerializeJson(System.Object,System.Boolean)">
             <inheritdoc/>
         </member>
+        <member name="T:OllamaFlow.Core.Services.AdminApiService">
+            <summary>
+            Administrative API service for managing frontends, backends, and sessions.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.#ctor(OllamaFlow.Core.OllamaFlowSettings,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,OllamaFlow.Core.Services.ModelSynchronizationService,OllamaFlow.Core.Services.SessionStickinessService)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="logging">Logging.</param>
+            <param name="serializer">Serializer.</param>
+            <param name="frontendService">Frontend service.</param>
+            <param name="backendService">Backend service.</param>
+            <param name="healthCheck">Health check service.</param>
+            <param name="modelSynchronization">Model synchronization service.</param>
+            <param name="sessionStickiness">Session stickiness service.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.IsAuthenticated(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Check if the request is authenticated with a valid bearer token.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>True if authenticated, false otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.GetFrontendsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get all frontends.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.GetFrontendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get a specific frontend by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when frontend with specified identifier is not found.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.DeleteFrontendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Delete a frontend by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when frontend with specified identifier is not found.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.CreateFrontendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Create a new frontend.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when frontend with specified identifier already exists.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.UpdateFrontendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Update an existing frontend.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when frontend with specified identifier is not found.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.GetBackendsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get all backends.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.GetBackendsHealthRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get health status of all backends.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.GetBackendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get a specific backend by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when backend with specified identifier is not found.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.GetBackendHealthRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get health status of a specific backend by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when backend with specified identifier is not found.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.DeleteBackendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Delete a backend by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when backend with specified identifier is not found.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.CreateBackendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Create a new backend.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when backend with specified identifier already exists.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.UpdateBackendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Update an existing backend.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when backend with specified identifier is not found.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.GetSessionsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get all sticky sessions.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.GetClientSessionsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get sticky sessions for a specific client.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.DeleteClientSessionsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Delete all sticky sessions for a specific client.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.AdminApiService.DeleteAllSessionsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Delete all sticky sessions.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        </member>
         <member name="T:OllamaFlow.Core.Services.BackendService">
             <summary>
             Backend service.
@@ -2441,10 +2701,10 @@
         </member>
         <member name="T:OllamaFlow.Core.Services.GatewayService">
             <summary>
-            Gateway service.
+            Gateway service responsible for coordinating request processing and routing.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,OllamaFlow.Core.Services.ModelSynchronizationService,OllamaFlow.Core.Services.SessionStickinessService,OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline,System.Threading.CancellationTokenSource)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.#ctor(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.OllamaFlowCallbacks,SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.FrontendService,OllamaFlow.Core.Services.BackendService,OllamaFlow.Core.Services.HealthCheckService,OllamaFlow.Core.Services.ModelSynchronizationService,OllamaFlow.Core.Services.SessionStickinessService,OllamaFlow.Core.Services.AdminApiService,OllamaFlow.Core.Services.StaticRouteHandler,OllamaFlow.Core.Services.ProxyService,OllamaFlow.Core.Services.RequestProcessorService,System.Threading.CancellationTokenSource)">
             <summary>
             Instantiate.
             </summary>
@@ -2457,239 +2717,260 @@
             <param name="healthCheck">Healthcheck service.</param>
             <param name="modelSynchronization">Model synchronization service.</param>
             <param name="sessionStickiness">Session stickiness service.</param>
-            <param name="transformationPipeline">Transformation pipeline for API format conversion.</param>
+            <param name="adminApiService">Admin API service.</param>
+            <param name="staticRouteHandler">Static route handler.</param>
+            <param name="proxyService">Proxy service.</param>
+            <param name="requestProcessorService">Request processor service.</param>
             <param name="tokenSource">Cancellation token source.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.Dispose(System.Boolean)">
-            <summary>
-            Dispose.
-            </summary>
-            <param name="disposing">Disposing.</param>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.Dispose">
             <summary>
-            Dispose.
+            Dispose of the object.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.InitializeRoutes(WatsonWebserver.Core.WebserverBase)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.DefaultRoute(WatsonWebserver.Core.HttpContextBase)">
             <summary>
-            Initialize routes.
-            </summary>
-            <param name="webserver">Webserver.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.AuthenticationRoute(WatsonWebserver.Core.HttpContextBase)">
-            <summary>
-            Authentication route.
+            Default route handler - main entry point for AI API requests.
             </summary>
             <param name="ctx">HTTP context.</param>
             <returns>Task.</returns>
-            <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.OptionsRoute(WatsonWebserver.Core.HttpContextBase)">
             <summary>
-            Route for handling OPTIONS requests.
+            OPTIONS route handler for CORS support.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.AuthenticationRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Authentication route handler.
             </summary>
             <param name="ctx">HTTP context.</param>
             <returns>Task.</returns>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.PreRoutingHandler(WatsonWebserver.Core.HttpContextBase)">
             <summary>
-            Pre-routing handler.
+            Pre-routing handler for request setup.
             </summary>
             <param name="ctx">HTTP context.</param>
             <returns>Task.</returns>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.PostRoutingHandler(WatsonWebserver.Core.HttpContextBase)">
             <summary>
-            Post-routing handler.
+            Post-routing handler for cleanup.
             </summary>
             <param name="ctx">HTTP context.</param>
             <returns>Task.</returns>
         </member>
         <member name="M:OllamaFlow.Core.Services.GatewayService.ExceptionRoute(WatsonWebserver.Core.HttpContextBase,System.Exception)">
             <summary>
-            Exception route.
+            Exception route handler for unhandled exceptions.
             </summary>
             <param name="ctx">HTTP context.</param>
             <param name="e">Exception.</param>
             <returns>Task.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.DefaultRoute(WatsonWebserver.Core.HttpContextBase)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetRootRoute(WatsonWebserver.Core.HttpContextBase)">
             <summary>
-            Default request handler.
+            GET route for root endpoint (/).
             </summary>
             <param name="ctx">HTTP context.</param>
             <returns>Task.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.DetectSourceApiFormat(WatsonWebserver.Core.HttpContextBase)">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.HeadRootRoute(WatsonWebserver.Core.HttpContextBase)">
             <summary>
-            Detect the source API format based on the request URL and headers.
+            HEAD route for root endpoint (/).
             </summary>
             <param name="ctx">HTTP context.</param>
-            <returns>Detected API format.</returns>
+            <returns>Task.</returns>
         </member>
-        <member name="T:OllamaFlow.Core.Services.GatewayService.ProxyResult">
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetFaviconRoute(WatsonWebserver.Core.HttpContextBase)">
             <summary>
-            Result of a proxy request operation.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.ResponseReceived">
-            <summary>
-            Whether a response was received from the backend.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.StatusCode">
-            <summary>
-            The HTTP status code returned by the backend.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.ResponseBody">
-            <summary>
-            The response body as bytes.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.ContentType">
-            <summary>
-            The response content type.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.Headers">
-            <summary>
-            The response headers.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.Services.GatewayService.ProxyResult.AlreadySent">
-            <summary>
-            Whether the response was sent to the client (for non-transformed responses).
-            </summary>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessRequestWithRetry(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
-            <summary>
-            Process a request with retry logic for 50x errors.
-            </summary>
-            <param name="requestGuid">Request unique identifier.</param>
-            <param name="ctx">HTTP context.</param>
-            <param name="frontend">Frontend configuration.</param>
-            <param name="initialBackend">Initially selected backend.</param>
-            <param name="clientId">Client identifier.</param>
-            <param name="telemetry">Telemetry object.</param>
-            <returns>True if response was successfully sent, false otherwise.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessRequestWithTransformation(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
-            <summary>
-            Process request using the transformation pipeline for API format compatibility.
-            </summary>
-            <param name="requestGuid">Request identifier.</param>
-            <param name="ctx">HTTP context.</param>
-            <param name="frontend">Frontend configuration.</param>
-            <param name="backend">Selected backend.</param>
-            <param name="clientId">Client identifier.</param>
-            <param name="telemetry">Telemetry object.</param>
-            <returns>True if response was successfully sent, false otherwise.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.GetTargetUrlPath(System.String,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum)">
-            <summary>
-            Get the target URL path based on API format conversion.
-            </summary>
-            <param name="sourcePath">Source URL path.</param>
-            <param name="sourceFormat">Source API format.</param>
-            <param name="targetFormat">Target API format.</param>
-            <returns>Target URL path.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.ProxyTransformedRequest(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Services.Transformation.TransformationPipelineResult,System.Byte[],System.String)">
-            <summary>
-            Proxy the transformed request to the backend server.
-            </summary>
-            <param name="requestGuid">Request identifier.</param>
-            <param name="originalContext">Original HTTP context.</param>
-            <param name="frontend">Frontend configuration.</param>
-            <param name="backend">Backend server.</param>
-            <param name="telemetry">Telemetry object.</param>
-            <param name="transformationResult">Transformation result for logging.</param>
-            <param name="transformedRequestBody">Transformed request body bytes.</param>
-            <param name="targetUrlPath">Target URL path.</param>
-            <returns>Proxy result.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.TransformAndSendResponse(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Services.GatewayService.ProxyResult,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Backend)">
-            <summary>
-            Transform the backend response and send it to the client.
-            </summary>
-            <param name="originalContext">Original HTTP context for the client response.</param>
-            <param name="proxyResult">Result from the backend proxy operation.</param>
-            <param name="sourceFormat">Source API format (client).</param>
-            <param name="targetFormat">Target API format (backend).</param>
-            <param name="backend">Backend server information.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessRequestWithStreamingTransformation(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
-            <summary>
-            Process a request with streaming transformation support.
-            This method handles streaming responses and transforms them between API formats in real-time.
-            </summary>
-            <param name="requestGuid">Request identifier.</param>
-            <param name="ctx">HTTP context.</param>
-            <param name="frontend">Frontend configuration.</param>
-            <param name="backend">Backend server.</param>
-            <param name="clientId">Client identifier.</param>
-            <param name="telemetry">Telemetry message.</param>
-            <param name="sourceFormat">Source API format (client).</param>
-            <param name="targetFormat">Target API format (backend).</param>
-            <param name="requestType">Type of request being processed.</param>
-            <returns>True if request was processed successfully.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.ProxyRequestWithStreamingTransformation(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Services.Transformation.TransformationPipelineResult,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum,System.Byte[],System.String)">
-            <summary>
-            Proxy request to backend with real-time streaming transformation support.
-            </summary>
-            <param name="requestGuid">Request identifier.</param>
-            <param name="originalContext">Original HTTP context from client.</param>
-            <param name="frontend">Frontend configuration.</param>
-            <param name="backend">Backend server.</param>
-            <param name="telemetry">Telemetry message.</param>
-            <param name="transformationResult">Transformation pipeline result.</param>
-            <param name="sourceFormat">Source API format (client).</param>
-            <param name="targetFormat">Target API format (backend).</param>
-            <param name="requestType">Type of request being processed.</param>
-            <param name="transformedRequestBody">Transformed request body bytes.</param>
-            <param name="targetUrlPath">Target URL path for backend.</param>
-            <returns>True if request was processed successfully.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.ProcessStreamingResponseWithTransformation(RestWrapper.RestResponse,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
-            <summary>
-            Process streaming response with real-time transformation between API formats.
-            </summary>
-            <param name="backendResponse">Response from backend server.</param>
-            <param name="clientContext">HTTP context for client response.</param>
-            <param name="telemetry">Telemetry message.</param>
-            <param name="sourceFormat">Source API format (client).</param>
-            <param name="targetFormat">Target API format (backend).</param>
-            <param name="requestType">Type of request being processed.</param>
-            <returns>True if streaming was processed successfully.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.SendTransformedChunk(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Services.Transformation.Interfaces.StreamingChunkResult,OllamaFlow.Core.Enums.ApiFormatEnum,System.Boolean)">
-            <summary>
-            Send a transformed chunk to the client in the appropriate format.
-            </summary>
-            <param name="context">Client HTTP context.</param>
-            <param name="chunkResult">Transformed chunk result.</param>
-            <param name="targetFormat">Target format for the client.</param>
-            <param name="isFinal">Whether this is the final chunk.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.GetAlternativeBackend(OllamaFlow.Core.Frontend,System.String)">
-            <summary>
-            Get an alternative backend excluding a specific backend.
-            </summary>
-            <param name="frontend">Frontend configuration.</param>
-            <param name="excludeBackendId">Backend to exclude from selection.</param>
-            <returns>Alternative backend or null if none available.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.IsStreamingRequest(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest,OllamaFlow.Core.Helpers.RequestTypeEnum)">
-            <summary>
-            Determines if the request is asking for streaming responses.
+            GET route for favicon.ico.
             </summary>
             <param name="ctx">HTTP context.</param>
-            <param name="agnosticRequest">Agnostic request.</param>
-            <param name="requestType">Request type.</param>
-            <returns>True if streaming is requested.</returns>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.HeadFaviconRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            HEAD route for favicon.ico.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetFrontendsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            GET route for retrieving all frontends.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetFrontendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            GET route for retrieving a specific frontend by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.DeleteFrontendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            DELETE route for removing a frontend by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.CreateFrontendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            PUT route for creating a new frontend.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.UpdateFrontendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            PUT route for updating an existing frontend.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetBackendsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            GET route for retrieving all backends.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetBackendsHealthRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            GET route for retrieving health status of all backends.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetBackendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            GET route for retrieving a specific backend by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetBackendHealthRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            GET route for retrieving health status of a specific backend.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.DeleteBackendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            DELETE route for removing a backend by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.CreateBackendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            PUT route for creating a new backend.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.UpdateBackendRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            PUT route for updating an existing backend.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetSessionsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            GET route for retrieving all active sessions.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetClientSessionsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            GET route for retrieving sessions for a specific client.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.DeleteClientSessionsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            DELETE route for removing sessions for a specific client.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.DeleteAllSessionsRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            DELETE route for removing all active sessions.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.HandleAdminApiRequest(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Handle admin API requests by routing to appropriate handlers.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.HandleDynamicAdminPath(WatsonWebserver.Core.HttpContextBase,System.String,System.String)">
+            <summary>
+            Handle dynamic admin API paths with parameters.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <param name="path">Request path.</param>
+            <param name="method">HTTP method.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.ExtractIdentifierFromPath(System.String,System.String,System.String)">
+            <summary>
+            Extract identifier from URL path.
+            </summary>
+            <param name="path">The full URL path.</param>
+            <param name="prefix">The prefix to remove.</param>
+            <param name="suffix">Optional suffix to remove.</param>
+            <returns>The extracted identifier.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.SetUrlParameter(WatsonWebserver.Core.HttpContextBase,System.String,System.String)">
+            <summary>
+            Set a URL parameter on the HTTP context for the admin API handlers.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <param name="key">Parameter key.</param>
+            <param name="value">Parameter value.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.SendMethodNotAllowed(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Send a 405 Method Not Allowed response.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.SendNotFound(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Send a 404 Not Found response.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetFrontend(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get the frontend configuration based on the request context.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Frontend configuration or null if not found.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.GatewayService.GetClientIdentifier(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Get client identifier from the request context.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Client identifier.</returns>
         </member>
         <member name="T:OllamaFlow.Core.Services.HealthCheckService">
             <summary>
@@ -2888,6 +3169,310 @@
             <returns>List of model names, or empty list if backend not found.</returns>
             <exception cref="T:System.ArgumentNullException">Thrown when backendIdentifier is null.</exception>
         </member>
+        <member name="T:OllamaFlow.Core.Services.ProxyResult">
+            <summary>
+            Result of a proxy request operation.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.ProxyResult.ResponseReceived">
+            <summary>
+            Whether a response was received from the backend.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.ProxyResult.StatusCode">
+            <summary>
+            The HTTP status code returned by the backend.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.ProxyResult.ResponseBody">
+            <summary>
+            The response body as bytes.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.ProxyResult.ContentType">
+            <summary>
+            The response content type.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.ProxyResult.Headers">
+            <summary>
+            The response headers.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Services.ProxyResult.AlreadySent">
+            <summary>
+            Whether the response was sent to the client (for non-transformed responses).
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.ProxyService">
+            <summary>
+            Service responsible for proxying requests to backend servers.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.#ctor(SyslogLogging.LoggingModule)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="logging">Logging.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.ProxyRequestAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,OllamaFlow.Core.Models.TelemetryMessage,System.Byte[],System.String,System.Boolean)">
+            <summary>
+            Proxy a request to a backend server with full functionality including transformation support.
+            </summary>
+            <param name="requestGuid">Request unique identifier.</param>
+            <param name="ctx">HTTP context.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Backend server.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <param name="overrideRequestBody">Optional override request body.</param>
+            <param name="overrideUrlPath">Optional override URL path.</param>
+            <param name="captureResponseForTransformation">Whether to capture response for transformation.</param>
+            <returns>Proxy result.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.ProxyRequestWithStreamingTransformationAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Services.Transformation.TransformationPipelineResult,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum,System.Byte[],System.String)">
+            <summary>
+            Proxy request to backend with real-time streaming transformation support.
+            </summary>
+            <param name="requestGuid">Request identifier.</param>
+            <param name="originalContext">Original HTTP context from client.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Backend server.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <param name="transformationResult">Transformation pipeline result.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="requestType">Type of request being processed.</param>
+            <param name="transformedRequestBody">Transformed request body bytes.</param>
+            <param name="targetUrlPath">Target URL path for backend.</param>
+            <returns>True if request was processed successfully.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.ConfigureProxyRequest(RestWrapper.RestRequest,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.Byte[])">
+            <summary>
+            Configure a RestRequest with common headers and settings.
+            </summary>
+            <param name="request">The RestRequest to configure.</param>
+            <param name="ctx">HTTP context for source request.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Backend server.</param>
+            <param name="overrideRequestBody">Optional override request body.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.LogRequestBodyIfEnabled(OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.Byte[],System.String)">
+            <summary>
+            Log request body if logging is enabled.
+            </summary>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Backend configuration.</param>
+            <param name="requestBody">Request body bytes.</param>
+            <param name="contentType">Content type of request.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.LogResponseBodyIfEnabled(OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,RestWrapper.RestResponse)">
+            <summary>
+            Log response body if logging is enabled.
+            </summary>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Backend configuration.</param>
+            <param name="response">Response from backend.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.CopyResponseHeaders(WatsonWebserver.Core.HttpResponseBase,RestWrapper.RestResponse,OllamaFlow.Core.Backend)">
+            <summary>
+            Copy response headers from backend response to client response, avoiding duplicates.
+            </summary>
+            <param name="clientResponse">Client HTTP response.</param>
+            <param name="backendResponse">Backend response.</param>
+            <param name="backend">Backend server information.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.HandleChunkedResponse(RestWrapper.RestResponse,WatsonWebserver.Core.HttpResponseBase,OllamaFlow.Core.Models.TelemetryMessage)">
+            <summary>
+            Handle streaming response with chunked transfer encoding.
+            </summary>
+            <param name="backendResponse">Response from backend.</param>
+            <param name="clientResponse">Client HTTP response.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <returns>Task representing the async operation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.HandleServerSentEventResponse(RestWrapper.RestResponse,WatsonWebserver.Core.HttpResponseBase,OllamaFlow.Core.Models.TelemetryMessage)">
+            <summary>
+            Handle streaming response with server-sent events.
+            </summary>
+            <param name="backendResponse">Response from backend.</param>
+            <param name="clientResponse">Client HTTP response.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <returns>Task representing the async operation.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.ShouldExcludeHeader(System.String)">
+            <summary>
+            Determine if a header should be excluded from being forwarded to the backend.
+            </summary>
+            <param name="headerName">The header name to check.</param>
+            <returns>True if the header should be excluded.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.ConvertHttpMethod(WatsonWebserver.Core.HttpMethod)">
+            <summary>
+            Convert Watson HTTP method to System.Net.Http method.
+            </summary>
+            <param name="method">Watson HTTP method.</param>
+            <returns>System.Net.Http method.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when HTTP method is unknown.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.SetupStreamingResponseHeaders(WatsonWebserver.Core.HttpResponseBase,RestWrapper.RestResponse,OllamaFlow.Core.Backend,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Setup response headers for streaming transformation.
+            </summary>
+            <param name="clientResponse">Client HTTP response.</param>
+            <param name="backendResponse">Backend response.</param>
+            <param name="backend">Backend server information.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.HandleStreamingTransformationWithSSE(RestWrapper.RestResponse,WatsonWebserver.Core.HttpResponseBase,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Services.Transformation.TransformationPipelineResult,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Handle streaming transformation with Server-Sent Events.
+            </summary>
+            <param name="backendResponse">Response from backend.</param>
+            <param name="clientResponse">Client HTTP response.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <param name="transformationResult">Transformation pipeline result.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="requestType">Type of request being processed.</param>
+            <returns>True if successful.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.ProxyService.HandleStreamingTransformationWithChunks(RestWrapper.RestResponse,WatsonWebserver.Core.HttpResponseBase,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Services.Transformation.TransformationPipelineResult,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Handle streaming transformation with chunked transfer encoding.
+            </summary>
+            <param name="backendResponse">Response from backend.</param>
+            <param name="clientResponse">Client HTTP response.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <param name="transformationResult">Transformation pipeline result.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="requestType">Type of request being processed.</param>
+            <returns>True if successful.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.RequestProcessorService">
+            <summary>
+            Service responsible for processing requests with transformation, retry logic, and streaming support.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.#ctor(SyslogLogging.LoggingModule,OllamaFlow.Core.Serialization.Serializer,OllamaFlow.Core.Services.HealthCheckService,OllamaFlow.Core.Services.SessionStickinessService,OllamaFlow.Core.Services.Transformation.Interfaces.ITransformationPipeline,OllamaFlow.Core.Services.ProxyService)">
+            <summary>
+            Instantiate.
+            </summary>
+            <param name="logging">Logging.</param>
+            <param name="serializer">Serializer.</param>
+            <param name="healthCheck">Health check service.</param>
+            <param name="sessionStickiness">Session stickiness service.</param>
+            <param name="transformationPipeline">Transformation pipeline for API format conversion.</param>
+            <param name="proxyService">Proxy service.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ProcessRequestWithTransformationAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
+            <summary>
+            Process request using the transformation pipeline for API format compatibility.
+            </summary>
+            <param name="requestGuid">Request identifier.</param>
+            <param name="ctx">HTTP context.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Selected backend.</param>
+            <param name="clientId">Client identifier.</param>
+            <param name="telemetry">Telemetry object.</param>
+            <returns>True if response was successfully sent, false otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ProcessRequestWithRetryAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
+            <summary>
+            Process a request with retry logic for 50x errors.
+            </summary>
+            <param name="requestGuid">Request unique identifier.</param>
+            <param name="ctx">HTTP context.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="initialBackend">Initially selected backend.</param>
+            <param name="clientId">Client identifier.</param>
+            <param name="telemetry">Telemetry object.</param>
+            <returns>True if response was successfully sent, false otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ProcessRequestWithStreamingTransformationAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Process a request with streaming transformation support.
+            This method handles streaming responses and transforms them between API formats in real-time.
+            </summary>
+            <param name="requestGuid">Request identifier.</param>
+            <param name="ctx">HTTP context.</param>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="backend">Backend server.</param>
+            <param name="clientId">Client identifier.</param>
+            <param name="telemetry">Telemetry message.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="requestType">Type of request being processed.</param>
+            <returns>True if request was processed successfully.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.GetTargetUrlPath(System.String,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum)">
+            <summary>
+            Get the target URL path based on API format conversion.
+            </summary>
+            <param name="sourcePath">Source URL path.</param>
+            <param name="sourceFormat">Source API format.</param>
+            <param name="targetFormat">Target API format.</param>
+            <returns>Target URL path.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.TransformAndSendResponseAsync(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Services.ProxyResult,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Backend)">
+            <summary>
+            Transform the backend response and send it to the client.
+            </summary>
+            <param name="originalContext">Original HTTP context for the client response.</param>
+            <param name="proxyResult">Result from the backend proxy operation.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="backend">Backend server information.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.GetRequestTypeFromAgnosticRequest(OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest)">
+            <summary>
+            Get request type from an agnostic request object.
+            </summary>
+            <param name="request">Agnostic request.</param>
+            <returns>Request type enum.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.IsStreamingRequest(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Models.Agnostic.Base.AgnosticRequest,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+            <summary>
+            Determines if the request is asking for streaming responses.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <param name="agnosticRequest">Agnostic request.</param>
+            <param name="requestType">Request type.</param>
+            <returns>True if streaming is requested.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.GetAlternativeBackend(OllamaFlow.Core.Frontend,System.String)">
+            <summary>
+            Get an alternative backend excluding a specific backend.
+            </summary>
+            <param name="frontend">Frontend configuration.</param>
+            <param name="excludeBackendId">Backend to exclude from selection.</param>
+            <returns>Alternative backend or null if none available.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ModifyRequestToNonStreaming(System.String)">
+            <summary>
+            Modify a request body to set streaming to false.
+            </summary>
+            <param name="requestBody">Original request body JSON.</param>
+            <returns>Modified request body with stream set to false.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.TransformAndSendStreamingResponseAsync(WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Services.ProxyResult,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Backend,System.Boolean)">
+            <summary>
+            Transform response and send as streaming response to client.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <param name="proxyResult">Proxy result from backend.</param>
+            <param name="sourceFormat">Source API format (client).</param>
+            <param name="targetFormat">Target API format (backend).</param>
+            <param name="backend">Backend server information.</param>
+            <param name="isStreamingRequest">Whether the original client request was streaming.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.JsonElementToObject(System.Text.Json.JsonElement)">
+            <summary>
+            Convert JsonElement to appropriate object type.
+            </summary>
+            <param name="element">JSON element.</param>
+            <returns>Converted object.</returns>
+        </member>
         <member name="T:OllamaFlow.Core.Services.SessionStickinessService">
             <summary>
             Service for managing sticky sessions between clients and backends.
@@ -3007,6 +3592,39 @@
             Clear all sessions.
             </summary>
             <returns>Number of sessions removed.</returns>
+        </member>
+        <member name="T:OllamaFlow.Core.Services.StaticRouteHandler">
+            <summary>
+            Handler for static routes like root, favicon, and other simple HTTP responses.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.StaticRouteHandler.GetRootRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Handle GET request to root path.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.StaticRouteHandler.HeadRootRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Handle HEAD request to root path.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.StaticRouteHandler.GetFaviconRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Handle GET request to favicon.ico.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Services.StaticRouteHandler.HeadFaviconRoute(WatsonWebserver.Core.HttpContextBase)">
+            <summary>
+            Handle HEAD request to favicon.ico.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <returns>Task.</returns>
         </member>
         <member name="T:OllamaFlow.Core.Services.Transformation.Inbound.OllamaToAgnosticTransformer">
             <summary>

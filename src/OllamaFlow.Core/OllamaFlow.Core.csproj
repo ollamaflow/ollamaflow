@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<Title>OllamaFlow</Title>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 		<Description>OllamaFlow is a lightweight intelligent load-balancer for Ollama.</Description>
 		<Copyright>(c)2025 Joel Christner</Copyright>
 		<PackageReleaseNotes>Initial release.</PackageReleaseNotes>

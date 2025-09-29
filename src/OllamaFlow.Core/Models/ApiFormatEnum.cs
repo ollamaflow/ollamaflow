@@ -17,6 +17,12 @@
         /// OpenAI compatible API format.
         /// </summary>
         [EnumMember(Value = "OpenAI")]
-        OpenAI
+        OpenAI,
+
+        /// <summary>
+        /// OllamaFlow admin API format.
+        /// </summary>
+        [EnumMember(Value = "Admin")]
+        Admin
     }
 }

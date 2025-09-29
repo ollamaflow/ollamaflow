@@ -180,8 +180,7 @@
             // In a full implementation, you'd have response-specific transformers
             try
             {
-                // This is a placeholder - in practice, you'd have dedicated response transformers
-                // For now, assume the backend response is already in a compatible format
+                // Create agnostic response wrapper for backend response
                 AgnosticResponse result = new Models.Agnostic.Responses.AgnosticChatResponse
                 {
                     SourceFormat = sourceFormat,
@@ -214,8 +213,7 @@
 
             try
             {
-                // This is a placeholder - in practice, you'd have dedicated response transformers
-                // For now, return the original response if it exists, otherwise the agnostic response
+                // Return the original response if available, otherwise the agnostic response
                 object result;
                 if (agnosticResponse.OriginalResponse != null)
                 {

@@ -13,6 +13,10 @@ namespace Test.Ollama
     /// </summary>
     public static class TestOllama
     {
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
         private static Webserver? _mockOllamaServer;
         private static int _mockServerPort;
         private static string _mockServerUrl = "";
@@ -995,5 +999,9 @@ namespace Test.Ollama
         }
 
         #endregion
+
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
     }
 }
