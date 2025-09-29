@@ -3,7 +3,7 @@
 <div align="center">
   <img src="https://github.com/jchristn/ollamaflow/blob/main/assets/icon.png?raw=true" width="200" height="184" alt="OllamaFlow">
   
-  **Intelligent Load Balancing and Model Orchestration for Ollama**
+  **Intelligent Load Balancing and Model Orchestration for Ollama and OpenAI Platforms**
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
   [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com)
@@ -24,9 +24,9 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 - **🔄 Universal API Support**: Frontend supports both Ollama and OpenAI API formats with native transformation
 - **🌐 Multi-Backend Support**: Connect to Ollama, OpenAI, [vLLM](https://vllm.ai), [SharpAI](https://github.com/jchristn/sharpai), and other OpenAI-compatible backends
 - **⚖️ Smart Load Balancing**: Distribute requests intelligently across healthy backends
-- **🔧 Automatic Model Sync**: Ensure all backends have the required models - automatically
+- **🔧 Automatic Model Sync**: Ensure all backends have the required models (Ollama-compatible backends only)
 - **❤️ Health Monitoring**: Real-time health checks with configurable thresholds
-- **📊 Zero Downtime**: Seamlessly handle backend failures without dropping requests
+- **📊 Zero Downtime**: Provide high-availability to mitigate effects of backend failures
 - **🛠️ RESTful Admin API**: Full control through a comprehensive management API
 - **🎨 Web Dashboard**: Optional web UI for visual cluster management and monitoring
 
@@ -37,11 +37,12 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 - Request routing based on backend health and capacity
 - Automatic failover for unhealthy backends
 - Configurable rate limiting per backend
+- Sticky sessions based on custom headers or IP address
 
 ### Model Management
-- **Automatic model discovery** across all backends
-- **Intelligent synchronization** - pulls missing models automatically
-- **Dynamic model requirements** - update required models on the fly
+- **Automatic model discovery** across all Ollama backends
+- **Intelligent synchronization** - pulls missing models automatically on Ollama-compatible backends
+- **Dynamic model requirements** - update required models on Ollama-compatible backends
 - **Parallel downloads** with configurable concurrency
 
 ### High Availability
@@ -131,7 +132,7 @@ Backends represent your actual AI inference instances (Ollama, OpenAI, vLLM, Sha
   "MaxParallelRequests": 4,
   "HealthCheckUrl": "/",
   "UnhealthyThreshold": 2,
-  "BackendType": "Ollama"
+  "ApiFormat": "Ollama"
 }
 ```
 
@@ -146,7 +147,7 @@ OllamaFlow provides universal API compatibility with native transformation betwe
 
 ### Supported Endpoints
 
-**Ollama Format:**
+**Ollama API:**
 - ✅ `/api/generate` - Text generation
 - ✅ `/api/chat` - Chat completions
 - ✅ `/api/pull` - Model pulling
@@ -157,7 +158,7 @@ OllamaFlow provides universal API compatibility with native transformation betwe
 - ✅ `/api/embed` - Embeddings
 - ✅ `/api/delete` - Model deletion
 
-**OpenAI Format:**
+**OpenAI API:**
 - ✅ `/v1/chat/completions` - Chat completions
 - ✅ `/v1/completions` - Text completions
 - ✅ `/v1/embeddings` - Text embeddings
@@ -220,33 +221,6 @@ Please check out our [Contributing Guidelines](CONTRIBUTING.md) and feel free to
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## 📊 Performance
-
-OllamaFlow adds minimal overhead to your Ollama requests:
-
-- **< 1ms** routing decision time
-- **Negligible memory footprint** (~50MB)
-- **High throughput** - handles thousands of requests per second
-- **Efficient streaming** support for real-time responses
-
-## 🛡️ Security
-
-- Bearer token authentication for administrative APIs
-- Request source IP forwarding for audit trails
-- Configurable request size limits
-- No external dependencies for core functionality
-
-## 🌟 Use Cases
-
-- **GPU Cluster Management**: Distribute AI workloads across multiple GPU servers
-- **Multi-Provider Orchestration**: Combine local Ollama instances with cloud OpenAI services
-- **API Format Unification**: Present a consistent interface regardless of backend type
-- **High Availability**: Ensure your AI services stay online 24/7 with automatic failover
-- **Development & Testing**: Easily switch between different model configurations and providers
-- **Cost Optimization**: Route requests to the most cost-effective backend automatically
-- **Multi-Tenant Scenarios**: Isolate workloads while sharing infrastructure
-- **Migration Support**: Seamlessly migrate between different AI service providers
 
 ## 📚 Documentation & Resources
 
