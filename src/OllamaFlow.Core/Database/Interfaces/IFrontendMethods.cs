@@ -13,35 +13,35 @@
         /// </summary>
         /// <param name="obj">Record.</param>
         /// <returns>Record.</returns>
-        OllamaFrontend Create(OllamaFrontend obj);
+        Frontend Create(Frontend obj);
 
         /// <summary>
         /// Create multiple records.
         /// </summary>
         /// <param name="objs">Records.</param>
         /// <returns>Records.</returns>
-        List<OllamaFrontend> CreateMany(List<OllamaFrontend> objs);
+        List<Frontend> CreateMany(List<Frontend> objs);
 
         /// <summary>
         /// Read all records.
         /// </summary>
         /// <param name="order">Enumeration order.</param>
         /// <returns>Records.</returns>
-        IEnumerable<OllamaFrontend> ReadAll(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending);
+        IEnumerable<Frontend> ReadAll(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending);
 
         /// <summary>
         /// Read objects by identifiers.
         /// </summary>
         /// <param name="ids">Identifiers.</param>
         /// <returns>Objects.</returns>
-        IEnumerable<OllamaFrontend> ReadByIdentifiers(List<string> ids);
+        IEnumerable<Frontend> ReadByIdentifiers(List<string> ids);
 
         /// <summary>
         /// Enumerate objects.
         /// </summary>
         /// <param name="query">Enumeration query.</param>
         /// <returns>Enumeration result containing a page of objects.</returns>
-        EnumerationResult<OllamaFrontend> Enumerate(EnumerationRequest query);
+        EnumerationResult<Frontend> Enumerate(EnumerationRequest query);
 
         /// <summary>
         /// Get the record count.  Optionally supply a continuation token to indicate that only records from that continuation token (identifier) should be counted.
@@ -58,7 +58,7 @@
         /// </summary>
         /// <param name="obj">Record.</param>
         /// <returns>Record.</returns>
-        OllamaFrontend Update(OllamaFrontend obj);
+        Frontend Update(Frontend obj);
 
         /// <summary>
         /// Delete a record.

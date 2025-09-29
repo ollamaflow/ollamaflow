@@ -14,7 +14,7 @@
     using WatsonWebserver;
     using WatsonWebserver.Core;
 
-    public static class Program
+    public static class IntegrationTest
     {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -36,7 +36,7 @@
 
         private static int _NumRequests = 8;
 
-        public static async Task Main(string[] args)
+        public static async Task IntegrationMain(string[] args)
         {
             Console.WriteLine("");
             Console.WriteLine("Use typical Ollama requests, but use server port 43411");
@@ -106,7 +106,7 @@
             SqliteDatabaseDriver driver = new SqliteDatabaseDriver(_Settings, new LoggingModule(), _Serializer, _Settings.DatabaseFilename);
             driver.InitializeRepository();
 
-            driver.Frontend.Create(new OllamaFrontend
+            driver.Frontend.Create(new Frontend
             {
                 Identifier = "virtual-ollama",
                 Name = "Virtual Ollama",
@@ -115,7 +115,7 @@
                 Backends = new List<string> { "ollama1", "ollama2", "ollama3" }
             });
 
-            driver.Backend.Create(new OllamaBackend
+            driver.Backend.Create(new Backend
             {
                 Identifier = "ollama1",
                 Name = "Ollama 1",
@@ -124,7 +124,7 @@
                 Ssl = false
             });
 
-            driver.Backend.Create(new OllamaBackend
+            driver.Backend.Create(new Backend
             {
                 Identifier = "ollama2",
                 Name = "Ollama 2",
@@ -133,7 +133,7 @@
                 Ssl = false
             });
 
-            driver.Backend.Create(new OllamaBackend
+            driver.Backend.Create(new Backend
             {
                 Identifier = "ollama3",
                 Name = "Ollama 3",

@@ -1,10 +1,6 @@
 ﻿namespace OllamaFlow.Core.Database.Sqlite.Queries
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
-    using System.Threading.Tasks;
 
     internal static class SetupQueries
     {
@@ -25,9 +21,12 @@
                 + "maxrequestbodysize INT NOT NULL, "
                 + "backends VARCHAR(2048) NOT NULL, "
                 + "requiredmodels VARCHAR(2048) NOT NULL, "
-                + "logrequestfull INT NOT NULL, " 
+                + "logrequestfull INT NOT NULL, "
                 + "logrequestbody INT NOT NULL, "
                 + "logresponsebody INT NOT NULL, "
+                + "usestickysessions INT NOT NULL DEFAULT 0, "
+                + "stickysessionexpirationms INT NOT NULL DEFAULT 1800000, "
+                + "allowretries INT NOT NULL DEFAULT 1, "
                 + "active INT NOT NULL, "
                 + "createdutc VARCHAR(64), "
                 + "lastupdateutc VARCHAR(64) "
@@ -59,6 +58,7 @@
                 + "logrequestfull INT NOT NULL, "
                 + "logrequestbody INT NOT NULL, "
                 + "logresponsebody INT NOT NULL, "
+                + "apiformat VARCHAR(32) DEFAULT 'Ollama', "
                 + "active INT NOT NULL, "
                 + "createdutc VARCHAR(64), "
                 + "lastupdateutc VARCHAR(64) "

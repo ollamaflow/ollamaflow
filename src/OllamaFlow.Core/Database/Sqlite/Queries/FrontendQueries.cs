@@ -15,13 +15,14 @@
 
         internal static Serializer Serializer = new Serializer();
 
-        internal static string Insert(OllamaFrontend obj)
+        internal static string Insert(Frontend obj)
         {
             string ret =
                 "INSERT INTO 'frontends' "
                 + "(identifier, name, hostname, timeoutms, loadbalancing, blockhttp10, "
                 + "maxrequestbodysize, backends, requiredmodels, logrequestfull, "
-                + "logrequestbody, logresponsebody, active, createdutc, lastupdateutc) "
+                + "logrequestbody, logresponsebody, usestickysessions, stickysessionexpirationms, "
+                + "allowretries, active, createdutc, lastupdateutc) "
                 + "VALUES ("
                 + "'" + Sanitizer.Sanitize(obj.Identifier) + "',"
                 + "'" + Sanitizer.Sanitize(obj.Name) + "',"
@@ -35,6 +36,9 @@
                 + (obj.LogRequestFull ? "1" : "0") + ","
                 + (obj.LogRequestBody ? "1" : "0") + ","
                 + (obj.LogResponseBody ? "1" : "0") + ","
+                + (obj.UseStickySessions ? "1" : "0") + ","
+                + obj.StickySessionExpirationMs + ","
+                + (obj.AllowRetries ? "1" : "0") + ","
                 + (obj.Active ? "1" : "0") + ","
                 + "'" + Sanitizer.Sanitize(obj.CreatedUtc.ToString(TimestampFormat)) + "',"
                 + "'" + Sanitizer.Sanitize(obj.LastUpdateUtc.ToString(TimestampFormat)) + "'"
@@ -85,7 +89,7 @@
             int batchSize = 100,
             int skip = 0,
             EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending,
-            OllamaFrontend marker = null)
+            Frontend marker = null)
         {
             string ret = "SELECT * FROM 'frontends' WHERE identifier IS NOT NULL ";
 
@@ -101,7 +105,7 @@
 
         internal static string GetRecordCount(
             EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending,
-            OllamaFrontend marker = null)
+            Frontend marker = null)
         {
             string ret = "SELECT COUNT(*) AS record_count FROM 'frontends' WHERE identifier IS NOT NULL ";
 
@@ -113,7 +117,7 @@
             return ret;
         }
 
-        internal static string Update(OllamaFrontend obj)
+        internal static string Update(Frontend obj)
         {
             string query =
                 "UPDATE 'frontends' SET "
@@ -129,6 +133,9 @@
                 + "logrequestfull = " + (obj.LogRequestFull ? "1" : "0") + ","
                 + "logrequestbody = " + (obj.LogRequestBody ? "1": "0") + ","
                 + "logresponsebody = " + (obj.LogResponseBody ? "1" : "0") + ","
+                + "usestickysessions = " + (obj.UseStickySessions ? "1" : "0") + ","
+                + "stickysessionexpirationms = " + obj.StickySessionExpirationMs + ","
+                + "allowretries = " + (obj.AllowRetries ? "1" : "0") + ","
                 + "active = " + (obj.Active ? "1" : "0") + " "
                 + "WHERE identifier = '" + Sanitizer.Sanitize(obj.Identifier) + "' "
                 + "RETURNING *;"; 
@@ -157,7 +164,7 @@
             }
         }
 
-        private static string ContinuationTokenWhereClause(EnumerationOrderEnum order, OllamaFrontend obj)
+        private static string ContinuationTokenWhereClause(EnumerationOrderEnum order, Frontend obj)
         {
             switch (order)
             {

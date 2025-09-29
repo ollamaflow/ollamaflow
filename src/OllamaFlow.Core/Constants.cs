@@ -128,19 +128,29 @@ namespace OllamaFlow.Core
         #region Headers
 
         /// <summary>
-        /// Forwarded for header, generally x-forwarded-for.
+        /// Forwarded for header, generally X-Forwarded-For.
         /// </summary>
-        public static string ForwardedForHeader = "x-forwarded-for";
+        public static string ForwardedForHeader = "X-Forwarded-For";
 
         /// <summary>
         /// Request ID header.
         /// </summary>
-        public static string RequestIdHeader = "x-ollamaflow-request-id";
+        public static string RequestIdHeader = "X-OllamaFlow-Request";
 
         /// <summary>
         /// Backend server ID header.
         /// </summary>
-        public static string BackendServerHeader = "x-ollamaflow-backend-id";
+        public static string BackendServerHeader = "X-OllamaFlow-Backend";
+
+        /// <summary>
+        /// Sticky server header.
+        /// </summary>
+        public static string StickyServerHeader = "X-OllamaFlow-Sticky";
+
+        /// <summary>
+        /// Expose headers header.
+        /// </summary>
+        public static string ExposeHeadersHeader = "Access-Control-Expose-Headers";
 
         #endregion
     }

@@ -9,11 +9,12 @@
     using System.Threading;
     using System.Threading.Tasks;
     using OllamaFlow.Core.Serialization;
+    using OllamaFlow.Core.Enums;
 
     /// <summary>
     /// Origin server.
     /// </summary>
-    public class OllamaBackend
+    public class Backend
     {
         #region Public-Members
 
@@ -200,6 +201,12 @@
         public bool LogResponseBody { get; set; } = false;
 
         /// <summary>
+        /// API format supported by this backend.
+        /// Default is Ollama.
+        /// </summary>
+        public ApiFormatEnum ApiFormat { get; set; } = ApiFormatEnum.Ollama;
+
+        /// <summary>
         /// Boolean indicating if the object is active or not.
         /// </summary>
         public bool Active { get; set; } = true;
@@ -264,6 +271,11 @@
             }
         }
 
+        /// <summary>
+        /// Boolean indicating whether or not the backend was chosen due to stickiness.
+        /// </summary>
+        public bool IsSticky { get; set; } = false;
+
         #endregion
 
         #region Internal-Members
@@ -320,9 +332,9 @@
         #region Constructors-and-Factories
 
         /// <summary>
-        /// Ollama backend.
+        /// Backend server.
         /// </summary>
-        public OllamaBackend()
+        public Backend()
         {
 
         }

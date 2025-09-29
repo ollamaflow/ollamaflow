@@ -3,34 +3,24 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
-    using System.IO;
     using System.Linq;
-    using System.Net.Sockets;
-    using System.Text;
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using RestWrapper;
     using OllamaFlow.Core;
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Helpers;
+    using OllamaFlow.Core.Models;
     using OllamaFlow.Core.Serialization;
     using SyslogLogging;
-    using Timestamps;
-    using UrlMatcher;
-    using WatsonWebserver;
     using WatsonWebserver.Core;
-    using System.Data.Common;
 
     /// <summary>
-    /// Gateway service.
+    /// Gateway service responsible for coordinating request processing and routing.
     /// </summary>
     public class GatewayService : IDisposable
     {
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-
-        #region Public-Members
-
-        #endregion
 
         #region Private-Members
 
@@ -39,15 +29,21 @@
         private OllamaFlowCallbacks _Callbacks = null;
         private LoggingModule _Logging = null;
         private Serializer _Serializer = null;
-        private Random _Random = new Random(Guid.NewGuid().GetHashCode());
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
         private bool _IsDisposed = false;
 
+        // Core services
         private FrontendService _FrontendService = null;
         private BackendService _BackendService = null;
         private HealthCheckService _HealthCheck = null;
+        private ModelSynchronizationService _ModelSynchronization = null;
+        private SessionStickinessService _SessionStickiness = null;
 
-        private const int BUFFER_SIZE = 65536;
+        // Extracted services
+        private AdminApiService _AdminApiService = null;
+        private StaticRouteHandler _StaticRouteHandler = null;
+        private ProxyService _ProxyService = null;
+        private RequestProcessorService _RequestProcessorService = null;
 
         #endregion
 
@@ -63,6 +59,12 @@
         /// <param name="frontend">Frontend service.</param>
         /// <param name="backend">Backend service.</param>
         /// <param name="healthCheck">Healthcheck service.</param>
+        /// <param name="modelSynchronization">Model synchronization service.</param>
+        /// <param name="sessionStickiness">Session stickiness service.</param>
+        /// <param name="adminApiService">Admin API service.</param>
+        /// <param name="staticRouteHandler">Static route handler.</param>
+        /// <param name="proxyService">Proxy service.</param>
+        /// <param name="requestProcessorService">Request processor service.</param>
         /// <param name="tokenSource">Cancellation token source.</param>
         public GatewayService(
             OllamaFlowSettings settings,
@@ -72,6 +74,12 @@
             FrontendService frontend,
             BackendService backend,
             HealthCheckService healthCheck,
+            ModelSynchronizationService modelSynchronization,
+            SessionStickinessService sessionStickiness,
+            AdminApiService adminApiService,
+            StaticRouteHandler staticRouteHandler,
+            ProxyService proxyService,
+            RequestProcessorService requestProcessorService,
             CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -82,6 +90,12 @@
             _FrontendService = frontend ?? throw new ArgumentNullException(nameof(frontend));
             _BackendService = backend ?? throw new ArgumentNullException(nameof(backend));
             _HealthCheck = healthCheck ?? throw new ArgumentNullException(nameof(healthCheck));
+            _ModelSynchronization = modelSynchronization ?? throw new ArgumentNullException(nameof(modelSynchronization));
+            _SessionStickiness = sessionStickiness ?? throw new ArgumentNullException(nameof(sessionStickiness));
+            _AdminApiService = adminApiService ?? throw new ArgumentNullException(nameof(adminApiService));
+            _StaticRouteHandler = staticRouteHandler ?? throw new ArgumentNullException(nameof(staticRouteHandler));
+            _ProxyService = proxyService ?? throw new ArgumentNullException(nameof(proxyService));
+            _RequestProcessorService = requestProcessorService ?? throw new ArgumentNullException(nameof(requestProcessorService));
 
             _Logging.Debug(_Header + "initialized");
         }
@@ -91,62 +105,171 @@
         #region Public-Methods
 
         /// <summary>
-        /// Dispose.
+        /// Dispose of the object.
         /// </summary>
-        /// <param name="disposing">Disposing.</param>
-        protected virtual void Dispose(bool disposing)
+        public void Dispose()
         {
             if (!_IsDisposed)
             {
-                if (disposing)
-                {
-                    _Random = null;
-                    _Serializer = null;
-                    _Logging = null;
-                    _Settings = null;
-                }
-
                 _IsDisposed = true;
+                _Logging.Debug(_Header + "dispose");
             }
         }
 
         /// <summary>
-        /// Dispose.
+        /// Default route handler - main entry point for AI API requests.
         /// </summary>
-        public void Dispose()
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task DefaultRoute(HttpContextBase ctx)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            Guid requestGuid = Guid.NewGuid();
+            ctx.Response.Headers.Add(Constants.RequestIdHeader, requestGuid.ToString());
+            ctx.Response.Headers.Add(Constants.ForwardedForHeader, ctx.Request.Source.IpAddress);
+            ctx.Response.Headers.Add(Constants.ExposeHeadersHeader, "*");
+
+            // Detect request type and API format once for efficiency
+            RequestTypeEnum requestType = RequestTypeHelper.GetRequestTypeFromRequest(ctx.Request.Method, ctx.Request.Url.RawWithQuery);
+            ApiFormatEnum apiFormat = RequestTypeHelper.GetApiFormatFromRequest(ctx.Request.Method, ctx.Request.Url.RawWithQuery);
+
+            // Initialize telemetry with all known information upfront
+            TelemetryMessage telemetry = new TelemetryMessage
+            {
+                ClientId = ctx.Request.Source.IpAddress,
+                RequestBodySize = ctx.Request.ContentLength,
+                RequestArrivalUtc = DateTime.UtcNow,
+                RequestType = requestType,
+                ApiFormat = apiFormat
+            };
+
+            try
+            {
+                // Handle admin API requests directly - don't try to transform them
+                if (apiFormat == ApiFormatEnum.Admin)
+                {
+                    await HandleAdminApiRequest(ctx);
+                    return;
+                }
+
+                Frontend frontend = await GetFrontend(ctx);
+                if (frontend == null)
+                {
+                    _Logging.Warn(_Header + "no frontend found for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.Full);
+                    ctx.Response.StatusCode = 400;
+                    ctx.Response.ContentType = Constants.JsonContentType;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadRequest, null, "No matching API endpoint found"), true));
+                    return;
+                }
+
+                // Handle model pull requests - add to required models for synchronization
+                if (requestType == RequestTypeEnum.PullModel)
+                {
+                    string model = RequestTypeHelper.GetModelFromRequest(ctx.Request, requestType);
+                    if (!String.IsNullOrEmpty(model))
+                    {
+                        lock (frontend.Lock)
+                        {
+                            if (!frontend.RequiredModels.Contains(model))
+                            {
+                                frontend.RequiredModels.Add(model);
+                            }
+                        }
+                    }
+                }
+
+                // Handle model delete requests - remove from required models
+                if (requestType == RequestTypeEnum.DeleteModel)
+                {
+                    string model = RequestTypeHelper.GetModelFromRequest(ctx.Request, requestType);
+                    if (!String.IsNullOrEmpty(model))
+                    {
+                        lock (frontend.Lock)
+                        {
+                            if (frontend.RequiredModels.Contains(model))
+                            {
+                                frontend.RequiredModels.Remove(model);
+                            }
+                        }
+                    }
+                }
+
+                // Get client identifier and select backend
+                string clientId = GetClientIdentifier(ctx);
+                Backend backend = _HealthCheck.GetNextBackend(frontend, clientId);
+
+                if (backend == null)
+                {
+                    _Logging.Warn(_Header + "no healthy backend found for frontend " + frontend.Identifier);
+                    ctx.Response.StatusCode = 502;
+                    ctx.Response.ContentType = Constants.JsonContentType;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadGateway, null, "No healthy backend servers available"), true));
+                    return;
+                }
+
+                telemetry.BackendServerId = backend.Identifier;
+                telemetry.BackendSelectedUtc = DateTime.UtcNow;
+
+                // Set response headers for backend information
+                ctx.Response.Headers.Add(Constants.StickyServerHeader, backend.IsSticky.ToString());
+
+                // Check request body size limits
+                if (frontend.MaxRequestBodySize > 0 && ctx.Request.ContentLength > frontend.MaxRequestBodySize)
+                {
+                    _Logging.Warn(_Header + "request too large from " + ctx.Request.Source.IpAddress + ": " + ctx.Request.ContentLength + " bytes");
+                    ctx.Response.StatusCode = 400;
+                    ctx.Response.ContentType = Constants.JsonContentType;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.TooLarge, null, "Your request was too large"), true));
+                    return;
+                }
+
+                // Check rate limiting
+                int totalRequests =
+                    Volatile.Read(ref backend._ActiveRequests) +
+                    Volatile.Read(ref backend._PendingRequests);
+
+                if (totalRequests > backend.RateLimitRequestsThreshold)
+                {
+                    _Logging.Warn(_Header + "too many active requests for backend " + backend.Identifier + ", sending 429 response to request from " + ctx.Request.Source.IpAddress);
+                    ctx.Response.StatusCode = 429;
+                    ctx.Response.ContentType = Constants.JsonContentType;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.SlowDown)));
+                    return;
+                }
+
+                Interlocked.Increment(ref backend._PendingRequests);
+
+                // Process request using the RequestProcessorService
+                bool responseReceived = await _RequestProcessorService.ProcessRequestWithTransformationAsync(
+                    requestGuid,
+                    ctx,
+                    frontend,
+                    backend,
+                    clientId,
+                    telemetry);
+
+                if (!responseReceived)
+                {
+                    _Logging.Warn(_Header + "no response or exception from " + backend.Identifier + " for Ollama endpoint " + frontend.Identifier);
+                    ctx.Response.StatusCode = 502;
+                    ctx.Response.ContentType = Constants.JsonContentType;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadGateway), true));
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                _Logging.Warn(_Header + "exception:" + Environment.NewLine + e.ToString());
+                ctx.Response.StatusCode = 500;
+                await ctx.Response.Send();
+            }
+            finally
+            {
+                _Logging.Debug(_Header + _Serializer.SerializeJson(telemetry, false));
+            }
         }
 
         /// <summary>
-        /// Initialize routes.
-        /// </summary>
-        /// <param name="webserver">Webserver.</param>
-        public void InitializeRoutes(WebserverBase webserver)
-        {
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/", GetRootRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.HEAD, "/", HeadRootRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/favicon.ico", GetFaviconRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.HEAD, "/favicon.ico", HeadFaviconRoute, ExceptionRoute);
-
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/v1.0/frontends", GetFrontendsRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/frontends/{identifier}", GetFrontendRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.DELETE, "/v1.0/frontends/{identifier}", DeleteFrontendRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/frontends", CreateFrontendRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/frontends/{identifier}", UpdateFrontendRoute, ExceptionRoute);
-
-            webserver.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/v1.0/backends", GetBackendsRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/backends/health", GetBackendsHealthRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/backends/{identifier}", GetBackendRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.GET, "/v1.0/backends/{identifier}/health", GetBackendHealthRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.DELETE, "/v1.0/backends/{identifier}", DeleteBackendRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends", CreateBackendRoute, ExceptionRoute);
-            webserver.Routes.PreAuthentication.Parameter.Add(HttpMethod.PUT, "/v1.0/backends/{identifier}", UpdateBackendRoute, ExceptionRoute);
-        }
-
-        /// <summary>
-        /// Route for handling OPTIONS requests.
+        /// OPTIONS route handler for CORS support.
         /// </summary>
         /// <param name="ctx">HTTP context.</param>
         /// <returns>Task.</returns>
@@ -193,21 +316,33 @@
             ctx.Response.StatusCode = 200;
             ctx.Response.Headers = responseHeaders;
             await ctx.Response.Send();
-            return;
         }
 
         /// <summary>
-        /// Pre-routing handler.
+        /// Authentication route handler.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task AuthenticationRoute(HttpContextBase ctx)
+        {
+            ctx.Response.StatusCode = 401;
+            ctx.Response.ContentType = Constants.JsonContentType;
+            await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.InternalError, null, "Unauthorized access"), true));
+        }
+
+        /// <summary>
+        /// Pre-routing handler for request setup.
         /// </summary>
         /// <param name="ctx">HTTP context.</param>
         /// <returns>Task.</returns>
         public async Task PreRoutingHandler(HttpContextBase ctx)
         {
             ctx.Response.ContentType = Constants.JsonContentType;
+            await Task.CompletedTask;
         }
 
         /// <summary>
-        /// Post-routing handler.
+        /// Post-routing handler for cleanup.
         /// </summary>
         /// <param name="ctx">HTTP context.</param>
         /// <returns>Task.</returns>
@@ -221,10 +356,12 @@
                 ctx.Request.Method.ToString() + " " + ctx.Request.Url.RawWithQuery + ": " +
                 ctx.Response.StatusCode +
                 " (" + ctx.Timestamp.TotalMs.Value.ToString("F2") + "ms)");
+
+            await Task.CompletedTask;
         }
 
         /// <summary>
-        /// Exception route.
+        /// Exception route handler for unhandled exceptions.
         /// </summary>
         /// <param name="ctx">HTTP context.</param>
         /// <param name="e">Exception.</param>
@@ -257,584 +394,398 @@
             }
         }
 
+        // Static route delegates - delegated to StaticRouteHandler
+
         /// <summary>
-        /// Default request handler.
+        /// GET route for root endpoint (/).
         /// </summary>
         /// <param name="ctx">HTTP context.</param>
         /// <returns>Task.</returns>
-        public async Task DefaultRoute(HttpContextBase ctx)
-        {
-            Guid requestGuid = Guid.NewGuid();
-            ctx.Response.Headers.Add(Constants.RequestIdHeader, requestGuid.ToString());
+        public async Task GetRootRoute(HttpContextBase ctx) => await _StaticRouteHandler.GetRootRoute(ctx);
 
-            try
-            {
-                OllamaFrontend frontend = await GetFrontend(ctx);
-                if (frontend == null)
-                {
-                    _Logging.Warn(_Header + "no frontend found for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.Full);
-                    ctx.Response.StatusCode = 400;
-                    ctx.Response.ContentType = Constants.JsonContentType;
-                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadRequest, null, "No matching API endpoint found"), true));
-                    return;
-                }
+        /// <summary>
+        /// HEAD route for root endpoint (/).
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task HeadRootRoute(HttpContextBase ctx) => await _StaticRouteHandler.HeadRootRoute(ctx);
 
-                RequestTypeEnum requestType = RequestTypeHelper.DetermineRequestType(ctx.Request.Method, ctx.Request.Url.RawWithQuery);
+        /// <summary>
+        /// GET route for favicon.ico.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task GetFaviconRoute(HttpContextBase ctx) => await _StaticRouteHandler.GetFaviconRoute(ctx);
 
-                if (requestType == RequestTypeEnum.PullModel)
-                {
-                    string model = Helpers.RequestTypeHelper.GetModelFromRequest(ctx.Request, requestType);
+        /// <summary>
+        /// HEAD route for favicon.ico.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task HeadFaviconRoute(HttpContextBase ctx) => await _StaticRouteHandler.HeadFaviconRoute(ctx);
 
-                    if (!String.IsNullOrEmpty(model))
-                    {
-                        lock (frontend.Lock)
-                        {
-                            if (!frontend.RequiredModels.Contains(model))
-                            {
-                                frontend.RequiredModels.Add(model);
-                            }
-                        }
-                    }
-                }
+        // Admin API route delegates - delegated to AdminApiService
 
-                if (requestType == RequestTypeEnum.DeleteModel)
-                {
-                    string model = Helpers.RequestTypeHelper.GetModelFromRequest(ctx.Request, requestType);
+        /// <summary>
+        /// GET route for retrieving all frontends.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task GetFrontendsRoute(HttpContextBase ctx) => await _AdminApiService.GetFrontendsRoute(ctx);
 
-                    if (!String.IsNullOrEmpty(model))
-                    {
-                        lock (frontend.Lock)
-                        {
-                            if (!frontend.RequiredModels.Contains(model))
-                            {
-                                frontend.RequiredModels.Remove(model);
-                            }
-                        }
-                    }
-                }
+        /// <summary>
+        /// GET route for retrieving a specific frontend by identifier.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task GetFrontendRoute(HttpContextBase ctx) => await _AdminApiService.GetFrontendRoute(ctx);
 
-                OllamaBackend backend = _HealthCheck.GetNextBackend(frontend);
-                if (backend == null)
-                {
-                    _Logging.Warn(_Header + "no backend found for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.RawWithoutQuery);
-                    ctx.Response.StatusCode = 502;
-                    ctx.Response.ContentType = Constants.JsonContentType;
-                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadGateway, null, "No backend servers are available to service your request"), true));
-                    return;
-                }
+        /// <summary>
+        /// DELETE route for removing a frontend by identifier.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task DeleteFrontendRoute(HttpContextBase ctx) => await _AdminApiService.DeleteFrontendRoute(ctx);
 
-                if (frontend.MaxRequestBodySize > 0 && ctx.Request.ContentLength > frontend.MaxRequestBodySize)
-                {
-                    _Logging.Warn(_Header + "request too large from " + ctx.Request.Source.IpAddress + ": " + ctx.Request.ContentLength + " bytes");
-                    ctx.Response.StatusCode = 400;
-                    ctx.Response.ContentType = Constants.JsonContentType;
-                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.TooLarge, null, "Your request was too large"), true));
-                    return;
-                }
+        /// <summary>
+        /// PUT route for creating a new frontend.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task CreateFrontendRoute(HttpContextBase ctx) => await _AdminApiService.CreateFrontendRoute(ctx);
 
-                int totalRequests =
-                    Volatile.Read(ref backend._ActiveRequests) +
-                    Volatile.Read(ref backend._PendingRequests);
+        /// <summary>
+        /// PUT route for updating an existing frontend.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task UpdateFrontendRoute(HttpContextBase ctx) => await _AdminApiService.UpdateFrontendRoute(ctx);
 
-                if (totalRequests > backend.RateLimitRequestsThreshold)
-                {
-                    _Logging.Warn(_Header + "too many active requests for backend " + backend.Identifier + ", sending 429 response to request from " + ctx.Request.Source.IpAddress);
-                    ctx.Response.StatusCode = 429;
-                    ctx.Response.ContentType = Constants.JsonContentType;
-                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.SlowDown)));
-                    return;
-                }
+        /// <summary>
+        /// GET route for retrieving all backends.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task GetBackendsRoute(HttpContextBase ctx) => await _AdminApiService.GetBackendsRoute(ctx);
 
-                Interlocked.Increment(ref backend._PendingRequests);
+        /// <summary>
+        /// GET route for retrieving health status of all backends.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task GetBackendsHealthRoute(HttpContextBase ctx) => await _AdminApiService.GetBackendsHealthRoute(ctx);
 
-                bool responseReceived = await ProxyRequest(
-                    requestGuid,
-                    ctx,
-                    frontend,
-                    backend);
+        /// <summary>
+        /// GET route for retrieving a specific backend by identifier.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task GetBackendRoute(HttpContextBase ctx) => await _AdminApiService.GetBackendRoute(ctx);
 
-                if (!responseReceived)
-                {
-                    _Logging.Warn(_Header + "no response or exception from " + backend.Identifier + " for Ollama endpoint " + frontend.Identifier);
-                    ctx.Response.StatusCode = 502;
-                    ctx.Response.ContentType = Constants.JsonContentType;
-                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadGateway), true));
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                _Logging.Warn(_Header + "exception:" + Environment.NewLine + e.ToString());
-                ctx.Response.StatusCode = 500;
-                await ctx.Response.Send();
-            }
-        }
+        /// <summary>
+        /// GET route for retrieving health status of a specific backend.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task GetBackendHealthRoute(HttpContextBase ctx) => await _AdminApiService.GetBackendHealthRoute(ctx);
+
+        /// <summary>
+        /// DELETE route for removing a backend by identifier.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task DeleteBackendRoute(HttpContextBase ctx) => await _AdminApiService.DeleteBackendRoute(ctx);
+
+        /// <summary>
+        /// PUT route for creating a new backend.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task CreateBackendRoute(HttpContextBase ctx) => await _AdminApiService.CreateBackendRoute(ctx);
+
+        /// <summary>
+        /// PUT route for updating an existing backend.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task UpdateBackendRoute(HttpContextBase ctx) => await _AdminApiService.UpdateBackendRoute(ctx);
+
+        /// <summary>
+        /// GET route for retrieving all active sessions.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task GetSessionsRoute(HttpContextBase ctx) => await _AdminApiService.GetSessionsRoute(ctx);
+
+        /// <summary>
+        /// GET route for retrieving sessions for a specific client.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task GetClientSessionsRoute(HttpContextBase ctx) => await _AdminApiService.GetClientSessionsRoute(ctx);
+
+        /// <summary>
+        /// DELETE route for removing sessions for a specific client.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task DeleteClientSessionsRoute(HttpContextBase ctx) => await _AdminApiService.DeleteClientSessionsRoute(ctx);
+
+        /// <summary>
+        /// DELETE route for removing all active sessions.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        public async Task DeleteAllSessionsRoute(HttpContextBase ctx) => await _AdminApiService.DeleteAllSessionsRoute(ctx);
 
         #endregion
 
         #region Private-Methods
 
-        private async Task GetRootRoute(HttpContextBase ctx)
+        /// <summary>
+        /// Handle admin API requests by routing to appropriate handlers.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        private async Task HandleAdminApiRequest(HttpContextBase ctx)
         {
-            ctx.Response.StatusCode = 200;
-            ctx.Response.ContentType = Constants.HtmlContentType;
-            await ctx.Response.Send(Constants.HtmlHomepage);
-        }
+            string path = ctx.Request.Url.RawWithoutQuery;
+            string method = ctx.Request.Method.ToString().ToUpper();
 
-        private async Task HeadRootRoute(HttpContextBase ctx)
-        {
-            ctx.Response.StatusCode = 200;
-            ctx.Response.ContentType = Constants.TextContentType;
-            await ctx.Response.Send();
-        }
-
-        private async Task GetFaviconRoute(HttpContextBase ctx)
-        {
-            ctx.Response.StatusCode = 200;
-            ctx.Response.ContentType = Constants.FaviconContentType;
-            await ctx.Response.Send(File.ReadAllBytes(Constants.FaviconFilename));
-        }
-
-        private async Task HeadFaviconRoute(HttpContextBase ctx)
-        {
-            ctx.Response.StatusCode = 200;
-            ctx.Response.ContentType = Constants.FaviconContentType;
-            await ctx.Response.Send();
-        }
-
-        private async Task<OllamaFrontend> GetFrontend(HttpContextBase ctx)
-        {
-            Uri uri = new Uri(ctx.Request.Url.Full);
-
-            List<OllamaFrontend> frontends = _HealthCheck.Frontends;
-
-            foreach (OllamaFrontend ep in frontends)
+            // Route to appropriate admin handler based on path and method
+            try
             {
-                if (ep.Hostname.Equals("*")) return ep;
-                if (ep.Hostname.Equals(uri.Host)) return ep;
-            }
-
-            _Logging.Warn(_Header + "no frontend found for host " + uri.Host);
-            return null;
-        }
-
-        private System.Net.Http.HttpMethod ConvertHttpMethod(WatsonWebserver.Core.HttpMethod method)
-        {
-            switch (method)
-            {
-                case HttpMethod.CONNECT:
-                    return System.Net.Http.HttpMethod.Connect;
-                case HttpMethod.DELETE:
-                    return System.Net.Http.HttpMethod.Delete;
-                case HttpMethod.GET:
-                    return System.Net.Http.HttpMethod.Get;
-                case HttpMethod.HEAD:
-                    return System.Net.Http.HttpMethod.Head;
-                case HttpMethod.OPTIONS:
-                    return System.Net.Http.HttpMethod.Options;
-                case HttpMethod.PATCH:
-                    return System.Net.Http.HttpMethod.Patch;
-                case HttpMethod.POST:
-                    return System.Net.Http.HttpMethod.Post;
-                case HttpMethod.PUT:
-                    return System.Net.Http.HttpMethod.Put;
-                case HttpMethod.TRACE:
-                    return System.Net.Http.HttpMethod.Trace;
-                default:
-                    throw new ArgumentException("Unknown HTTP method " + method.ToString());
-            }
-        }
-
-        private async Task<bool> ProxyRequest(
-            Guid requestGuid,
-            HttpContextBase ctx,
-            OllamaFrontend frontend,
-            OllamaBackend backend)
-        {
-            _Logging.Debug(_Header + "proxying request to " + backend.Identifier + " for Ollama endpoint " + frontend.Identifier + " for request " + requestGuid.ToString());
-
-            RestResponse resp = null;
-
-            using (Timestamp ts = new Timestamp())
-            {
-                string url = backend.UrlPrefix + ctx.Request.Url.RawWithQuery;
-
-                try
+                switch (path)
                 {
-                    #region Enter-Semaphore
+                    case "/v1.0/frontends":
+                        if (method == "GET") await GetFrontendsRoute(ctx);
+                        else if (method == "PUT") await CreateFrontendRoute(ctx);
+                        else await SendMethodNotAllowed(ctx);
+                        break;
 
-                    await backend.Semaphore.WaitAsync().ConfigureAwait(false);
-                    Interlocked.Increment(ref backend._ActiveRequests);
-                    Interlocked.Decrement(ref backend._PendingRequests);
+                    case "/v1.0/backends":
+                        if (method == "GET") await GetBackendsRoute(ctx);
+                        else if (method == "PUT") await CreateBackendRoute(ctx);
+                        else await SendMethodNotAllowed(ctx);
+                        break;
 
-                    #endregion
+                    case "/v1.0/backends/health":
+                        if (method == "GET") await GetBackendsHealthRoute(ctx);
+                        else await SendMethodNotAllowed(ctx);
+                        break;
 
-                    #region Build-Request-and-Send
+                    case "/v1.0/sessions":
+                        if (method == "GET") await GetSessionsRoute(ctx);
+                        else if (method == "DELETE") await DeleteAllSessionsRoute(ctx);
+                        else await SendMethodNotAllowed(ctx);
+                        break;
 
-                    using (RestRequest req = new RestRequest(url, ConvertHttpMethod(ctx.Request.Method)))
+                    default:
+                        // Handle dynamic paths like /v1.0/frontends/{id}, /v1.0/backends/{id}, etc.
+                        await HandleDynamicAdminPath(ctx, path, method);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _Logging.Error(_Header + $"error handling admin API request: {ex.Message}");
+                ctx.Response.StatusCode = 500;
+                ctx.Response.ContentType = Constants.JsonContentType;
+                await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.InternalError), true));
+            }
+        }
+
+        /// <summary>
+        /// Handle dynamic admin API paths with parameters.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <param name="path">Request path.</param>
+        /// <param name="method">HTTP method.</param>
+        /// <returns>Task.</returns>
+        private async Task HandleDynamicAdminPath(HttpContextBase ctx, string path, string method)
+        {
+            if (path.StartsWith("/v1.0/frontends/"))
+            {
+                string identifier = ExtractIdentifierFromPath(path, "/v1.0/frontends/");
+                if (string.IsNullOrEmpty(identifier))
+                {
+                    await SendNotFound(ctx);
+                    return;
+                }
+
+                SetUrlParameter(ctx, "identifier", identifier);
+
+                if (method == "GET") await GetFrontendRoute(ctx);
+                else if (method == "PUT") await UpdateFrontendRoute(ctx);
+                else if (method == "DELETE") await DeleteFrontendRoute(ctx);
+                else await SendMethodNotAllowed(ctx);
+            }
+            else if (path.StartsWith("/v1.0/backends/"))
+            {
+                if (path.EndsWith("/health"))
+                {
+                    string identifier = ExtractIdentifierFromPath(path, "/v1.0/backends/", "/health");
+                    if (string.IsNullOrEmpty(identifier))
                     {
-                        if (frontend.TimeoutMs > 0)
-                            req.TimeoutMilliseconds = frontend.TimeoutMs;
-
-                        req.Headers.Add(Constants.ForwardedForHeader, ctx.Request.Source.IpAddress);
-
-                        if (ctx.Request.Headers != null && ctx.Request.Headers.Count > 0)
-                        {
-                            foreach (string key in ctx.Request.Headers.Keys)
-                            {
-                                if (!req.Headers.AllKeys.Contains(key))
-                                {
-                                    string val = ctx.Request.Headers.Get(key);
-                                    req.Headers.Add(key, val);
-                                }
-                            }
-                        }
-
-                        foreach (string key in req.Headers.AllKeys)
-                        {
-                            if (key.ToLower().Equals("host"))
-                            {
-                                req.Headers.Remove(key);
-                                req.Headers.Add("Host", backend.Hostname + ":" + backend.Port.ToString());
-                            }
-                        }
-
-                        #region Log-Request-Body
-
-                        if (frontend.LogRequestBody || backend.LogRequestBody)
-                        {
-                            _Logging.Debug(
-                                _Header
-                                + "request body (" + ctx.Request.DataAsBytes.Length + " bytes): "
-                                + Environment.NewLine
-                                + Encoding.UTF8.GetString(ctx.Request.DataAsBytes));
-
-                            _Logging.Debug(_Header + "using content-type: " + req.ContentType);
-                        }
-
-                        #endregion
-
-                        #region Send-Request
-
-                        if (ctx.Request.DataAsBytes != null && ctx.Request.DataAsBytes.Length > 0)
-                        {
-                            #region With-Data
-
-                            if (!String.IsNullOrEmpty(ctx.Request.ContentType))
-                                req.ContentType = ctx.Request.ContentType;
-                            else
-                                req.ContentType = Constants.BinaryContentType;
-
-                            resp = await req.SendAsync(ctx.Request.DataAsBytes);
-
-                            #endregion
-                        }
-                        else
-                        {
-                            #region Without-Data
-
-                            resp = await req.SendAsync();
-
-                            #endregion
-                        }
-
-                        if (resp != null)
-                        {
-                            #region Log-Response-Body
-
-                            if (frontend.LogResponseBody || backend.LogResponseBody)
-                            {
-                                if (resp.DataAsBytes != null && resp.DataAsBytes.Length > 0)
-                                {
-                                    _Logging.Debug(
-                                        _Header
-                                        + "response body (" + resp.DataAsBytes.Length + " bytes) status " + resp.StatusCode + ": "
-                                        + Environment.NewLine
-                                        + Encoding.UTF8.GetString(resp.DataAsBytes));
-                                }
-                                else
-                                {
-                                    _Logging.Debug(
-                                        _Header
-                                        + "response body (0 bytes) status " + resp.StatusCode);
-                                }
-                            }
-
-                            #endregion
-
-                            #region Set-Headers
-
-                            ctx.Response.StatusCode = resp.StatusCode;
-                            ctx.Response.ContentType = resp.ContentType;
-                            ctx.Response.Headers = resp.Headers;
-                            ctx.Response.Headers.Add(Constants.BackendServerHeader, backend.Identifier);
-                            ctx.Response.ChunkedTransfer = resp.ChunkedTransferEncoding;
-
-                            #endregion
-
-                            #region Send-Response
-
-                            if (!resp.ServerSentEvents)
-                            {
-                                if (!ctx.Response.ChunkedTransfer)
-                                {
-                                    await ctx.Response.Send(resp.DataAsBytes);
-                                }
-                                else
-                                {
-                                    if (resp.DataAsBytes.Length > 0)
-                                    {
-                                        for (int i = 0; i < resp.DataAsBytes.Length; i += BUFFER_SIZE)
-                                        {
-                                            int currentChunkSize = Math.Min(BUFFER_SIZE, resp.DataAsBytes.Length - i);
-
-                                            byte[] chunk = new byte[currentChunkSize];
-                                            Array.Copy(resp.DataAsBytes, i, chunk, 0, currentChunkSize);
-
-                                            if (chunk.Length == BUFFER_SIZE) await ctx.Response.SendChunk(chunk, false).ConfigureAwait(false);
-                                            else await ctx.Response.SendChunk(chunk, true).ConfigureAwait(false);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        await ctx.Response.SendChunk(Array.Empty<byte>(), true).ConfigureAwait(false);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                ctx.Response.ProtocolVersion = "HTTP/1.1";
-                                ctx.Response.ServerSentEvents = true;
-
-                                while (true)
-                                {
-                                    ServerSentEvent sse = await resp.ReadEventAsync();
-
-                                    if (sse == null)
-                                    {
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        if (!String.IsNullOrEmpty(sse.Data))
-                                        {
-                                            await ctx.Response.SendEvent(sse.Data, false);
-                                        }
-                                        else
-                                        {
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                await ctx.Response.SendEvent(null, true);
-                            }
-
-                            #endregion
-
-                            return true;
-                        }
-                        else
-                        {
-                            _Logging.Warn(_Header + "no response from origin " + url);
-                            return false;
-                        }
-
-                        #endregion
+                        await SendNotFound(ctx);
+                        return;
                     }
+
+                    SetUrlParameter(ctx, "identifier", identifier);
+
+                    if (method == "GET") await GetBackendHealthRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
                 }
-                catch (System.Net.Http.HttpRequestException hre)
+                else
                 {
-                    _Logging.Warn(
-                        _Header
-                        + "exception proxying request to backend " + backend.Identifier
-                        + " for endpoint " + frontend.Identifier
-                        + " for request " + requestGuid.ToString()
-                        + ": " + hre.Message);
+                    string identifier = ExtractIdentifierFromPath(path, "/v1.0/backends/");
+                    if (string.IsNullOrEmpty(identifier))
+                    {
+                        await SendNotFound(ctx);
+                        return;
+                    }
 
-                    return false;
-                }
-                catch (SocketException se)
-                {
-                    _Logging.Warn(
-                        _Header
-                        + "exception proxying request to backend " + backend.Identifier
-                        + " for endpoint " + frontend.Identifier
-                        + " for request " + requestGuid.ToString()
-                        + ": " + se.Message);
+                    SetUrlParameter(ctx, "identifier", identifier);
 
-                    return false;
-                }
-                catch (Exception e)
-                {
-                    _Logging.Warn(
-                        _Header
-                        + "exception proxying request to backend " + backend.Identifier
-                        + " for endpoint " + frontend.Identifier
-                        + " for request " + requestGuid.ToString()
-                        + Environment.NewLine
-                        + e.ToString());
-
-                    return false;
-                }
-                finally
-                {
-                    ts.End = DateTime.UtcNow;
-                    _Logging.Debug(
-                        _Header
-                        + "completed request " + requestGuid.ToString() + " "
-                        + "backend " + backend.Identifier + " "
-                        + "frontend " + frontend.Identifier + " "
-                        + (resp != null ? resp.StatusCode : "0") + " "
-                        + "(" + ts.TotalMs + "ms)");
-
-                    if (resp != null) resp.Dispose();
-
-                    backend.Semaphore.Release();
-                    Interlocked.Decrement(ref backend._ActiveRequests);
-                }
-
-                #endregion
-            }
-        }
-
-        private bool IsAuthenticated(HttpContextBase ctx)
-        {
-            if (ctx.Request.Authorization != null  && !String.IsNullOrEmpty(ctx.Request.Authorization.BearerToken))
-            {
-                if (_Settings.AdminBearerTokens != null)
-                {
-                    if (_Settings.AdminBearerTokens.Contains(ctx.Request.Authorization.BearerToken)) 
-                        return true;
+                    if (method == "GET") await GetBackendRoute(ctx);
+                    else if (method == "PUT") await UpdateBackendRoute(ctx);
+                    else if (method == "DELETE") await DeleteBackendRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
                 }
             }
-
-            return false;
-        }
-
-        private async Task GetFrontendsRoute(HttpContextBase ctx)
-        {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            List<OllamaFrontend> objs = _FrontendService.GetAll().ToList();
-            await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
-        }
-
-        private async Task GetFrontendRoute(HttpContextBase ctx)
-        {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            string identifier = ctx.Request.Url.Parameters["identifier"];
-            OllamaFrontend obj = _FrontendService.GetByIdentifier(identifier);
-            if (obj == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
-            await ctx.Response.Send(_Serializer.SerializeJson(obj, true));
-        }
-
-        private async Task DeleteFrontendRoute(HttpContextBase ctx)
-        {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            string identifier = ctx.Request.Url.Parameters["identifier"];
-            if (!_FrontendService.Exists(identifier)) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
-            _FrontendService.Delete(identifier);
-            ctx.Response.StatusCode = 204;
-            await ctx.Response.Send();
-        }
-
-        private async Task CreateFrontendRoute(HttpContextBase ctx)
-        {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            OllamaFrontend obj = _Serializer.DeserializeJson<OllamaFrontend>(ctx.Request.DataAsString);
-            OllamaFrontend existing = _FrontendService.GetByIdentifier(obj.Identifier);
-            if (existing != null) throw new ArgumentException("An object with identifier " + obj.Identifier + " already exists.");
-            OllamaFrontend created = _FrontendService.Create(obj);
-            ctx.Response.StatusCode = 201;
-            await ctx.Response.Send(_Serializer.SerializeJson(created, true));
-        }
-
-        private async Task UpdateFrontendRoute(HttpContextBase ctx)
-        {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            string identifier = ctx.Request.Url.Parameters["identifier"];
-            OllamaFrontend original = _FrontendService.GetByIdentifier(identifier);
-            if (original == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
-
-            OllamaFrontend updated = _Serializer.DeserializeJson<OllamaFrontend>(ctx.Request.DataAsString);
-            updated.Identifier = identifier;
-            updated = _FrontendService.Update(updated);
-            await ctx.Response.Send(_Serializer.SerializeJson(updated, true));
-        }
-
-        private async Task GetBackendsRoute(HttpContextBase ctx)
-        {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            List<OllamaBackend> objs = _BackendService.GetAll().ToList();
-            await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
-        }
-
-        private async Task GetBackendsHealthRoute(HttpContextBase ctx)
-        {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            List<OllamaBackend> objs = new List<OllamaBackend>(_HealthCheck.Backends);
-            await ctx.Response.Send(_Serializer.SerializeJson(objs, true));
-        }
-
-        private async Task GetBackendRoute(HttpContextBase ctx)
-        {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            string identifier = ctx.Request.Url.Parameters["identifier"];
-            OllamaBackend obj = _BackendService.GetByIdentifier(identifier);
-            if (obj == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
-            await ctx.Response.Send(_Serializer.SerializeJson(obj, true));
-        }
-
-        private async Task GetBackendHealthRoute(HttpContextBase ctx)
-        {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            string identifier = ctx.Request.Url.Parameters["identifier"];
-            List<OllamaBackend> backends = new List<OllamaBackend>(_HealthCheck.Backends);
-            if (backends.Any(b => b.Identifier.Equals(identifier)))
+            else if (path.StartsWith("/v1.0/sessions/"))
             {
-                OllamaBackend backend = backends.First(b => b.Identifier.Equals(identifier));
-                await ctx.Response.Send(_Serializer.SerializeJson(backend, true));
+                string identifier = ExtractIdentifierFromPath(path, "/v1.0/sessions/");
+                if (string.IsNullOrEmpty(identifier))
+                {
+                    await SendNotFound(ctx);
+                    return;
+                }
+
+                SetUrlParameter(ctx, "identifier", identifier);
+
+                if (method == "GET") await GetClientSessionsRoute(ctx);
+                else if (method == "DELETE") await DeleteClientSessionsRoute(ctx);
+                else await SendMethodNotAllowed(ctx);
             }
             else
             {
-                throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+                await SendNotFound(ctx);
             }
         }
 
-        private async Task DeleteBackendRoute(HttpContextBase ctx)
+        /// <summary>
+        /// Extract identifier from URL path.
+        /// </summary>
+        /// <param name="path">The full URL path.</param>
+        /// <param name="prefix">The prefix to remove.</param>
+        /// <param name="suffix">Optional suffix to remove.</param>
+        /// <returns>The extracted identifier.</returns>
+        private string ExtractIdentifierFromPath(string path, string prefix, string suffix = null)
         {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            string identifier = ctx.Request.Url.Parameters["identifier"];
-            if (!_BackendService.Exists(identifier)) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
-            _BackendService.Delete(identifier);
-            ctx.Response.StatusCode = 204;
-            await ctx.Response.Send();
+            if (!path.StartsWith(prefix)) return null;
+
+            string identifier = path.Substring(prefix.Length);
+
+            if (!string.IsNullOrEmpty(suffix) && identifier.EndsWith(suffix))
+            {
+                identifier = identifier.Substring(0, identifier.Length - suffix.Length);
+            }
+
+            return identifier;
         }
 
-        private async Task CreateBackendRoute(HttpContextBase ctx)
+        /// <summary>
+        /// Set a URL parameter on the HTTP context for the admin API handlers.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <param name="key">Parameter key.</param>
+        /// <param name="value">Parameter value.</param>
+        private void SetUrlParameter(HttpContextBase ctx, string key, string value)
         {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            OllamaBackend obj = _Serializer.DeserializeJson<OllamaBackend>(ctx.Request.DataAsString);
-            OllamaBackend existing = _BackendService.GetByIdentifier(obj.Identifier);
-            if (existing != null) throw new ArgumentException("An object with identifier " + obj.Identifier + " already exists.");
-            OllamaBackend created = _BackendService.Create(obj);
-            ctx.Response.StatusCode = 201;
-            await ctx.Response.Send(_Serializer.SerializeJson(created, true));
+            // Initialize Parameters collection if it doesn't exist
+            if (ctx.Request.Url.Parameters == null)
+            {
+                ctx.Request.Url.Parameters = new System.Collections.Specialized.NameValueCollection();
+            }
+
+            ctx.Request.Url.Parameters[key] = value;
         }
 
-        private async Task UpdateBackendRoute(HttpContextBase ctx)
+        /// <summary>
+        /// Send a 405 Method Not Allowed response.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        private async Task SendMethodNotAllowed(HttpContextBase ctx)
         {
-            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
-            string identifier = ctx.Request.Url.Parameters["identifier"];
-            OllamaBackend original = _BackendService.GetByIdentifier(identifier);
-            if (original == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
+            ctx.Response.StatusCode = 405;
+            ctx.Response.ContentType = Constants.JsonContentType;
+            await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadRequest, null, "Method not allowed"), true));
+        }
 
-            OllamaBackend updated = _Serializer.DeserializeJson<OllamaBackend>(ctx.Request.DataAsString);
-            updated.Identifier = identifier;
-            updated = _BackendService.Update(updated);
+        /// <summary>
+        /// Send a 404 Not Found response.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Task.</returns>
+        private async Task SendNotFound(HttpContextBase ctx)
+        {
+            ctx.Response.StatusCode = 404;
+            ctx.Response.ContentType = Constants.JsonContentType;
+            await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.NotFound, null, "Endpoint not found"), true));
+        }
 
-            _HealthCheck.UpdateBackend(updated);
-            await ctx.Response.Send(_Serializer.SerializeJson(updated, true));
+        /// <summary>
+        /// Get the frontend configuration based on the request context.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Frontend configuration or null if not found.</returns>
+        private async Task<Frontend> GetFrontend(HttpContextBase ctx)
+        {
+            await Task.CompletedTask;
+
+            if (String.IsNullOrEmpty(ctx.Request.Url.Full))
+            {
+                _Logging.Warn(_Header + "no URL found in request");
+                return null;
+            }
+
+            // For now, get the first available frontend as a simplified implementation
+            // This can be enhanced later to support hostname-based routing
+            Frontend frontend = _FrontendService.GetAll().FirstOrDefault();
+            if (frontend == null)
+            {
+                _Logging.Debug(_Header + "no frontend found, using default configuration");
+                // Return a basic frontend if none exist
+                return new Frontend
+                {
+                    Identifier = "default",
+                    Name = "Default Frontend",
+                    Backends = new List<string>()
+                };
+            }
+
+            return frontend;
+        }
+
+        /// <summary>
+        /// Get client identifier from the request context.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <returns>Client identifier.</returns>
+        private string GetClientIdentifier(HttpContextBase ctx)
+        {
+            string ret = ctx.Request.Source.IpAddress;
+            if (ctx.Request.Headers != null)
+            {
+                foreach (string stickyHeader in _Settings.StickyHeaders)
+                {
+                    string value = ctx.Request.Headers[stickyHeader]; // NameValueCollection lookups are case-insensitive
+                    if (!String.IsNullOrEmpty(value)) return value;
+                }
+            }
+            return ret;
         }
 
         #endregion

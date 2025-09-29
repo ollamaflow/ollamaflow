@@ -50,7 +50,7 @@
         #region Public-Methods
 
         /// <inheritdoc />
-        public OllamaFrontend Create(OllamaFrontend obj)
+        public Frontend Create(Frontend obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
             string query = FrontendQueries.Insert(obj);
@@ -59,12 +59,12 @@
         }
 
         /// <inheritdoc />
-        public List<OllamaFrontend> CreateMany(List<OllamaFrontend> objs)
+        public List<Frontend> CreateMany(List<Frontend> objs)
         {
             if (objs == null || objs.Count == 0) throw new ArgumentNullException(nameof(objs));
 
             List<string> queries = new List<string>();
-            foreach (var obj in objs)
+            foreach (Frontend obj in objs)
             {
                 queries.Add(FrontendQueries.Insert(obj));
             }
@@ -74,8 +74,8 @@
 
             // Since we're using RETURNING *, we need to get all created objects
             // We'll need to retrieve them individually
-            List<OllamaFrontend> created = new List<OllamaFrontend>();
-            foreach (var obj in objs)
+            List<Frontend> created = new List<Frontend>();
+            foreach (Frontend obj in objs)
             {
                 string selectQuery = FrontendQueries.SelectByIdentifier(obj.Identifier);
                 DataTable selectResult = _Repo.ExecuteQuery(selectQuery);
@@ -89,7 +89,7 @@
         }
 
         /// <inheritdoc />
-        public IEnumerable<OllamaFrontend> ReadAll(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending)
+        public IEnumerable<Frontend> ReadAll(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending)
         {
             int skip = 0;
             bool moreData = true;
@@ -105,10 +105,10 @@
                     yield break;
                 }
 
-                List<OllamaFrontend> frontends = Converters.FrontendsFromDataTable(result);
+                List<Frontend> frontends = Converters.FrontendsFromDataTable(result);
                 if (frontends != null)
                 {
-                    foreach (var frontend in frontends)
+                    foreach (Frontend frontend in frontends)
                     {
                         yield return frontend;
                     }
@@ -126,7 +126,7 @@
         }
 
         /// <inheritdoc />
-        public IEnumerable<OllamaFrontend> ReadByIdentifiers(List<string> ids)
+        public IEnumerable<Frontend> ReadByIdentifiers(List<string> ids)
         {
             if (ids == null || ids.Count == 0) yield break;
 
@@ -142,10 +142,10 @@
 
                 if (result != null && result.Rows.Count > 0)
                 {
-                    List<OllamaFrontend> frontends = Converters.FrontendsFromDataTable(result);
+                    List<Frontend> frontends = Converters.FrontendsFromDataTable(result);
                     if (frontends != null)
                     {
-                        foreach (var frontend in frontends)
+                        foreach (Frontend frontend in frontends)
                         {
                             yield return frontend;
                         }
@@ -155,16 +155,16 @@
         }
 
         /// <inheritdoc />
-        public EnumerationResult<OllamaFrontend> Enumerate(EnumerationRequest query)
+        public EnumerationResult<Frontend> Enumerate(EnumerationRequest query)
         {
             if (query == null) throw new ArgumentNullException(nameof(query));
 
-            EnumerationResult<OllamaFrontend> result = new EnumerationResult<OllamaFrontend>();
-            result.Objects = new List<OllamaFrontend>();
+            EnumerationResult<Frontend> result = new EnumerationResult<Frontend>();
+            result.Objects = new List<Frontend>();
             result.MaxResults = query.MaxResults;
 
             // Parse continuation token to get the marker
-            OllamaFrontend marker = null;
+            Frontend marker = null;
             if (!string.IsNullOrEmpty(query.ContinuationToken))
             {
                 string markerQuery = FrontendQueries.SelectByIdentifier(query.ContinuationToken);
@@ -191,7 +191,7 @@
                 // Set continuation token if there might be more records
                 if (result.Objects.Count == query.MaxResults)
                 {
-                    var lastRecord = result.Objects.Last();
+                    Frontend lastRecord = result.Objects.Last();
                     result.ContinuationToken = lastRecord.Identifier;
                     result.EndOfResults = false;
                 }
@@ -230,7 +230,7 @@
         /// <inheritdoc />
         public int GetRecordCount(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending, string continuationToken = null)
         {
-            OllamaFrontend marker = null;
+            Frontend marker = null;
             if (!string.IsNullOrEmpty(continuationToken))
             {
                 string markerQuery = FrontendQueries.SelectByIdentifier(continuationToken);
@@ -253,7 +253,7 @@
         }
 
         /// <inheritdoc />
-        public OllamaFrontend Update(OllamaFrontend obj)
+        public Frontend Update(Frontend obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
             string query = FrontendQueries.Update(obj);
@@ -274,7 +274,7 @@
             if (ids == null || ids.Count == 0) return;
 
             List<string> queries = new List<string>();
-            foreach (var id in ids)
+            foreach (string id in ids)
             {
                 queries.Add(FrontendQueries.Delete(id));
             }

@@ -79,6 +79,15 @@
             }
         }
 
+        /// <summary>
+        /// List of headers to use to identify a node when evaluating session stickiness.
+        /// </summary>
+        public List<string> StickyHeaders
+        {
+            get => _StickyHeaders;
+            set => _StickyHeaders = (value != null ? value : new List<string>());
+        }
+
         #endregion
 
         #region Private-Members
@@ -87,6 +96,11 @@
         private WebserverSettings _Webserver = new WebserverSettings();
         private List<string> _AdminBearerTokens = new List<string>();
         private string _DatabaseFilename = Constants.DatabaseFilename;
+        private List<string> _StickyHeaders = new List<string>
+        {
+            "x-conversation-id",
+            "x-thread-id"
+        };
 
         #endregion
 

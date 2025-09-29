@@ -4,7 +4,8 @@
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// Represents the different types of requests that can be proxied to Ollama.
+    /// Represents the different types of requests in a format-agnostic way.
+    /// Used to categorize requests regardless of the source API format (Ollama, OpenAI, etc.).
     /// </summary>
     public enum RequestTypeEnum
     {
@@ -114,38 +115,105 @@
 
         #endregion
 
-        #region OpenAI-Compatibility
+        #region Admin-API
 
         /// <summary>
-        /// OpenAI-compatible chat completions endpoint.
+        /// Admin API request to list frontends.
         /// </summary>
-        [EnumMember(Value = "OpenAIChatCompletions")]
-        OpenAIChatCompletions,
+        [EnumMember(Value = "AdminListFrontends")]
+        AdminListFrontends,
 
         /// <summary>
-        /// OpenAI-compatible completions endpoint.
+        /// Admin API request to get a specific frontend.
         /// </summary>
-        [EnumMember(Value = "OpenAICompletions")]
-        OpenAICompletions,
+        [EnumMember(Value = "AdminGetFrontend")]
+        AdminGetFrontend,
 
         /// <summary>
-        /// OpenAI-compatible embeddings endpoint.
+        /// Admin API request to create a frontend.
         /// </summary>
-        [EnumMember(Value = "OpenAIEmbeddings")]
-        OpenAIEmbeddings,
+        [EnumMember(Value = "AdminCreateFrontend")]
+        AdminCreateFrontend,
 
         /// <summary>
-        /// OpenAI-compatible models list endpoint.
+        /// Admin API request to update a frontend.
         /// </summary>
-        [EnumMember(Value = "OpenAIListModels")]
-        OpenAIListModels,
+        [EnumMember(Value = "AdminUpdateFrontend")]
+        AdminUpdateFrontend,
 
         /// <summary>
-        /// OpenAI-compatible model retrieval endpoint.
+        /// Admin API request to delete a frontend.
         /// </summary>
-        [EnumMember(Value = "OpenAIRetrieveModel")]
-        OpenAIRetrieveModel,
+        [EnumMember(Value = "AdminDeleteFrontend")]
+        AdminDeleteFrontend,
+
+        /// <summary>
+        /// Admin API request to list backends.
+        /// </summary>
+        [EnumMember(Value = "AdminListBackends")]
+        AdminListBackends,
+
+        /// <summary>
+        /// Admin API request to get a specific backend.
+        /// </summary>
+        [EnumMember(Value = "AdminGetBackend")]
+        AdminGetBackend,
+
+        /// <summary>
+        /// Admin API request to create a backend.
+        /// </summary>
+        [EnumMember(Value = "AdminCreateBackend")]
+        AdminCreateBackend,
+
+        /// <summary>
+        /// Admin API request to update a backend.
+        /// </summary>
+        [EnumMember(Value = "AdminUpdateBackend")]
+        AdminUpdateBackend,
+
+        /// <summary>
+        /// Admin API request to delete a backend.
+        /// </summary>
+        [EnumMember(Value = "AdminDeleteBackend")]
+        AdminDeleteBackend,
+
+        /// <summary>
+        /// Admin API request to get health status of all backends.
+        /// </summary>
+        [EnumMember(Value = "AdminGetBackendsHealth")]
+        AdminGetBackendsHealth,
+
+        /// <summary>
+        /// Admin API request to get health status of a specific backend.
+        /// </summary>
+        [EnumMember(Value = "AdminGetBackendHealth")]
+        AdminGetBackendHealth,
+
+        /// <summary>
+        /// Admin API request to list all sessions.
+        /// </summary>
+        [EnumMember(Value = "AdminListSessions")]
+        AdminListSessions,
+
+        /// <summary>
+        /// Admin API request to get sessions for a specific client.
+        /// </summary>
+        [EnumMember(Value = "AdminGetClientSessions")]
+        AdminGetClientSessions,
+
+        /// <summary>
+        /// Admin API request to delete sessions for a specific client.
+        /// </summary>
+        [EnumMember(Value = "AdminDeleteClientSessions")]
+        AdminDeleteClientSessions,
+
+        /// <summary>
+        /// Admin API request to delete all sessions.
+        /// </summary>
+        [EnumMember(Value = "AdminDeleteAllSessions")]
+        AdminDeleteAllSessions
 
         #endregion
+
     }
 }
