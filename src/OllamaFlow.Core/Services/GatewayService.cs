@@ -13,6 +13,7 @@
     using OllamaFlow.Core.Models;
     using OllamaFlow.Core.Serialization;
     using SyslogLogging;
+    using UrlMatcher;
     using WatsonWebserver.Core;
 
     /// <summary>
@@ -144,14 +145,19 @@
 
             try
             {
-                // Handle admin API requests directly - don't try to transform them
+                #region Admin-Requests
+
                 if (apiFormat == ApiFormatEnum.Admin)
                 {
                     await HandleAdminApiRequest(ctx);
                     return;
                 }
 
-                Frontend frontend = await GetFrontend(ctx);
+                #endregion
+
+                #region Get-and-Validate-Frontend
+
+                Frontend frontend = await GetMatchingFrontend(ctx);
                 if (frontend == null)
                 {
                     _Logging.Warn(_Header + "no frontend found for " + ctx.Request.Method.ToString() + " " + ctx.Request.Url.Full);
@@ -160,6 +166,27 @@
                     await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadRequest, null, "No matching API endpoint found"), true));
                     return;
                 }
+
+                if (requestType == RequestTypeEnum.GenerateEmbeddings && !frontend.AllowEmbeddings)
+                {
+                    _Logging.Warn(_Header + "embeddings request explicitly denied on frontend " + frontend.Identifier);
+                    await SendNotAuthorized(ctx, "Embeddings request are not permitted on this frontend");
+                    return;
+                }
+
+                if (requestType == RequestTypeEnum.GenerateCompletion || requestType == RequestTypeEnum.GenerateChatCompletion)
+                {
+                    if (!frontend.AllowCompletions)
+                    {
+                        _Logging.Warn(_Header + "completions request explicitly denied on frontend " + frontend.Identifier);
+                        await SendNotAuthorized(ctx, "Completions requests are not permitted on this frontend");
+                        return;
+                    }
+                }
+
+                #endregion
+
+                #region Model-Pull-and-Delete-Requests
 
                 // Handle model pull requests - add to required models for synchronization
                 if (requestType == RequestTypeEnum.PullModel)
@@ -193,6 +220,10 @@
                     }
                 }
 
+                #endregion
+
+                #region Get-Client-Identifier-and-Backend
+
                 // Get client identifier and select backend
                 string clientId = GetClientIdentifier(ctx);
                 Backend backend = _HealthCheck.GetNextBackend(frontend, clientId);
@@ -206,11 +237,32 @@
                     return;
                 }
 
+                if (requestType == RequestTypeEnum.GenerateEmbeddings && !backend.AllowEmbeddings)
+                {
+                    _Logging.Warn(_Header + "embeddings request explicitly denied on backend " + backend.Identifier);
+                    await SendNotAuthorized(ctx, "Embeddings request are not permitted on this backend");
+                    return;
+                }
+
+                if (requestType == RequestTypeEnum.GenerateCompletion || requestType == RequestTypeEnum.GenerateChatCompletion)
+                {
+                    if (!backend.AllowCompletions)
+                    {
+                        _Logging.Warn(_Header + "completions request explicitly denied on backend " + backend.Identifier);
+                        await SendNotAuthorized(ctx, "Completions requests are not permitted on this backend");
+                        return;
+                    }
+                }
+
                 telemetry.BackendServerId = backend.Identifier;
                 telemetry.BackendSelectedUtc = DateTime.UtcNow;
 
                 // Set response headers for backend information
                 ctx.Response.Headers.Add(Constants.StickyServerHeader, backend.IsSticky.ToString());
+
+                #endregion
+
+                #region Check-Request-Size
 
                 // Check request body size limits
                 if (frontend.MaxRequestBodySize > 0 && ctx.Request.ContentLength > frontend.MaxRequestBodySize)
@@ -221,6 +273,10 @@
                     await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.TooLarge, null, "Your request was too large"), true));
                     return;
                 }
+
+                #endregion
+
+                #region Check-Rate-Limiting
 
                 // Check rate limiting
                 int totalRequests =
@@ -237,6 +293,10 @@
                 }
 
                 Interlocked.Increment(ref backend._PendingRequests);
+
+                #endregion
+
+                #region Proxy-Request
 
                 // Process request using the RequestProcessorService
                 bool responseReceived = await _RequestProcessorService.ProcessRequestWithTransformationAsync(
@@ -255,6 +315,8 @@
                     await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadGateway), true));
                     return;
                 }
+
+                #endregion
             }
             catch (Exception e)
             {
@@ -394,8 +456,6 @@
             }
         }
 
-        // Static route delegates - delegated to StaticRouteHandler
-
         /// <summary>
         /// GET route for root endpoint (/).
         /// </summary>
@@ -423,8 +483,6 @@
         /// <param name="ctx">HTTP context.</param>
         /// <returns>Task.</returns>
         public async Task HeadFaviconRoute(HttpContextBase ctx) => await _StaticRouteHandler.HeadFaviconRoute(ctx);
-
-        // Admin API route delegates - delegated to AdminApiService
 
         /// <summary>
         /// GET route for retrieving all frontends.
@@ -542,48 +600,79 @@
 
         #region Private-Methods
 
-        /// <summary>
-        /// Handle admin API requests by routing to appropriate handlers.
-        /// </summary>
-        /// <param name="ctx">HTTP context.</param>
-        /// <returns>Task.</returns>
         private async Task HandleAdminApiRequest(HttpContextBase ctx)
         {
             string path = ctx.Request.Url.RawWithoutQuery;
             string method = ctx.Request.Method.ToString().ToUpper();
+            NameValueCollection vals = null;
 
             // Route to appropriate admin handler based on path and method
             try
             {
-                switch (path)
+                // Frontends with identifier
+                if (Matcher.Match(path, "/v1.0/frontends/{identifier}", out vals))
                 {
-                    case "/v1.0/frontends":
-                        if (method == "GET") await GetFrontendsRoute(ctx);
-                        else if (method == "PUT") await CreateFrontendRoute(ctx);
-                        else await SendMethodNotAllowed(ctx);
-                        break;
-
-                    case "/v1.0/backends":
-                        if (method == "GET") await GetBackendsRoute(ctx);
-                        else if (method == "PUT") await CreateBackendRoute(ctx);
-                        else await SendMethodNotAllowed(ctx);
-                        break;
-
-                    case "/v1.0/backends/health":
-                        if (method == "GET") await GetBackendsHealthRoute(ctx);
-                        else await SendMethodNotAllowed(ctx);
-                        break;
-
-                    case "/v1.0/sessions":
-                        if (method == "GET") await GetSessionsRoute(ctx);
-                        else if (method == "DELETE") await DeleteAllSessionsRoute(ctx);
-                        else await SendMethodNotAllowed(ctx);
-                        break;
-
-                    default:
-                        // Handle dynamic paths like /v1.0/frontends/{id}, /v1.0/backends/{id}, etc.
-                        await HandleDynamicAdminPath(ctx, path, method);
-                        break;
+                    SetUrlParameter(ctx, "identifier", vals["identifier"]);
+                    if (method == "GET") await GetFrontendRoute(ctx);
+                    else if (method == "PUT") await UpdateFrontendRoute(ctx);
+                    else if (method == "DELETE") await DeleteFrontendRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
+                // Frontends collection
+                else if (Matcher.Match(path, "/v1.0/frontends", out _) || Matcher.Match(path, "/v1.0/frontends/", out _))
+                {
+                    if (method == "GET") await GetFrontendsRoute(ctx);
+                    else if (method == "PUT") await CreateFrontendRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
+                // Backends with identifier and health
+                else if (Matcher.Match(path, "/v1.0/backends/{identifier}/health", out vals))
+                {
+                    SetUrlParameter(ctx, "identifier", vals["identifier"]);
+                    if (method == "GET") await GetBackendHealthRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
+                // Backends with identifier
+                else if (Matcher.Match(path, "/v1.0/backends/{identifier}", out vals))
+                {
+                    SetUrlParameter(ctx, "identifier", vals["identifier"]);
+                    if (method == "GET") await GetBackendRoute(ctx);
+                    else if (method == "PUT") await UpdateBackendRoute(ctx);
+                    else if (method == "DELETE") await DeleteBackendRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
+                // Backends health collection
+                else if (Matcher.Match(path, "/v1.0/backends/health", out _))
+                {
+                    if (method == "GET") await GetBackendsHealthRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
+                // Backends collection
+                else if (Matcher.Match(path, "/v1.0/backends", out _) || Matcher.Match(path, "/v1.0/backends/", out _))
+                {
+                    if (method == "GET") await GetBackendsRoute(ctx);
+                    else if (method == "PUT") await CreateBackendRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
+                // Sessions with client identifier
+                else if (Matcher.Match(path, "/v1.0/sessions/{identifier}", out vals))
+                {
+                    SetUrlParameter(ctx, "identifier", vals["identifier"]);
+                    if (method == "GET") await GetClientSessionsRoute(ctx);
+                    else if (method == "DELETE") await DeleteClientSessionsRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
+                // Sessions collection
+                else if (Matcher.Match(path, "/v1.0/sessions", out _) || Matcher.Match(path, "/v1.0/sessions/", out _))
+                {
+                    if (method == "GET") await GetSessionsRoute(ctx);
+                    else if (method == "DELETE") await DeleteAllSessionsRoute(ctx);
+                    else await SendMethodNotAllowed(ctx);
+                }
+                // No match found
+                else
+                {
+                    await SendNotFound(ctx);
                 }
             }
             catch (Exception ex)
@@ -595,123 +684,19 @@
             }
         }
 
-        /// <summary>
-        /// Handle dynamic admin API paths with parameters.
-        /// </summary>
-        /// <param name="ctx">HTTP context.</param>
-        /// <param name="path">Request path.</param>
-        /// <param name="method">HTTP method.</param>
-        /// <returns>Task.</returns>
-        private async Task HandleDynamicAdminPath(HttpContextBase ctx, string path, string method)
-        {
-            if (path.StartsWith("/v1.0/frontends/"))
-            {
-                string identifier = ExtractIdentifierFromPath(path, "/v1.0/frontends/");
-                if (string.IsNullOrEmpty(identifier))
-                {
-                    await SendNotFound(ctx);
-                    return;
-                }
-
-                SetUrlParameter(ctx, "identifier", identifier);
-
-                if (method == "GET") await GetFrontendRoute(ctx);
-                else if (method == "PUT") await UpdateFrontendRoute(ctx);
-                else if (method == "DELETE") await DeleteFrontendRoute(ctx);
-                else await SendMethodNotAllowed(ctx);
-            }
-            else if (path.StartsWith("/v1.0/backends/"))
-            {
-                if (path.EndsWith("/health"))
-                {
-                    string identifier = ExtractIdentifierFromPath(path, "/v1.0/backends/", "/health");
-                    if (string.IsNullOrEmpty(identifier))
-                    {
-                        await SendNotFound(ctx);
-                        return;
-                    }
-
-                    SetUrlParameter(ctx, "identifier", identifier);
-
-                    if (method == "GET") await GetBackendHealthRoute(ctx);
-                    else await SendMethodNotAllowed(ctx);
-                }
-                else
-                {
-                    string identifier = ExtractIdentifierFromPath(path, "/v1.0/backends/");
-                    if (string.IsNullOrEmpty(identifier))
-                    {
-                        await SendNotFound(ctx);
-                        return;
-                    }
-
-                    SetUrlParameter(ctx, "identifier", identifier);
-
-                    if (method == "GET") await GetBackendRoute(ctx);
-                    else if (method == "PUT") await UpdateBackendRoute(ctx);
-                    else if (method == "DELETE") await DeleteBackendRoute(ctx);
-                    else await SendMethodNotAllowed(ctx);
-                }
-            }
-            else if (path.StartsWith("/v1.0/sessions/"))
-            {
-                string identifier = ExtractIdentifierFromPath(path, "/v1.0/sessions/");
-                if (string.IsNullOrEmpty(identifier))
-                {
-                    await SendNotFound(ctx);
-                    return;
-                }
-
-                SetUrlParameter(ctx, "identifier", identifier);
-
-                if (method == "GET") await GetClientSessionsRoute(ctx);
-                else if (method == "DELETE") await DeleteClientSessionsRoute(ctx);
-                else await SendMethodNotAllowed(ctx);
-            }
-            else
-            {
-                await SendNotFound(ctx);
-            }
-        }
-
-        /// <summary>
-        /// Extract identifier from URL path.
-        /// </summary>
-        /// <param name="path">The full URL path.</param>
-        /// <param name="prefix">The prefix to remove.</param>
-        /// <param name="suffix">Optional suffix to remove.</param>
-        /// <returns>The extracted identifier.</returns>
-        private string ExtractIdentifierFromPath(string path, string prefix, string suffix = null)
-        {
-            if (!path.StartsWith(prefix)) return null;
-
-            string identifier = path.Substring(prefix.Length);
-
-            if (!string.IsNullOrEmpty(suffix) && identifier.EndsWith(suffix))
-            {
-                identifier = identifier.Substring(0, identifier.Length - suffix.Length);
-            }
-
-            return identifier;
-        }
-
-        /// <summary>
-        /// Set a URL parameter on the HTTP context for the admin API handlers.
-        /// </summary>
-        /// <param name="ctx">HTTP context.</param>
-        /// <param name="key">Parameter key.</param>
-        /// <param name="value">Parameter value.</param>
         private void SetUrlParameter(HttpContextBase ctx, string key, string value)
         {
             if (ctx.Request.Url.Parameters == null) ctx.Request.Url.Parameters = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
             ctx.Request.Url.Parameters[key] = value;
         }
 
-        /// <summary>
-        /// Send a 405 Method Not Allowed response.
-        /// </summary>
-        /// <param name="ctx">HTTP context.</param>
-        /// <returns>Task.</returns>
+        private async Task SendNotAuthorized(HttpContextBase ctx, string msg)
+        {
+            ctx.Response.StatusCode = 401;
+            ctx.Response.ContentType = Constants.JsonContentType;
+            await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.AuthorizationFailed, null, msg), true));
+        }
+
         private async Task SendMethodNotAllowed(HttpContextBase ctx)
         {
             ctx.Response.StatusCode = 405;
@@ -719,11 +704,6 @@
             await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadRequest, null, "Method not allowed"), true));
         }
 
-        /// <summary>
-        /// Send a 404 Not Found response.
-        /// </summary>
-        /// <param name="ctx">HTTP context.</param>
-        /// <returns>Task.</returns>
         private async Task SendNotFound(HttpContextBase ctx)
         {
             ctx.Response.StatusCode = 404;
@@ -731,13 +711,7 @@
             await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.NotFound, null, "Endpoint not found"), true));
         }
 
-        /// <summary>
-        /// Get the frontend configuration based on the request context.
-        /// Matches frontends by hostname, with "*" serving as a catch-all.
-        /// </summary>
-        /// <param name="ctx">HTTP context.</param>
-        /// <returns>Frontend configuration or null if not found.</returns>
-        private async Task<Frontend> GetFrontend(HttpContextBase ctx)
+        private async Task<Frontend> GetMatchingFrontend(HttpContextBase ctx)
         {
             await Task.CompletedTask;
 
@@ -789,11 +763,6 @@
             return null;
         }
 
-        /// <summary>
-        /// Get client identifier from the request context.
-        /// </summary>
-        /// <param name="ctx">HTTP context.</param>
-        /// <returns>Client identifier.</returns>
         private string GetClientIdentifier(HttpContextBase ctx)
         {
             string ret = ctx.Request.Source.IpAddress;

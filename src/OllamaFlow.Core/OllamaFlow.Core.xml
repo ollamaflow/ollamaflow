@@ -2971,68 +2971,6 @@
             <param name="ctx">HTTP context.</param>
             <returns>Task.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.HandleAdminApiRequest(WatsonWebserver.Core.HttpContextBase)">
-            <summary>
-            Handle admin API requests by routing to appropriate handlers.
-            </summary>
-            <param name="ctx">HTTP context.</param>
-            <returns>Task.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.HandleDynamicAdminPath(WatsonWebserver.Core.HttpContextBase,System.String,System.String)">
-            <summary>
-            Handle dynamic admin API paths with parameters.
-            </summary>
-            <param name="ctx">HTTP context.</param>
-            <param name="path">Request path.</param>
-            <param name="method">HTTP method.</param>
-            <returns>Task.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.ExtractIdentifierFromPath(System.String,System.String,System.String)">
-            <summary>
-            Extract identifier from URL path.
-            </summary>
-            <param name="path">The full URL path.</param>
-            <param name="prefix">The prefix to remove.</param>
-            <param name="suffix">Optional suffix to remove.</param>
-            <returns>The extracted identifier.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.SetUrlParameter(WatsonWebserver.Core.HttpContextBase,System.String,System.String)">
-            <summary>
-            Set a URL parameter on the HTTP context for the admin API handlers.
-            </summary>
-            <param name="ctx">HTTP context.</param>
-            <param name="key">Parameter key.</param>
-            <param name="value">Parameter value.</param>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.SendMethodNotAllowed(WatsonWebserver.Core.HttpContextBase)">
-            <summary>
-            Send a 405 Method Not Allowed response.
-            </summary>
-            <param name="ctx">HTTP context.</param>
-            <returns>Task.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.SendNotFound(WatsonWebserver.Core.HttpContextBase)">
-            <summary>
-            Send a 404 Not Found response.
-            </summary>
-            <param name="ctx">HTTP context.</param>
-            <returns>Task.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.GetFrontend(WatsonWebserver.Core.HttpContextBase)">
-            <summary>
-            Get the frontend configuration based on the request context.
-            Matches frontends by hostname, with "*" serving as a catch-all.
-            </summary>
-            <param name="ctx">HTTP context.</param>
-            <returns>Frontend configuration or null if not found.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Services.GatewayService.GetClientIdentifier(WatsonWebserver.Core.HttpContextBase)">
-            <summary>
-            Get client identifier from the request context.
-            </summary>
-            <param name="ctx">HTTP context.</param>
-            <returns>Client identifier.</returns>
-        </member>
         <member name="T:OllamaFlow.Core.Services.HealthCheckService">
             <summary>
             Health check service.

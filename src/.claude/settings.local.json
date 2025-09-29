@@ -14,7 +14,8 @@
       "Bash(dir:*)",
       "Read(//c/Code/OllamaFlow/**)",
       "Bash(dotnet run:*)",
-      "Bash(dotnet clean:*)"
+      "Bash(dotnet clean:*)",
+      "WebFetch(domain:www.nuget.org)"
     ],
     "deny": [],
     "ask": []
