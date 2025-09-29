@@ -291,6 +291,8 @@ curl -X PUT \
 
 A complete **Postman collection** (`OllamaFlow.postman_collection.json`) is included in the repository root with examples for all API endpoints, including Ollama API, OpenAI API, and administrative APIs with native transformation examples.
 
+For interactive API testing and experimentation, the **[OllamaFlow API Explorer](https://github.com/ollamaflow/apiexplorer)** provides a web-based dashboard for exploring and testing all OllamaFlow endpoints.
+
 For a visual interface, check out the **[OllamaFlow Web UI](https://github.com/ollamaflow/ui)** which provides a dashboard for cluster management and monitoring.
 
 ## 🤝 Contributing
@@ -314,6 +316,7 @@ Please check out our [Contributing Guidelines](CONTRIBUTING.md) and feel free to
 
 - **[Complete Documentation](https://ollamaflow.readme.io/)** - Comprehensive guides, API reference, and tutorials
 - **[Web UI Dashboard](https://github.com/ollamaflow/ui)** - Visual cluster management interface
+- **[API Explorer](https://github.com/ollamaflow/apiexplorer)** - Interactive web-based API testing and experimentation
 - **[Postman Collection](OllamaFlow.postman_collection.json)** - API testing and examples
 
 ## 📜 License
@@ -331,5 +334,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   <b>Ready to scale your AI infrastructure?</b><br>
   Get started with OllamaFlow today!<br><br>
   📖 <a href="https://ollamaflow.readme.io/"><b>Documentation</b></a> |
-  🎨 <a href="https://github.com/ollamaflow/ui"><b>Web Dashboard</b></a>
+  🎨 <a href="https://github.com/ollamaflow/ui"><b>Web Dashboard</b></a> |
+  🔬 <a href="https://github.com/ollamaflow/apiexplorer"><b>API Explorer</b></a>
 </div>
