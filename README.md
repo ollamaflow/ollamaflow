@@ -12,17 +12,19 @@
   [![Web UI](https://img.shields.io/badge/Web%20UI-Dashboard-orange.svg)](https://github.com/ollamaflow/ui)
 </div>
 
-## 🚀 Scale Your Ollama Infrastructure
+## 🚀 Scale Your AI Infrastructure
 
-OllamaFlow is a lightweight, intelligent orchestration layer that transforms multiple Ollama instances into a unified, high-availability AI inference cluster. Whether you're scaling AI workloads across multiple GPUs or ensuring zero-downtime model serving, OllamaFlow has you covered.
+OllamaFlow is a lightweight, intelligent orchestration layer that unifies multiple AI backend instances into a high-availability inference cluster. Supporting both Ollama and OpenAI API formats on the frontend with native transformation capabilities, OllamaFlow scales AI workloads across multiple backends while ensuring zero-downtime model serving.
 
 > 📖 **[Complete Documentation](https://ollamaflow.readme.io/)** | 🎨 **[Web UI Dashboard](https://github.com/ollamaflow/ui)**
 
 ### Why OllamaFlow?
 
-- **🎯 Multiple Virtual Endpoints**: Create multiple frontend endpoints, each mapping to their own set of Ollama backends
+- **🎯 Multiple Virtual Endpoints**: Create multiple frontend endpoints, each mapping to their own set of AI backends
+- **🔄 Universal API Support**: Frontend supports both Ollama and OpenAI API formats with native transformation
+- **🌐 Multi-Backend Support**: Connect to Ollama, OpenAI, [vLLM](https://vllm.ai), [SharpAI](https://github.com/jchristn/sharpai), and other OpenAI-compatible backends
 - **⚖️ Smart Load Balancing**: Distribute requests intelligently across healthy backends
-- **🔄 Automatic Model Sync**: Ensure all backends have the required models - automatically
+- **🔧 Automatic Model Sync**: Ensure all backends have the required models - automatically
 - **❤️ Health Monitoring**: Real-time health checks with configurable thresholds
 - **📊 Zero Downtime**: Seamlessly handle backend failures without dropping requests
 - **🛠️ RESTful Admin API**: Full control through a comprehensive management API
@@ -116,7 +118,7 @@ Frontends define your virtual Ollama endpoints:
 
 ### Backend Configuration
 
-Backends represent your actual Ollama instances:
+Backends represent your actual AI inference instances (Ollama, OpenAI, vLLM, SharpAI, etc.):
 
 ```json
 {
@@ -126,14 +128,23 @@ Backends represent your actual Ollama instances:
   "Port": 11434,
   "MaxParallelRequests": 4,
   "HealthCheckUrl": "/",
-  "UnhealthyThreshold": 2
+  "UnhealthyThreshold": 2,
+  "BackendType": "Ollama"
 }
 ```
 
 ## 📡 API Compatibility
 
-OllamaFlow is fully compatible with the Ollama API, supporting:
+OllamaFlow provides universal API compatibility with native transformation between formats:
 
+### Frontend API Support
+- ✅ **Ollama API** - Complete compatibility with all Ollama endpoints
+- ✅ **OpenAI API** - Chat completions, embeddings, and model management
+- ✅ **Native Transformation** - Automatic request/response format conversion
+
+### Supported Endpoints
+
+**Ollama Format:**
 - ✅ `/api/generate` - Text generation
 - ✅ `/api/chat` - Chat completions
 - ✅ `/api/pull` - Model pulling
@@ -144,18 +155,31 @@ OllamaFlow is fully compatible with the Ollama API, supporting:
 - ✅ `/api/embed` - Embeddings
 - ✅ `/api/delete` - Model deletion
 
+**OpenAI Format:**
+- ✅ `/v1/chat/completions` - Chat completions
+- ✅ `/v1/completions` - Text completions
+- ✅ `/v1/embeddings` - Text embeddings
+- ✅ `/v1/models` - List available models
+
+### Supported Backends
+- **[Ollama](https://ollama.ai)** - Local AI runtime
+- **[OpenAI](https://openai.com)** - OpenAI API services
+- **[vLLM](https://vllm.ai)** - High-performance LLM inference
+- **[SharpAI](https://github.com/jchristn/sharpai)** - .NET-based AI inference server
+- **Any OpenAI-compatible API** - Universal backend support
+
 ## 🔧 Advanced Features
 
-### Multi-Node Testing
+### Multi-Backend Testing
 
-Test with multiple Ollama instances using Docker Compose:
+Test with multiple AI backend instances using Docker Compose:
 
 ```bash
 cd Docker
 docker compose -f compose-ollama.yaml up -d
 ```
 
-This spins up 4 Ollama instances on ports 11435-11438 for testing.
+This spins up 4 Ollama instances on ports 11435-11438 for testing load balancing and transformation capabilities.
 
 ### Admin API
 
@@ -174,7 +198,7 @@ curl -X PUT \
   http://localhost:43411/v1.0/backends
 ```
 
-A complete **Postman collection** (`OllamaFlow.postman_collection.json`) is included in the repository root with examples for all API endpoints, both Ollama-compatible and administrative APIs.
+A complete **Postman collection** (`OllamaFlow.postman_collection.json`) is included in the repository root with examples for all API endpoints, including Ollama API, OpenAI API, and administrative APIs with native transformation examples.
 
 For a visual interface, check out the **[OllamaFlow Web UI](https://github.com/ollamaflow/ui)** which provides a dashboard for cluster management and monitoring.
 
@@ -214,11 +238,13 @@ OllamaFlow adds minimal overhead to your Ollama requests:
 ## 🌟 Use Cases
 
 - **GPU Cluster Management**: Distribute AI workloads across multiple GPU servers
-- **CPU Infrastructure**: Perfect for dense CPU systems like Ampere processors
-- **High Availability**: Ensure your AI services stay online 24/7
-- **Development & Testing**: Easily switch between different model configurations
-- **Cost Optimization**: Maximize hardware utilization across your infrastructure
+- **Multi-Provider Orchestration**: Combine local Ollama instances with cloud OpenAI services
+- **API Format Unification**: Present a consistent interface regardless of backend type
+- **High Availability**: Ensure your AI services stay online 24/7 with automatic failover
+- **Development & Testing**: Easily switch between different model configurations and providers
+- **Cost Optimization**: Route requests to the most cost-effective backend automatically
 - **Multi-Tenant Scenarios**: Isolate workloads while sharing infrastructure
+- **Migration Support**: Seamlessly migrate between different AI service providers
 
 ## 📚 Documentation & Resources
 

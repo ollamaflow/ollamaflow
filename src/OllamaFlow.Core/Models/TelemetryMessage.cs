@@ -1,5 +1,6 @@
 ﻿namespace OllamaFlow.Core.Models
 {
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Helpers;
     using System;
     using System.Collections.Generic;
@@ -23,6 +24,11 @@
         public RequestTypeEnum RequestType { get; set; } = RequestTypeEnum.Unknown;
 
         /// <summary>
+        /// API format of the incoming request.
+        /// </summary>
+        public ApiFormatEnum ApiFormat { get; set; } = ApiFormatEnum.Ollama;
+
+        /// <summary>
         /// Gets or sets the conversation/session identifier this request belongs to.
         /// </summary>
         public string ConversationId { get; set; }
@@ -36,6 +42,11 @@
         /// Gets or sets the identifier of the client that initiated this request.
         /// </summary>
         public string ClientId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the transformation identifier if request/response transformation was performed.
+        /// </summary>
+        public string TransformationId { get; set; }
 
         // Public Properties - Request Configuration
 

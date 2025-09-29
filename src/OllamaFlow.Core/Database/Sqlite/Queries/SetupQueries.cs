@@ -1,10 +1,6 @@
 ﻿namespace OllamaFlow.Core.Database.Sqlite.Queries
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
-    using System.Threading.Tasks;
 
     internal static class SetupQueries
     {
@@ -62,6 +58,7 @@
                 + "logrequestfull INT NOT NULL, "
                 + "logrequestbody INT NOT NULL, "
                 + "logresponsebody INT NOT NULL, "
+                + "apiformat VARCHAR(32) DEFAULT 'Ollama', "
                 + "active INT NOT NULL, "
                 + "createdutc VARCHAR(64), "
                 + "lastupdateutc VARCHAR(64) "

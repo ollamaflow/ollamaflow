@@ -15,7 +15,7 @@
 
         internal static Serializer Serializer = new Serializer();
 
-        internal static string Insert(OllamaFrontend obj)
+        internal static string Insert(Frontend obj)
         {
             string ret =
                 "INSERT INTO 'frontends' "
@@ -89,7 +89,7 @@
             int batchSize = 100,
             int skip = 0,
             EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending,
-            OllamaFrontend marker = null)
+            Frontend marker = null)
         {
             string ret = "SELECT * FROM 'frontends' WHERE identifier IS NOT NULL ";
 
@@ -105,7 +105,7 @@
 
         internal static string GetRecordCount(
             EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending,
-            OllamaFrontend marker = null)
+            Frontend marker = null)
         {
             string ret = "SELECT COUNT(*) AS record_count FROM 'frontends' WHERE identifier IS NOT NULL ";
 
@@ -117,7 +117,7 @@
             return ret;
         }
 
-        internal static string Update(OllamaFrontend obj)
+        internal static string Update(Frontend obj)
         {
             string query =
                 "UPDATE 'frontends' SET "
@@ -164,7 +164,7 @@
             }
         }
 
-        private static string ContinuationTokenWhereClause(EnumerationOrderEnum order, OllamaFrontend obj)
+        private static string ContinuationTokenWhereClause(EnumerationOrderEnum order, Frontend obj)
         {
             switch (order)
             {

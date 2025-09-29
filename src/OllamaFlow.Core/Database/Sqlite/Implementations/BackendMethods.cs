@@ -50,7 +50,7 @@
         #region Public-Methods
 
         /// <inheritdoc />
-        public OllamaBackend Create(OllamaBackend obj)
+        public Backend Create(Backend obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
             string query = BackendQueries.Insert(obj);
@@ -59,12 +59,12 @@
         }
 
         /// <inheritdoc />
-        public List<OllamaBackend> CreateMany(List<OllamaBackend> objs)
+        public List<Backend> CreateMany(List<Backend> objs)
         {
             if (objs == null || objs.Count == 0) throw new ArgumentNullException(nameof(objs));
 
             List<string> queries = new List<string>();
-            foreach (var obj in objs)
+            foreach (Backend obj in objs)
             {
                 queries.Add(BackendQueries.Insert(obj));
             }
@@ -74,8 +74,8 @@
 
             // Since we're using RETURNING *, we need to get all created objects
             // We'll need to retrieve them individually
-            List<OllamaBackend> created = new List<OllamaBackend>();
-            foreach (var obj in objs)
+            List<Backend> created = new List<Backend>();
+            foreach (Backend obj in objs)
             {
                 string selectQuery = BackendQueries.SelectByIdentifier(obj.Identifier);
                 DataTable selectResult = _Repo.ExecuteQuery(selectQuery);
@@ -89,7 +89,7 @@
         }
 
         /// <inheritdoc />
-        public IEnumerable<OllamaBackend> ReadAll(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending)
+        public IEnumerable<Backend> ReadAll(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending)
         {
             int skip = 0;
             bool moreData = true;
@@ -105,10 +105,10 @@
                     yield break;
                 }
 
-                List<OllamaBackend> backends = Converters.BackendsFromDataTable(result);
+                List<Backend> backends = Converters.BackendsFromDataTable(result);
                 if (backends != null)
                 {
-                    foreach (var backend in backends)
+                    foreach (Backend backend in backends)
                     {
                         yield return backend;
                     }
@@ -126,7 +126,7 @@
         }
 
         /// <inheritdoc />
-        public IEnumerable<OllamaBackend> ReadByIdentifiers(List<string> ids)
+        public IEnumerable<Backend> ReadByIdentifiers(List<string> ids)
         {
             if (ids == null || ids.Count == 0) yield break;
 
@@ -140,10 +140,10 @@
 
                 if (result != null && result.Rows.Count > 0)
                 {
-                    List<OllamaBackend> backends = Converters.BackendsFromDataTable(result);
+                    List<Backend> backends = Converters.BackendsFromDataTable(result);
                     if (backends != null)
                     {
-                        foreach (var backend in backends)
+                        foreach (Backend backend in backends)
                         {
                             yield return backend;
                         }
@@ -153,16 +153,16 @@
         }
 
         /// <inheritdoc />
-        public EnumerationResult<OllamaBackend> Enumerate(EnumerationRequest query)
+        public EnumerationResult<Backend> Enumerate(EnumerationRequest query)
         {
             if (query == null) throw new ArgumentNullException(nameof(query));
 
-            EnumerationResult<OllamaBackend> result = new EnumerationResult<OllamaBackend>();
-            result.Objects = new List<OllamaBackend>();
+            EnumerationResult<Backend> result = new EnumerationResult<Backend>();
+            result.Objects = new List<Backend>();
             result.MaxResults = query.MaxResults;
 
             // Parse continuation token to get the marker
-            OllamaBackend marker = null;
+            Backend marker = null;
             if (!string.IsNullOrEmpty(query.ContinuationToken))
             {
                 string markerQuery = BackendQueries.SelectByIdentifier(query.ContinuationToken);
@@ -189,7 +189,7 @@
                 // Set continuation token if there might be more records
                 if (result.Objects.Count == query.MaxResults)
                 {
-                    var lastRecord = result.Objects.Last();
+                    Backend lastRecord = result.Objects.Last();
                     result.ContinuationToken = lastRecord.Identifier;
                     result.EndOfResults = false;
                 }
@@ -228,7 +228,7 @@
         /// <inheritdoc />
         public int GetRecordCount(EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending, string continuationToken = null)
         {
-            OllamaBackend marker = null;
+            Backend marker = null;
             if (!string.IsNullOrEmpty(continuationToken))
             {
                 string markerQuery = BackendQueries.SelectByIdentifier(continuationToken);
@@ -251,7 +251,7 @@
         }
 
         /// <inheritdoc />
-        public OllamaBackend Update(OllamaBackend obj)
+        public Backend Update(Backend obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
             string query = BackendQueries.Update(obj);
@@ -272,7 +272,7 @@
             if (ids == null || ids.Count == 0) return;
 
             List<string> queries = new List<string>();
-            foreach (var id in ids)
+            foreach (string id in ids)
             {
                 queries.Add(BackendQueries.Delete(id));
             }

@@ -203,7 +203,7 @@
 
         private void ApplyPerformanceSettings(SqliteConnection conn)
         {
-            using (var cmd = conn.CreateCommand())
+            using (SqliteCommand cmd = conn.CreateCommand())
             {
                 cmd.CommandText =
                     // "PRAGMA journal_mode = WAL; " +

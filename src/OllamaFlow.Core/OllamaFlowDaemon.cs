@@ -8,6 +8,8 @@
     using OllamaFlow.Core.Database.Sqlite;
     using OllamaFlow.Core.Serialization;
     using OllamaFlow.Core.Services;
+    using OllamaFlow.Core.Services.Transformation;
+    using OllamaFlow.Core.Services.Transformation.Interfaces;
     using SyslogLogging;
     using WatsonWebserver;
 
@@ -51,6 +53,7 @@
         private SessionStickinessService _SessionStickinessService = null;
         private HealthCheckService _HealthCheckService = null;
         private ModelSynchronizationService _ModelSynchronizationService = null;
+        private ITransformationPipeline _TransformationPipeline = null;
         private GatewayService _GatewayService = null;
         private Webserver _Webserver = null;
 
@@ -296,6 +299,31 @@
                 _HealthCheckService,
                 _TokenSource);
 
+            _TransformationPipeline = new TransformationPipeline(_Serializer);
+
+            // Create the extracted services
+            AdminApiService adminApiService = new AdminApiService(
+                _Settings,
+                _Logging,
+                _Serializer,
+                _FrontendService,
+                _BackendService,
+                _HealthCheckService,
+                _ModelSynchronizationService,
+                _SessionStickinessService);
+
+            StaticRouteHandler staticRouteHandler = new StaticRouteHandler();
+
+            ProxyService proxyService = new ProxyService(_Logging);
+
+            RequestProcessorService requestProcessorService = new RequestProcessorService(
+                _Logging,
+                _Serializer,
+                _HealthCheckService,
+                _SessionStickinessService,
+                _TransformationPipeline,
+                proxyService);
+
             _GatewayService = new GatewayService(
                 _Settings,
                 _Callbacks,
@@ -306,6 +334,10 @@
                 _HealthCheckService,
                 _ModelSynchronizationService,
                 _SessionStickinessService,
+                adminApiService,
+                staticRouteHandler,
+                proxyService,
+                requestProcessorService,
                 _TokenSource);
 
             #endregion
@@ -319,7 +351,7 @@
             _Webserver.Routes.PreRouting = _GatewayService.PreRoutingHandler;
             _Webserver.Routes.PostRouting = _GatewayService.PostRoutingHandler;
 
-            _GatewayService.InitializeRoutes(_Webserver);
+            _Logging.Debug(_Header + "webserver routes configured successfully");
 
             _Webserver.Start();
 

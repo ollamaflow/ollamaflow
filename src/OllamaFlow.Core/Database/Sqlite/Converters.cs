@@ -5,7 +5,9 @@
     using System.Collections.Generic;
     using System.Data;
     using ExpressionTree;
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Serialization;
+    using OllamaFlow.Core.Models;
 
     internal static class Converters
     {
@@ -80,7 +82,7 @@
         {
             if (obj == null) return null;
             List<object> ret = new List<object>();
-            var enumerator = ((IEnumerable)obj).GetEnumerator();
+            IEnumerator enumerator = ((IEnumerable)obj).GetEnumerator();
             while (enumerator.MoveNext())
             {
                 ret.Add(enumerator.Current);
@@ -578,11 +580,11 @@
             return clause;
         }
 
-        internal static OllamaFrontend FrontendFromDataRow(DataRow row)
+        internal static Frontend FrontendFromDataRow(DataRow row)
         {
             if (row == null) return null;
 
-            return new OllamaFrontend
+            return new Frontend
             {
                 Identifier = GetDataRowStringValue(row, "identifier"),
                 Name = GetDataRowStringValue(row, "name"),
@@ -605,11 +607,11 @@
             };
         }
 
-        internal static List<OllamaFrontend> FrontendsFromDataTable(DataTable table)
+        internal static List<Frontend> FrontendsFromDataTable(DataTable table)
         {
             if (table == null || table.Rows == null || table.Rows.Count < 1) return null;
 
-            List<OllamaFrontend> ret = new List<OllamaFrontend>();
+            List<Frontend> ret = new List<Frontend>();
 
             foreach (DataRow row in table.Rows)
                 ret.Add(FrontendFromDataRow(row));
@@ -617,11 +619,11 @@
             return ret;
         }
 
-        internal static OllamaBackend BackendFromDataRow(DataRow row)
+        internal static Backend BackendFromDataRow(DataRow row)
         {
             if (row == null) return null;
 
-            return new OllamaBackend
+            return new Backend
             {
                 Identifier = GetDataRowStringValue(row, "identifier"),
                 Name = GetDataRowStringValue(row, "name"),
@@ -637,16 +639,18 @@
                 LogRequestFull = GetDataRowIntValue(row, "logrequestfull") == 1,
                 LogRequestBody = GetDataRowIntValue(row, "logrequestbody") == 1,
                 LogResponseBody = GetDataRowIntValue(row, "logresponsebody") == 1,
+                ApiFormat = Enum.TryParse<ApiFormatEnum>(GetDataRowStringValue(row, "apiformat"), out ApiFormatEnum apiFormat) ? apiFormat : ApiFormatEnum.Ollama,
+                Active = GetDataRowIntValue(row, "active") == 1,
                 CreatedUtc = DateTime.Parse(row["createdutc"].ToString()),
                 LastUpdateUtc = DateTime.Parse(row["lastupdateutc"].ToString())
             };
         }
 
-        internal static List<OllamaBackend> BackendsFromDataTable(DataTable table)
+        internal static List<Backend> BackendsFromDataTable(DataTable table)
         {
             if (table == null || table.Rows == null || table.Rows.Count < 1) return null;
 
-            List<OllamaBackend> ret = new List<OllamaBackend>();
+            List<Backend> ret = new List<Backend>();
 
             foreach (DataRow row in table.Rows)
                 ret.Add(BackendFromDataRow(row));

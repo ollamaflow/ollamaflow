@@ -10,11 +10,14 @@ namespace OllamaFlow.Core.Services
     using System.Threading;
     using System.Threading.Tasks;
     using OllamaFlow.Core;
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Serialization;
     using SyslogLogging;
+    using OllamaFlow.Core.Models;
 
     /// <summary>
     /// Model synchronization service.
+    /// Only operates on Ollama backends since OpenAI/vLLM backends don't support runtime model pulling.
     /// </summary>
     public class ModelSynchronizationService : IDisposable
     {
@@ -124,7 +127,7 @@ namespace OllamaFlow.Core.Services
             // Initialize existing backends from database
             InitializeExistingBackends();
 
-            _Logging.Debug(_Header + "initialized");
+            _Logging.Debug(_Header + "initialization complete");
         }
 
         #endregion
@@ -181,12 +184,22 @@ namespace OllamaFlow.Core.Services
 
         /// <summary>
         /// Add a backend and start model synchronization for it.
+        /// Only operates on Ollama backends since OpenAI/vLLM don't support runtime model pulling.
         /// </summary>
         /// <param name="backend">Backend that was added.</param>
         /// <exception cref="ArgumentNullException">Thrown when backend is null.</exception>
-        public void AddBackend(OllamaBackend backend)
+        public void AddBackend(Backend backend)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
+
+            // Only start synchronization for Ollama backends
+            if (backend.ApiFormat != ApiFormatEnum.Ollama)
+            {
+                _Logging.Debug(_Header + $"skipping model synchronization for non-Ollama backend {backend.Identifier} (format: {backend.ApiFormat})");
+                return;
+            }
+
+            _Logging.Debug(_Header + $"adding Ollama backend {backend.Identifier} for model synchronization");
 
             // Create semaphore for new backend to limit concurrent downloads
             SemaphoreSlim semaphore = new SemaphoreSlim(_MaxConcurrentDownloadsPerBackend, _MaxConcurrentDownloadsPerBackend);
@@ -210,7 +223,7 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="backend">Backend that was updated.</param>
         /// <exception cref="ArgumentNullException">Thrown when backend is null.</exception>
-        public void UpdateBackend(OllamaBackend backend)
+        public void UpdateBackend(Backend backend)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
             _Logging.Debug(_Header + "notified of updated backend " + backend.Identifier);
@@ -236,7 +249,7 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="frontend">Frontend that was added.</param>
         /// <exception cref="ArgumentNullException">Thrown when frontend is null.</exception>
-        public void AddFrontend(OllamaFrontend frontend)
+        public void AddFrontend(Frontend frontend)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
             _Logging.Debug(_Header + "notified of new frontend " + frontend.Identifier + " - will sync required models");
@@ -247,7 +260,7 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="frontend">Frontend that was updated.</param>
         /// <exception cref="ArgumentNullException">Thrown when frontend is null.</exception>
-        public void UpdateFrontend(OllamaFrontend frontend)
+        public void UpdateFrontend(Frontend frontend)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
 
@@ -306,8 +319,13 @@ namespace OllamaFlow.Core.Services
             try
             {
                 // Load existing backends and start synchronization tasks
-                List<OllamaBackend> backends = _BackendService.GetAll()?.ToList() ?? new List<OllamaBackend>();
-                foreach (OllamaBackend backend in backends)
+                // Only synchronize models for Ollama backends since OpenAI/vLLM don't support runtime model pulling
+                List<Backend> allBackends = _BackendService.GetAll()?.ToList() ?? new List<Backend>();
+                List<Backend> backends = allBackends.Where(b => b.ApiFormat == ApiFormatEnum.Ollama).ToList();
+
+                _Logging.Debug(_Header + $"found {allBackends.Count} total backends, {backends.Count} Ollama backends for model synchronization");
+
+                foreach (Backend backend in backends)
                 {
                     // Create semaphore for this backend
                     SemaphoreSlim semaphore = new SemaphoreSlim(_MaxConcurrentDownloadsPerBackend, _MaxConcurrentDownloadsPerBackend);
@@ -325,7 +343,7 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        private void StartBackendSynchronizationTask(OllamaBackend backend)
+        private void StartBackendSynchronizationTask(Backend backend)
         {
             if (backend == null || String.IsNullOrEmpty(backend.Identifier)) return;
 
@@ -406,7 +424,7 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"stopped and cleaned up synchronization task for backend {identifier}");
         }
 
-        private async Task BackendSynchronizationLoop(OllamaBackend backend, CancellationToken token)
+        private async Task BackendSynchronizationLoop(Backend backend, CancellationToken token)
         {
             _Logging.Debug(_Header + $"starting model discovery and synchronization for backend {backend.Identifier}");
 
@@ -435,7 +453,7 @@ namespace OllamaFlow.Core.Services
                     }
 
                     // Check if backend is healthy
-                    List<OllamaBackend> healthyBackends = _HealthCheckService.Backends.Where(b => b.Identifier == backend.Identifier && b.Healthy && b.Active).ToList();
+                    List<Backend> healthyBackends = _HealthCheckService.Backends.Where(b => b.Identifier == backend.Identifier && b.Healthy && b.Active).ToList();
                     if (healthyBackends.Count == 0)
                     {
                         await Task.Delay(5000, token).ConfigureAwait(false); // Wait longer if unhealthy
@@ -474,15 +492,15 @@ namespace OllamaFlow.Core.Services
             _Logging.Debug(_Header + $"model discovery and synchronization terminated for backend {backend.Identifier}");
         }
 
-        private async Task SynchronizeModelsForBackend(OllamaBackend backend, CancellationToken token)
+        private async Task SynchronizeModelsForBackend(Backend backend, CancellationToken token)
         {
             try
             {
                 // Get all frontends that use this backend
-                List<OllamaFrontend> frontends = _FrontendService.GetAll()?.ToList() ?? new List<OllamaFrontend>();
+                List<Frontend> frontends = _FrontendService.GetAll()?.ToList() ?? new List<Frontend>();
                 List<string> requiredModels = new List<string>();
 
-                foreach (OllamaFrontend frontend in frontends)
+                foreach (Frontend frontend in frontends)
                 {
                     if (frontend.Backends != null && frontend.Backends.Contains(backend.Identifier))
                     {
@@ -572,7 +590,7 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        private async Task PullModelToBackendInternal(OllamaBackend backend, string modelName, CancellationToken token)
+        private async Task PullModelToBackendInternal(Backend backend, string modelName, CancellationToken token)
         {
             if (!_BackendSemaphores.TryGetValue(backend.Identifier, out SemaphoreSlim semaphore))
             {
@@ -618,7 +636,7 @@ namespace OllamaFlow.Core.Services
             }
         }
 
-        private async Task<List<string>> DiscoverModelsForBackend(OllamaBackend backend, CancellationToken token)
+        private async Task<List<string>> DiscoverModelsForBackend(Backend backend, CancellationToken token)
         {
             try
             {
@@ -693,7 +711,7 @@ namespace OllamaFlow.Core.Services
             return models;
         }
 
-        private async Task PerformModelPull(OllamaBackend backend, string modelName, CancellationToken token)
+        private async Task PerformModelPull(Backend backend, string modelName, CancellationToken token)
         {
             try
             {

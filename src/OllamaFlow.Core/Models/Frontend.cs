@@ -12,7 +12,7 @@
     /// <summary>
     /// API endpoint.
     /// </summary>
-    public class OllamaFrontend
+    public class Frontend
     {
         #region Public-Members
 
@@ -258,7 +258,7 @@
         /// <summary>
         /// Instantiate.
         /// </summary>
-        public OllamaFrontend()
+        public Frontend()
         {
 
         }
