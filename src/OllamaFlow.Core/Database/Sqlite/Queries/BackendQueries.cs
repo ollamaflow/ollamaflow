@@ -147,9 +147,9 @@
                 + "logresponsebody = " + (obj.LogResponseBody ? "1" : "0") + ","
                 + "apiformat = '" + Sanitizer.Sanitize(obj.ApiFormat.ToString()) + "',"
                 + "pinnedembeddingsprops = '" + Sanitizer.Sanitize(obj.PinnedEmbeddingsPropertiesString) + "',"
-                + "pinnedcompletionsprops = '" + Sanitizer.Sanitize(obj.PinnedEmbeddingsPropertiesString) + "',"
-                + "allowembeddings = " + (obj.AllowEmbeddings ? "1" : "0") + " "
-                + "allowcompletions = " + (obj.AllowCompletions ? "1" : "0") + " "
+                + "pinnedcompletionsprops = '" + Sanitizer.Sanitize(obj.PinnedCompletionsPropertiesString) + "',"
+                + "allowembeddings = " + (obj.AllowEmbeddings ? "1" : "0") + ","
+                + "allowcompletions = " + (obj.AllowCompletions ? "1" : "0") + ","
                 + "active = " + (obj.Active ? "1" : "0") + " "
                 + "WHERE identifier = '" + Sanitizer.Sanitize(obj.Identifier) + "' "
                 + "RETURNING *;";

@@ -14,7 +14,7 @@
 
 ## 🚀 Scale Your AI Infrastructure
 
-OllamaFlow is a lightweight, intelligent orchestration layer that unifies multiple AI backend instances into a high-availability inference cluster. Supporting both Ollama and OpenAI API formats on the frontend with native transformation capabilities, OllamaFlow scales AI workloads across multiple backends while ensuring zero-downtime model serving.
+OllamaFlow is a lightweight, intelligent orchestration layer that unifies multiple AI backend instances into a high-availability inference cluster. Supporting both Ollama and OpenAI API formats on the frontend with native transformation capabilities, OllamaFlow delivers **scalability**, **high availability**, and **security control** - enabling you to scale AI workloads across multiple backends while ensuring zero-downtime model serving and fine-grained control over inference and embeddings deployments.
 
 > 📖 **[Complete Documentation](https://ollamaflow.readme.io/)** | 🎨 **[Web UI Dashboard](https://github.com/ollamaflow/ui)**
 
@@ -24,6 +24,7 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 - **🔄 Universal API Support**: Frontend supports both Ollama and OpenAI API formats with native transformation
 - **🌐 Multi-Backend Support**: Connect to Ollama, OpenAI, [vLLM](https://vllm.ai), [SharpAI](https://github.com/jchristn/sharpai), and other OpenAI-compatible backends
 - **⚖️ Smart Load Balancing**: Distribute requests intelligently across healthy backends
+- **🔒 Security & Control**: Fine-grained control over request types and parameter enforcement for secure inference and embeddings deployments
 - **🔧 Automatic Model Sync**: Ensure all backends have the required models (Ollama-compatible backends only)
 - **❤️ Health Monitoring**: Real-time health checks with configurable thresholds
 - **📊 Zero Downtime**: Provide high-availability to mitigate effects of backend failures
@@ -51,11 +52,17 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 - **Request queuing** during high load
 - **Connection pooling** for optimal performance
 
-### Enterprise Ready
+### Security & Control
+- **Request type restrictions** - Control embeddings and completions access at frontend and backend levels
+- **Pinned request properties** - Enforce or override parameters for compliance (models, context size, temperature, etc.)
 - **Bearer token authentication** for admin APIs
+- **Multi-tenant isolation** through separate virtual frontends
+
+### Enterprise Ready
 - **Comprehensive logging** with syslog support
 - **Docker and Docker Compose** ready
 - **SQLite database** for configuration persistence
+- **Production-tested** for scalability and high availability
 
 ## 🏃 Quick Start
 
@@ -115,7 +122,19 @@ Frontends define your virtual Ollama endpoints:
   "Hostname": "*",
   "LoadBalancing": "RoundRobin",
   "Backends": ["gpu-1", "gpu-2", "gpu-3"],
-  "RequiredModels": ["llama3", "mistral", "codellama"]
+  "RequiredModels": ["llama3", "mistral", "codellama"],
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "PinnedEmbeddingsProperties": {
+    "model": "nomic-embed-text"
+  },
+  "PinnedCompletionsProperties": {
+    "model": "llama3",
+    "options": {
+      "num_ctx": 4096,
+      "temperature": 0.7
+    }
+  }
 }
 ```
 
@@ -132,7 +151,19 @@ Backends represent your actual AI inference instances (Ollama, OpenAI, vLLM, Sha
   "MaxParallelRequests": 4,
   "HealthCheckUrl": "/",
   "UnhealthyThreshold": 2,
-  "ApiFormat": "Ollama"
+  "ApiFormat": "Ollama",
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "PinnedEmbeddingsProperties": {
+    "model": "nomic-embed-text"
+  },
+  "PinnedCompletionsProperties": {
+    "model": "llama3",
+    "options": {
+      "num_ctx": 8192,
+      "temperature": 0.8
+    }
+  }
 }
 ```
 
@@ -172,6 +203,63 @@ OllamaFlow provides universal API compatibility with native transformation betwe
 - **Any OpenAI-compatible API** - Universal backend support
 
 ## 🔧 Advanced Features
+
+### Request Control & Security
+
+OllamaFlow provides fine-grained control over request types and parameters at both the frontend and backend levels:
+
+#### Request Type Restrictions
+
+Control which types of requests are allowed using `AllowEmbeddings` and `AllowCompletions` boolean properties:
+
+- Set on **frontends** to control which request types clients can make to that endpoint
+- Set on **backends** to control which request types can be routed to that AI instance
+- Both must be `true` for a request to succeed - if either the frontend or backend disallows a request type, it will fail
+
+**Example use cases:**
+- Dedicate specific frontends for embeddings-only workloads
+- Reserve high-performance backends for completions only
+- Create security boundaries between different request types
+
+#### Pinned Request Properties
+
+Force specific properties into requests using `PinnedEmbeddingsProperties` and `PinnedCompletionsProperties` dictionaries:
+
+- Properties are **automatically appended** to requests that don't include them
+- Properties **overwrite existing values** in the request for compliance enforcement
+- Apply to both frontends and backends independently
+- Support any valid request property (model, options, temperature, context size, stop tokens, etc.)
+- **Structure must mirror the API request format** - for Ollama API, generation parameters go inside `options` object
+
+**Example use cases:**
+- **Model enforcement**: Ensure specific models are always used regardless of client request
+- **Resource control**: Lock context sizes to prevent memory exhaustion
+- **Quality assurance**: Standardize temperature and other generation parameters
+- **Security compliance**: Override user-specified parameters to meet organizational policies
+
+**Property precedence (highest to lowest):**
+1. Backend pinned properties
+2. Frontend pinned properties
+3. Original user request properties
+
+**Merge behavior:**
+- Uses recursive JSON merging via [JsonMerge](https://github.com/jchristn/jsonmerge)
+- Nested objects are merged intelligently (new properties added, existing properties overwritten)
+- Arrays are completely replaced, not merged
+
+```json
+{
+  "Identifier": "secured-frontend",
+  "PinnedCompletionsProperties": {
+    "model": "llama3",
+    "options": {
+      "temperature": 0.7,
+      "num_ctx": 4096,
+      "stop": ["[DONE]", "\n\n"]
+    }
+  }
+}
+```
 
 ### Multi-Backend Testing
 

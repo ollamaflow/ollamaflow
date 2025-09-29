@@ -215,11 +215,12 @@
         {
             get
             {
-                return Serializer.SerializeJson(_PinnedEmbeddingsProperties, false);
+                return _PinnedEmbeddingsPropertiesString;
             }
             set
             {
                 if (String.IsNullOrEmpty(value)) value = "{}";
+                _PinnedEmbeddingsPropertiesString = value;
                 _PinnedEmbeddingsProperties = Serializer.DeserializeJson<Dictionary<string, object>>(value);
             }
         }
@@ -237,6 +238,7 @@
             {
                 if (value == null) value = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
                 _PinnedEmbeddingsProperties = value;
+                _PinnedEmbeddingsPropertiesString = Serializer.SerializeJson(value, false);
             }
         }
 
@@ -248,11 +250,12 @@
         {
             get
             {
-                return Serializer.SerializeJson(_PinnedCompletionsProperties, false);
+                return _PinnedCompletionsPropertiesString;
             }
             set
             {
                 if (String.IsNullOrEmpty(value)) value = "{}";
+                _PinnedCompletionsPropertiesString = value;
                 _PinnedCompletionsProperties = Serializer.DeserializeJson<Dictionary<string, object>>(value);
             }
         }
@@ -270,6 +273,7 @@
             {
                 if (value == null) value = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
                 _PinnedCompletionsProperties = value;
+                _PinnedCompletionsPropertiesString = Serializer.SerializeJson(value, false);
             }
         }
 
@@ -323,7 +327,9 @@
         private string _RequiredModelsString = "[]";
         private int _StickySessionExpirationMs = 1800000; // 30 minutes
         private Dictionary<string, object> _PinnedEmbeddingsProperties = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        private string _PinnedEmbeddingsPropertiesString = "{}";
         private Dictionary<string, object> _PinnedCompletionsProperties = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        private string _PinnedCompletionsPropertiesString = "{}";
 
         #endregion
 

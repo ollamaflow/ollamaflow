@@ -147,14 +147,13 @@
             return RequestTypeEnum.Unknown;
         }
 
-        internal static string GetModelFromBody(HttpRequestBase req)
+        internal static string GetModelFromBody(string requestBody)
         {
-            string data = req.DataAsString;
-            if (String.IsNullOrEmpty(data)) return null;
+            if (String.IsNullOrEmpty(requestBody)) return null;
 
             try
             {
-                using (JsonDocument document = JsonDocument.Parse(data))
+                using (JsonDocument document = JsonDocument.Parse(requestBody))
                 {
                     if (document.RootElement.TryGetProperty("model", out JsonElement modelElement))
                     {
@@ -170,6 +169,12 @@
             return null;
         }
 
+        internal static string GetModelFromBody(HttpRequestBase req)
+        {
+            string data = req.DataAsString;
+            return GetModelFromBody(data);
+        }
+
         /// <summary>
         /// Determines the request type from a request (legacy method, use GetRequestTypeFromRequest instead).
         /// </summary>
@@ -182,14 +187,14 @@
             return GetRequestTypeFromRequest(method, url);
         }
 
-        internal static string GetModelFromRequest(HttpRequestBase req, RequestTypeEnum requestType)
+        internal static string GetModelFromRequest(string requestBody, string urlPath, RequestTypeEnum requestType)
         {
             // For ShowModelInformation from OpenAI API format, try to get model from URL path first
             if (requestType == RequestTypeEnum.ShowModelInformation &&
-                req.Url != null && req.Url.RawWithQuery.StartsWith("/v1/models/"))
+                !String.IsNullOrEmpty(urlPath) && urlPath.StartsWith("/v1/models/"))
             {
                 // Extract model from /v1/models/{model}
-                string modelPath = req.Url.RawWithQuery.Substring("/v1/models/".Length);
+                string modelPath = urlPath.Substring("/v1/models/".Length);
                 // Remove any query parameters
                 int queryIndex = modelPath.IndexOf('?');
                 if (queryIndex >= 0)
@@ -211,10 +216,17 @@
                 case RequestTypeEnum.CopyModel:
                 case RequestTypeEnum.DeleteModel:
                 case RequestTypeEnum.ShowModelInformation:
-                    return GetModelFromBody(req);
+                    return GetModelFromBody(requestBody);
             }
 
             return null;
+        }
+
+        internal static string GetModelFromRequest(HttpRequestBase req, RequestTypeEnum requestType)
+        {
+            string urlPath = req.Url?.RawWithQuery ?? "";
+            string requestBody = req.DataAsString;
+            return GetModelFromRequest(requestBody, urlPath, requestType);
         }
 
         /// <summary>

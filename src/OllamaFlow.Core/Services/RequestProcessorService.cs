@@ -72,6 +72,7 @@
         /// </summary>
         /// <param name="requestGuid">Request identifier.</param>
         /// <param name="ctx">HTTP context.</param>
+        /// <param name="requestBody">Request body string.</param>
         /// <param name="frontend">Frontend configuration.</param>
         /// <param name="backend">Selected backend.</param>
         /// <param name="clientId">Client identifier.</param>
@@ -80,6 +81,7 @@
         public async Task<bool> ProcessRequestWithTransformationAsync(
             Guid requestGuid,
             HttpContextBase ctx,
+            string requestBody,
             Frontend frontend,
             Backend backend,
             string clientId,
@@ -87,6 +89,13 @@
         {
             try
             {
+                // Update the context request data with the potentially modified request body
+                if (!String.IsNullOrEmpty(requestBody))
+                {
+                    byte[] requestBytes = System.Text.Encoding.UTF8.GetBytes(requestBody);
+                    ctx.Request.Data = new System.IO.MemoryStream(requestBytes);
+                }
+
                 // Step 1: Use already detected source format from telemetry for efficiency
                 ApiFormatEnum sourceFormat = telemetry.ApiFormat;
                 ApiFormatEnum targetFormat = backend.ApiFormat;
@@ -95,7 +104,7 @@
                 if (sourceFormat == targetFormat)
                 {
                     _Logging.Debug(_Header + $"no transformation required from API format {sourceFormat} for backend {backend.Identifier}");
-                    return await ProcessRequestWithRetryAsync(requestGuid, ctx, frontend, backend, clientId, telemetry);
+                    return await ProcessRequestWithRetryAsync(requestGuid, ctx, requestBody, frontend, backend, clientId, telemetry);
                 }
 
                 // Step 3: Transformation is required
@@ -120,7 +129,7 @@
                     }
 
                     return await ProcessRequestWithStreamingTransformationAsync(
-                        requestGuid, ctx, frontend, backend, clientId, telemetry, sourceFormat, targetFormat, requestType);
+                        requestGuid, ctx, requestBody, frontend, backend, clientId, telemetry, sourceFormat, targetFormat, requestType);
                 }
 
                 // Step 5: Fall back to non-streaming transformation
@@ -189,6 +198,7 @@
         /// </summary>
         /// <param name="requestGuid">Request unique identifier.</param>
         /// <param name="ctx">HTTP context.</param>
+        /// <param name="requestBody">Request body string.</param>
         /// <param name="frontend">Frontend configuration.</param>
         /// <param name="initialBackend">Initially selected backend.</param>
         /// <param name="clientId">Client identifier.</param>
@@ -197,11 +207,19 @@
         public async Task<bool> ProcessRequestWithRetryAsync(
             Guid requestGuid,
             HttpContextBase ctx,
+            string requestBody,
             Frontend frontend,
             Backend initialBackend,
             string clientId,
             TelemetryMessage telemetry)
         {
+            // Update the context request data with the potentially modified request body
+            if (!String.IsNullOrEmpty(requestBody))
+            {
+                byte[] requestBytes = System.Text.Encoding.UTF8.GetBytes(requestBody);
+                ctx.Request.Data = new System.IO.MemoryStream(requestBytes);
+            }
+
             Backend currentBackend = initialBackend;
 
             ProxyResult result = await _ProxyService.ProxyRequestAsync(requestGuid, ctx, frontend, currentBackend, telemetry);
@@ -274,6 +292,7 @@
         /// </summary>
         /// <param name="requestGuid">Request identifier.</param>
         /// <param name="ctx">HTTP context.</param>
+        /// <param name="requestBody">Request body string.</param>
         /// <param name="frontend">Frontend configuration.</param>
         /// <param name="backend">Backend server.</param>
         /// <param name="clientId">Client identifier.</param>
@@ -285,6 +304,7 @@
         public async Task<bool> ProcessRequestWithStreamingTransformationAsync(
             Guid requestGuid,
             HttpContextBase ctx,
+            string requestBody,
             Frontend frontend,
             Backend backend,
             string clientId,
@@ -295,6 +315,13 @@
         {
             try
             {
+                // Update the context request data with the potentially modified request body
+                if (!String.IsNullOrEmpty(requestBody))
+                {
+                    byte[] requestBytes = System.Text.Encoding.UTF8.GetBytes(requestBody);
+                    ctx.Request.Data = new System.IO.MemoryStream(requestBytes);
+                }
+
                 _Logging.Debug(_Header + $"processing request with streaming transformation (source: {sourceFormat}, target: {targetFormat})");
 
                 // Step 1: Check if streaming transformation is supported
@@ -302,7 +329,7 @@
                 {
                     _Logging.Warn(_Header + $"streaming transformation not supported for {sourceFormat} -> {targetFormat} ({requestType})");
                     // Fall back to non-streaming transformation
-                    return await ProcessRequestWithTransformationAsync(requestGuid, ctx, frontend, backend, clientId, telemetry);
+                    return await ProcessRequestWithTransformationAsync(requestGuid, ctx, requestBody, frontend, backend, clientId, telemetry);
                 }
 
                 // Step 2: Transform the request (same as non-streaming)

@@ -416,17 +416,16 @@ namespace OllamaFlow.Core.Services
                 }
             }
 
-            // Cleanup wait event
-            if (_BackendWaitEvents.TryRemove(identifier, out ManualResetEventSlim waitEvent))
+            // Signal the wait event to wake any waiting threads (but don't dispose yet)
+            if (_BackendWaitEvents.TryGetValue(identifier, out ManualResetEventSlim waitEvent))
             {
                 try
                 {
                     waitEvent.Set(); // Wake any waiting threads
-                    waitEvent.Dispose();
                 }
                 catch (Exception ex)
                 {
-                    _Logging.Warn(_Header + $"error disposing wait event for backend {identifier}: {ex.Message}");
+                    _Logging.Warn(_Header + $"error signaling wait event for backend {identifier}: {ex.Message}");
                 }
             }
 
@@ -444,6 +443,19 @@ namespace OllamaFlow.Core.Services
                 catch (Exception ex)
                 {
                     _Logging.Warn(_Header + $"error waiting for synchronization task for backend {identifier}: {ex.Message}");
+                }
+            }
+
+            // NOW dispose the wait event after the task has stopped
+            if (_BackendWaitEvents.TryRemove(identifier, out ManualResetEventSlim waitEventToDispose))
+            {
+                try
+                {
+                    waitEventToDispose.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    _Logging.Warn(_Header + $"error disposing wait event for backend {identifier}: {ex.Message}");
                 }
             }
 
@@ -503,6 +515,11 @@ namespace OllamaFlow.Core.Services
                 }
                 catch (OperationCanceledException)
                 {
+                    break;
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Wait event was disposed during shutdown/restart - exit gracefully
                     break;
                 }
                 catch (Exception ex)

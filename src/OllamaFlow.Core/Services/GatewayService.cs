@@ -7,6 +7,7 @@
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
+    using JsonMerge;
     using OllamaFlow.Core;
     using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Helpers;
@@ -143,8 +144,16 @@
                 ApiFormat = apiFormat
             };
 
+            string requestBody = "";
+
             try
             {
+                #region Get-Request-Body
+
+                if (!String.IsNullOrEmpty(ctx.Request.DataAsString)) requestBody = ctx.Request.DataAsString;
+
+                #endregion
+
                 #region Admin-Requests
 
                 if (apiFormat == ApiFormatEnum.Admin)
@@ -155,7 +164,7 @@
 
                 #endregion
 
-                #region Get-and-Validate-Frontend
+                #region Get-Frontend
 
                 Frontend frontend = await GetMatchingFrontend(ctx);
                 if (frontend == null)
@@ -166,6 +175,23 @@
                     await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadRequest, null, "No matching API endpoint found"), true));
                     return;
                 }
+
+                #endregion
+
+                #region Check-Request-Size
+
+                if (frontend.MaxRequestBodySize > 0 && requestBody.Length > frontend.MaxRequestBodySize)
+                {
+                    _Logging.Warn(_Header + "request too large from " + ctx.Request.Source.IpAddress + ": " + requestBody.Length + " bytes");
+                    ctx.Response.StatusCode = 400;
+                    ctx.Response.ContentType = Constants.JsonContentType;
+                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.TooLarge, null, "Your request was too large"), true));
+                    return;
+                }
+
+                #endregion
+
+                #region Validate-Request-Against-Frontend
 
                 if (requestType == RequestTypeEnum.GenerateEmbeddings && !frontend.AllowEmbeddings)
                 {
@@ -186,12 +212,35 @@
 
                 #endregion
 
+                #region Merge-Frontend-Pinned-Request-Parameters
+
+                if (requestType == RequestTypeEnum.GenerateEmbeddings 
+                    && !String.IsNullOrEmpty(requestBody)
+                    && frontend.PinnedEmbeddingsProperties.Any())
+                {
+                    _Logging.Debug(_Header + "merging frontend pinned embeddings properties: " + frontend.PinnedEmbeddingsPropertiesString);
+                    requestBody = JsonMerger.MergeJson(requestBody, frontend.PinnedEmbeddingsPropertiesString);
+                    _Logging.Debug(_Header + "merged request: " + requestBody);
+                }
+                else if ((requestType == RequestTypeEnum.GenerateCompletion || requestType == RequestTypeEnum.GenerateChatCompletion)
+                    && !String.IsNullOrEmpty(requestBody)
+                    && frontend.PinnedCompletionsProperties.Any())
+                {
+                    _Logging.Debug(_Header + "merging frontend pinned completions properties: " + frontend.PinnedCompletionsPropertiesString);
+                    requestBody = JsonMerger.MergeJson(requestBody, frontend.PinnedCompletionsPropertiesString);
+                    _Logging.Debug(_Header + "merged request: " + requestBody);
+                }
+
+                #endregion
+
                 #region Model-Pull-and-Delete-Requests
+
+                bool frontendModified = false;
 
                 // Handle model pull requests - add to required models for synchronization
                 if (requestType == RequestTypeEnum.PullModel)
                 {
-                    string model = RequestTypeHelper.GetModelFromRequest(ctx.Request, requestType);
+                    string model = RequestTypeHelper.GetModelFromRequest(requestBody, ctx.Request.Url.RawWithQuery, requestType);
                     if (!String.IsNullOrEmpty(model))
                     {
                         lock (frontend.Lock)
@@ -199,6 +248,8 @@
                             if (!frontend.RequiredModels.Contains(model))
                             {
                                 frontend.RequiredModels.Add(model);
+                                frontendModified = true;
+                                _Logging.Debug(_Header + "added model " + model + " to required models for frontend " + frontend.Identifier);
                             }
                         }
                     }
@@ -207,7 +258,7 @@
                 // Handle model delete requests - remove from required models
                 if (requestType == RequestTypeEnum.DeleteModel)
                 {
-                    string model = RequestTypeHelper.GetModelFromRequest(ctx.Request, requestType);
+                    string model = RequestTypeHelper.GetModelFromRequest(requestBody, ctx.Request.Url.RawWithQuery, requestType);
                     if (!String.IsNullOrEmpty(model))
                     {
                         lock (frontend.Lock)
@@ -215,17 +266,41 @@
                             if (frontend.RequiredModels.Contains(model))
                             {
                                 frontend.RequiredModels.Remove(model);
+                                frontendModified = true;
+                                _Logging.Debug(_Header + "removed model " + model + " from required models for frontend " + frontend.Identifier);
                             }
                         }
                     }
                 }
 
+                // Persist frontend changes to database and trigger immediate sync if modified
+                if (frontendModified)
+                {
+                    try
+                    {
+                        Frontend updatedFrontend = _FrontendService.Update(frontend);
+                        _Logging.Debug(_Header + "persisted required models changes to database for frontend " + frontend.Identifier);
+
+                        // Trigger immediate synchronization for affected backends
+                        _ModelSynchronization.UpdateFrontend(updatedFrontend);
+                        _Logging.Debug(_Header + "triggered immediate sync for backends associated with frontend " + frontend.Identifier);
+                    }
+                    catch (Exception ex)
+                    {
+                        _Logging.Error(_Header + "failed to persist frontend changes: " + ex.Message);
+                    }
+                }
+
                 #endregion
 
-                #region Get-Client-Identifier-and-Backend
+                #region Get-Client-ID
 
-                // Get client identifier and select backend
                 string clientId = GetClientIdentifier(ctx);
+
+                #endregion
+
+                #region Get-Backend
+
                 Backend backend = _HealthCheck.GetNextBackend(frontend, clientId);
 
                 if (backend == null)
@@ -236,6 +311,10 @@
                     await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.BadGateway, null, "No healthy backend servers available"), true));
                     return;
                 }
+
+                #endregion
+
+                #region Validate-Request-Against-Backend
 
                 if (requestType == RequestTypeEnum.GenerateEmbeddings && !backend.AllowEmbeddings)
                 {
@@ -262,16 +341,23 @@
 
                 #endregion
 
-                #region Check-Request-Size
+                #region Merge-Backend-Pinned-Request-Parameters
 
-                // Check request body size limits
-                if (frontend.MaxRequestBodySize > 0 && ctx.Request.ContentLength > frontend.MaxRequestBodySize)
+                if (requestType == RequestTypeEnum.GenerateEmbeddings
+                    && !String.IsNullOrEmpty(requestBody)
+                    && backend.PinnedEmbeddingsProperties.Any())
                 {
-                    _Logging.Warn(_Header + "request too large from " + ctx.Request.Source.IpAddress + ": " + ctx.Request.ContentLength + " bytes");
-                    ctx.Response.StatusCode = 400;
-                    ctx.Response.ContentType = Constants.JsonContentType;
-                    await ctx.Response.Send(_Serializer.SerializeJson(new ApiErrorResponse(ApiErrorEnum.TooLarge, null, "Your request was too large"), true));
-                    return;
+                    _Logging.Debug(_Header + "merging backend pinned embeddings properties: " + backend.PinnedEmbeddingsPropertiesString);
+                    requestBody = JsonMerger.MergeJson(requestBody, backend.PinnedEmbeddingsPropertiesString);
+                    _Logging.Debug(_Header + "merged request: " + requestBody);
+                }
+                else if ((requestType == RequestTypeEnum.GenerateCompletion || requestType == RequestTypeEnum.GenerateChatCompletion)
+                    && !String.IsNullOrEmpty(requestBody)
+                    && backend.PinnedCompletionsProperties.Any())
+                {
+                    _Logging.Debug(_Header + "merging backend pinned completions properties: " + backend.PinnedCompletionsPropertiesString);
+                    requestBody = JsonMerger.MergeJson(requestBody, backend.PinnedCompletionsPropertiesString);
+                    _Logging.Debug(_Header + "merged request: " + requestBody);
                 }
 
                 #endregion
@@ -302,6 +388,7 @@
                 bool responseReceived = await _RequestProcessorService.ProcessRequestWithTransformationAsync(
                     requestGuid,
                     ctx,
+                    requestBody,
                     frontend,
                     backend,
                     clientId,

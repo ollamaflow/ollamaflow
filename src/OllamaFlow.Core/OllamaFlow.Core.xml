@@ -3364,37 +3364,40 @@
             <param name="transformationPipeline">Transformation pipeline for API format conversion.</param>
             <param name="proxyService">Proxy service.</param>
         </member>
-        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ProcessRequestWithTransformationAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ProcessRequestWithTransformationAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,System.String,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
             <summary>
             Process request using the transformation pipeline for API format compatibility.
             </summary>
             <param name="requestGuid">Request identifier.</param>
             <param name="ctx">HTTP context.</param>
+            <param name="requestBody">Request body string.</param>
             <param name="frontend">Frontend configuration.</param>
             <param name="backend">Selected backend.</param>
             <param name="clientId">Client identifier.</param>
             <param name="telemetry">Telemetry object.</param>
             <returns>True if response was successfully sent, false otherwise.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ProcessRequestWithRetryAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ProcessRequestWithRetryAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,System.String,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage)">
             <summary>
             Process a request with retry logic for 50x errors.
             </summary>
             <param name="requestGuid">Request unique identifier.</param>
             <param name="ctx">HTTP context.</param>
+            <param name="requestBody">Request body string.</param>
             <param name="frontend">Frontend configuration.</param>
             <param name="initialBackend">Initially selected backend.</param>
             <param name="clientId">Client identifier.</param>
             <param name="telemetry">Telemetry object.</param>
             <returns>True if response was successfully sent, false otherwise.</returns>
         </member>
-        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ProcessRequestWithStreamingTransformationAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
+        <member name="M:OllamaFlow.Core.Services.RequestProcessorService.ProcessRequestWithStreamingTransformationAsync(System.Guid,WatsonWebserver.Core.HttpContextBase,System.String,OllamaFlow.Core.Frontend,OllamaFlow.Core.Backend,System.String,OllamaFlow.Core.Models.TelemetryMessage,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Helpers.RequestTypeEnum)">
             <summary>
             Process a request with streaming transformation support.
             This method handles streaming responses and transforms them between API formats in real-time.
             </summary>
             <param name="requestGuid">Request identifier.</param>
             <param name="ctx">HTTP context.</param>
+            <param name="requestBody">Request body string.</param>
             <param name="frontend">Frontend configuration.</param>
             <param name="backend">Backend server.</param>
             <param name="clientId">Client identifier.</param>

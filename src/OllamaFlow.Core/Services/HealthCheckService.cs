@@ -316,6 +316,11 @@ namespace OllamaFlow.Core.Services
                 cached.LogRequestFull = backend.LogRequestFull;
                 cached.LogRequestBody = backend.LogRequestBody;
                 cached.LogResponseBody = backend.LogResponseBody;
+                cached.ApiFormat = backend.ApiFormat;
+                cached.AllowEmbeddings = backend.AllowEmbeddings;
+                cached.AllowCompletions = backend.AllowCompletions;
+                cached.PinnedEmbeddingsProperties = backend.PinnedEmbeddingsProperties;
+                cached.PinnedCompletionsProperties = backend.PinnedCompletionsProperties;
                 cached.Active = backend.Active;
 
                 // Restart the health check task if critical properties changed
@@ -402,9 +407,23 @@ namespace OllamaFlow.Core.Services
             {
                 cached.Name = frontend.Name;
                 cached.Hostname = frontend.Hostname;
+                cached.TimeoutMs = frontend.TimeoutMs;
                 cached.LoadBalancing = frontend.LoadBalancing;
+                cached.BlockHttp10 = frontend.BlockHttp10;
+                cached.MaxRequestBodySize = frontend.MaxRequestBodySize;
                 cached.Backends = frontend.Backends;
                 cached.RequiredModels = frontend.RequiredModels;
+                cached.LogRequestFull = frontend.LogRequestFull;
+                cached.LogRequestBody = frontend.LogRequestBody;
+                cached.LogResponseBody = frontend.LogResponseBody;
+                cached.UseStickySessions = frontend.UseStickySessions;
+                cached.StickySessionExpirationMs = frontend.StickySessionExpirationMs;
+                cached.AllowEmbeddings = frontend.AllowEmbeddings;
+                cached.AllowCompletions = frontend.AllowCompletions;
+                cached.AllowRetries = frontend.AllowRetries;
+                cached.PinnedEmbeddingsProperties = frontend.PinnedEmbeddingsProperties;
+                cached.PinnedCompletionsProperties = frontend.PinnedCompletionsProperties;
+                cached.Active = frontend.Active;
 
                 _Logging.Debug(_Header + "updated cached frontend " + frontend.Identifier);
             }
