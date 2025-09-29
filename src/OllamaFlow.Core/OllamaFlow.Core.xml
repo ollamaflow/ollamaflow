@@ -1921,6 +1921,36 @@
             Default is Ollama.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.Backend.PinnedEmbeddingsPropertiesString">
+            <summary>
+            String containing JSON-serialized pinned properties, which will be applied to every embeddings request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.PinnedEmbeddingsProperties">
+            <summary>
+            Dictionary containing pinned properties, which will be applied to every embeddings request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.PinnedCompletionsPropertiesString">
+            <summary>
+            String containing JSON-serialized pinned properties, which will be applied to every completions request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.PinnedCompletionsProperties">
+            <summary>
+            Dictionary containing pinned properties, which will be applied to every completions request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.AllowEmbeddings">
+            <summary>
+            Boolean indicating if embeddings requests are allowed.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.AllowCompletions">
+            <summary>
+            Boolean indicating if completions requests are allowed.
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.Backend.Active">
             <summary>
             Boolean indicating if the object is active or not.
@@ -2174,6 +2204,36 @@
             Default is 1800000 milliseconds (30 minutes).
             Minimum is 10000 milliseconds (10 seconds).
             Maximum is 86400000 milliseconds (24 hours).
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Frontend.PinnedEmbeddingsPropertiesString">
+            <summary>
+            String containing JSON-serialized pinned properties, which will be applied to every embeddings request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Frontend.PinnedEmbeddingsProperties">
+            <summary>
+            Dictionary containing pinned properties, which will be applied to every embeddings request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Frontend.PinnedCompletionsPropertiesString">
+            <summary>
+            String containing JSON-serialized pinned properties, which will be applied to every completions request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Frontend.PinnedCompletionsProperties">
+            <summary>
+            Dictionary containing pinned properties, which will be applied to every completions request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Frontend.AllowEmbeddings">
+            <summary>
+            Boolean indicating if embeddings requests are allowed.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Frontend.AllowCompletions">
+            <summary>
+            Boolean indicating if completions requests are allowed.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Frontend.AllowRetries">

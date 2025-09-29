@@ -207,6 +207,82 @@
         public ApiFormatEnum ApiFormat { get; set; } = ApiFormatEnum.Ollama;
 
         /// <summary>
+        /// String containing JSON-serialized pinned properties, which will be applied to every embeddings request.
+        /// </summary>
+        [JsonIgnore]
+        public string PinnedEmbeddingsPropertiesString
+        {
+            get
+            {
+                return Serializer.SerializeJson(_PinnedEmbeddingsProperties, false);
+            }
+            set
+            {
+                if (String.IsNullOrEmpty(value)) value = "{}";
+                _PinnedEmbeddingsProperties = Serializer.DeserializeJson<Dictionary<string, object>>(value);
+            }
+        }
+
+        /// <summary>
+        /// Dictionary containing pinned properties, which will be applied to every embeddings request.
+        /// </summary>
+        public Dictionary<string, object> PinnedEmbeddingsProperties
+        {
+            get
+            {
+                return _PinnedEmbeddingsProperties;
+            }
+            set
+            {
+                if (value == null) value = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+                _PinnedEmbeddingsProperties = value;
+            }
+        }
+
+        /// <summary>
+        /// String containing JSON-serialized pinned properties, which will be applied to every completions request.
+        /// </summary>
+        [JsonIgnore]
+        public string PinnedCompletionsPropertiesString
+        {
+            get
+            {
+                return Serializer.SerializeJson(_PinnedCompletionsProperties, false);
+            }
+            set
+            {
+                if (String.IsNullOrEmpty(value)) value = "{}";
+                _PinnedCompletionsProperties = Serializer.DeserializeJson<Dictionary<string, object>>(value);
+            }
+        }
+
+        /// <summary>
+        /// Dictionary containing pinned properties, which will be applied to every completions request.
+        /// </summary>
+        public Dictionary<string, object> PinnedCompletionsProperties
+        {
+            get
+            {
+                return _PinnedCompletionsProperties;
+            }
+            set
+            {
+                if (value == null) value = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+                _PinnedCompletionsProperties = value;
+            }
+        }
+
+        /// <summary>
+        /// Boolean indicating if embeddings requests are allowed.
+        /// </summary>
+        public bool AllowEmbeddings { get; set; } = true;
+
+        /// <summary>
+        /// Boolean indicating if completions requests are allowed.
+        /// </summary>
+        public bool AllowCompletions { get; set; } = true;
+
+        /// <summary>
         /// Boolean indicating if the object is active or not.
         /// </summary>
         public bool Active { get; set; } = true;
@@ -325,6 +401,8 @@
         private HttpMethod _HealthCheckMethod = HttpMethod.Get;
         private string _HealthCheckUrl = "/";
         private List<string> _Models = new List<string>();
+        private Dictionary<string, object> _PinnedEmbeddingsProperties = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        private Dictionary<string, object> _PinnedCompletionsProperties = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         private SemaphoreSlim _Semaphore = null;
 
         #endregion

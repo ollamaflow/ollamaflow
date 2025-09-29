@@ -703,12 +703,7 @@
         /// <param name="value">Parameter value.</param>
         private void SetUrlParameter(HttpContextBase ctx, string key, string value)
         {
-            // Initialize Parameters collection if it doesn't exist
-            if (ctx.Request.Url.Parameters == null)
-            {
-                ctx.Request.Url.Parameters = new System.Collections.Specialized.NameValueCollection();
-            }
-
+            if (ctx.Request.Url.Parameters == null) ctx.Request.Url.Parameters = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
             ctx.Request.Url.Parameters[key] = value;
         }
 

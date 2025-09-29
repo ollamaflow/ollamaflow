@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"model\": \"QuantFactory/Qwen2.5-3B-GGUF\",\r\n  \"prompt\": \"system: you are a helpful AI assistant, always be nice.\\nuser: why is the sky blue?\\nassistant: \",\r\n  \"stream\": true,\r\n  \"options\": {\r\n    \"num_keep\": 5,\r\n    \"seed\": 42,\r\n    \"num_predict\": 1000,\r\n    \"top_k\": 20,\r\n    \"top_p\": 0.9,\r\n    \"min_p\": 0.0,\r\n    \"tfs_z\": 0.5,\r\n    \"typical_p\": 0.7,\r\n    \"repeat_last_n\": 33,\r\n    \"temperature\": 0.8,\r\n    \"repeat_penalty\": 1.2,\r\n    \"presence_penalty\": 1.5,\r\n    \"frequency_penalty\": 1.0,\r\n    \"mirostat\": 1,\r\n    \"mirostat_tau\": 0.8,\r\n    \"mirostat_eta\": 0.6,\r\n    \"penalize_newline\": true,\r\n    \"stop\": [\"\\n\", \"user:\"],\r\n    \"numa\": false,\r\n    \"num_ctx\": 1024,\r\n    \"num_batch\": 2,\r\n    \"num_gpu\": 1,\r\n    \"main_gpu\": 0,\r\n    \"low_vram\": false,\r\n    \"f16_kv\": true,\r\n    \"vocab_only\": false,\r\n    \"use_mmap\": true,\r\n    \"use_mlock\": false,\r\n    \"num_thread\": 8\r\n  }\r\n}",
+							"raw": "{\r\n  \"model\": \"Qwen/Qwen2.5-3B\",\r\n  \"prompt\": \"system: you are a helpful AI assistant, always be nice.\\nuser: give me a very long overview of the C programming language.\\nassistant:\",\r\n  \"stream\": false,\r\n  \"options\": {\r\n    \"num_keep\": 5,\r\n    \"seed\": 42,\r\n    \"num_predict\": 1000,\r\n    \"top_k\": 20,\r\n    \"top_p\": 0.9,\r\n    \"min_p\": 0.0,\r\n    \"tfs_z\": 0.5,\r\n    \"typical_p\": 0.7,\r\n    \"repeat_last_n\": 33,\r\n    \"temperature\": 0.8,\r\n    \"repeat_penalty\": 1.2,\r\n    \"presence_penalty\": 1.5,\r\n    \"frequency_penalty\": 1.0,\r\n    \"mirostat\": 1,\r\n    \"mirostat_tau\": 0.8,\r\n    \"mirostat_eta\": 0.6,\r\n    \"penalize_newline\": true,\r\n    \"stop\": [\"\\nuser:\"],\r\n    \"numa\": false,\r\n    \"num_ctx\": 1024,\r\n    \"num_batch\": 2,\r\n    \"num_gpu\": 1,\r\n    \"main_gpu\": 0,\r\n    \"low_vram\": false,\r\n    \"f16_kv\": true,\r\n    \"vocab_only\": false,\r\n    \"use_mmap\": true,\r\n    \"use_mlock\": false,\r\n    \"num_thread\": 8\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -407,7 +407,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"frontend1\",\r\n    \"Name\": \"Default Ollama frontend\",\r\n    \"Hostname\": \"localhost\",\r\n    \"TimeoutMs\": 60000,\r\n    \"LoadBalancing\": \"RoundRobin\",\r\n    \"BlockHttp10\": true,\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"MaxRequestBodySize\": 536870912,\r\n    \"Backends\": [\r\n        \"backend1\",\r\n        \"backend2\",\r\n        \"backend3\",\r\n        \"backend4\"\r\n    ],\r\n    \"RequiredModels\": [\r\n        \"all-minilm\",\r\n        \"qwen2.5:7b\"\r\n    ]\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"frontend1\",\r\n    \"Name\": \"Default Ollama frontend\",\r\n    \"Hostname\": \"localhost\",\r\n    \"TimeoutMs\": 60000,\r\n    \"LoadBalancing\": \"RoundRobin\",\r\n    \"BlockHttp10\": true,\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"MaxRequestBodySize\": 536870912,\r\n    \"AllowRetries\": true,\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { },\r\n    \"Backends\": [\r\n        \"backend1\",\r\n        \"backend2\",\r\n        \"backend3\",\r\n        \"backend4\"\r\n    ],\r\n    \"RequiredModels\": [\r\n        \"all-minilm\",\r\n        \"qwen2.5:7b\"\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -436,7 +436,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"frontend1\",\r\n    \"Name\": \"My first virtual Ollama\",\r\n    \"Hostname\": \"*\",\r\n    \"TimeoutMs\": 60000,\r\n    \"LoadBalancing\": \"RoundRobin\",\r\n    \"BlockHttp10\": true,\r\n    \"MaxRequestBodySize\": 536870912,\r\n    \"Backends\": [\r\n        \"backend1\",\r\n        \"backend2\",\r\n        \"backend3\",\r\n        \"backend4\",\r\n        \"backend5\"\r\n    ],\r\n    \"RequiredModels\": [\r\n        \"all-minilm\"\r\n    ],\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"Active\": true,\r\n    \"CreatedUtc\": \"2025-07-31T18:15:56.692931Z\",\r\n    \"LastUpdateUtc\": \"2025-07-31T18:15:56.692933Z\"\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"frontend1\",\r\n    \"Name\": \"My first virtual Ollama\",\r\n    \"Hostname\": \"*\",\r\n    \"TimeoutMs\": 60000,\r\n    \"LoadBalancing\": \"RoundRobin\",\r\n    \"BlockHttp10\": true,\r\n    \"MaxRequestBodySize\": 536870912,\r\n    \"AllowRetries\": true,\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { },\r\n    \"Backends\": [\r\n        \"backend1\",\r\n        \"backend2\",\r\n        \"backend3\",\r\n        \"backend4\",\r\n        \"backend5\"\r\n    ],\r\n    \"RequiredModels\": [\r\n        \"all-minilm\"\r\n    ],\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"Active\": true,\r\n    \"CreatedUtc\": \"2025-07-31T18:15:56.692931Z\",\r\n    \"LastUpdateUtc\": \"2025-07-31T18:15:56.692933Z\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -576,7 +576,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"backend5\",\r\n    \"Name\": \"backend1\",\r\n    \"Hostname\": \"astra\",\r\n    \"Port\": 11434,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": {\r\n        \"Method\": \"HEAD\"\r\n    },\r\n    \"HealthCheckUrl\": \"/\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"backend5\",\r\n    \"Name\": \"backend1\",\r\n    \"Hostname\": \"astra\",\r\n    \"Port\": 11434,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": {\r\n        \"Method\": \"HEAD\"\r\n    },\r\n    \"HealthCheckUrl\": \"/\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -605,7 +605,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"backend1\",\r\n    \"Name\": \"backend1\",\r\n    \"Hostname\": \"astra\",\r\n    \"Port\": 11434,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": {\r\n        \"Method\": \"HEAD\"\r\n    },\r\n    \"HealthCheckUrl\": \"/\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"backend1\",\r\n    \"Name\": \"backend1\",\r\n    \"Hostname\": \"astra\",\r\n    \"Port\": 11434,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": {\r\n        \"Method\": \"HEAD\"\r\n    },\r\n    \"HealthCheckUrl\": \"/\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"

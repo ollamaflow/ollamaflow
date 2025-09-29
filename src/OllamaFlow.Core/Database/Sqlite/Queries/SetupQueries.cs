@@ -26,7 +26,11 @@
                 + "logresponsebody INT NOT NULL, "
                 + "usestickysessions INT NOT NULL DEFAULT 0, "
                 + "stickysessionexpirationms INT NOT NULL DEFAULT 1800000, "
+                + "pinnedembeddingsprops VARCHAR(2048) NOT NULL, "
+                + "pinnedcompletionsprops VARCHAR(2048) NOT NULL, "
                 + "allowretries INT NOT NULL DEFAULT 1, "
+                + "allowembeddings INT NOT NULL DEFAULT 1, "
+                + "allowcompletions INT NOT NULL DEFAULT 1, "
                 + "active INT NOT NULL, "
                 + "createdutc VARCHAR(64), "
                 + "lastupdateutc VARCHAR(64) "
@@ -35,6 +39,9 @@
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_frontends_identifier' ON 'frontends' (identifier ASC);");
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_frontends_name' ON 'frontends' ('name' ASC);");
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_frontends_hostname' ON 'frontends' ('hostname' ASC);");
+            sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_frontends_active' ON 'frontends' ('active' ASC);");
+            sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_frontends_allowembeddings' ON 'frontends' ('allowembeddings' ASC);");
+            sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_frontends_allowcompletions' ON 'frontends' ('allowcompletions' ASC);");
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_frontends_createdutc' ON 'frontends' ('createdutc' ASC);");
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_frontends_lastupdateutc' ON 'frontends' ('lastupdateutc' ASC);");
 
@@ -59,6 +66,10 @@
                 + "logrequestbody INT NOT NULL, "
                 + "logresponsebody INT NOT NULL, "
                 + "apiformat VARCHAR(32) DEFAULT 'Ollama', "
+                + "pinnedembeddingsprops VARCHAR(2048) NOT NULL, "
+                + "pinnedcompletionsprops VARCHAR(2048) NOT NULL, "
+                + "allowembeddings INT NOT NULL DEFAULT 1, "
+                + "allowcompletions INT NOT NULL DEFAULT 1, "
                 + "active INT NOT NULL, "
                 + "createdutc VARCHAR(64), "
                 + "lastupdateutc VARCHAR(64) "
@@ -67,6 +78,9 @@
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_backends_identifier' ON 'backends' ('identifier' ASC);");
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_backends_name' ON 'backends' ('name' ASC);");
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_backends_hostname' ON 'backends' ('hostname' ASC);");
+            sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_backends_active' ON 'backends' ('active' ASC);");
+            sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_backends_allowembeddings' ON 'backends' ('allowembeddings' ASC);");
+            sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_backends_allowcompletions' ON 'backends' ('allowcompletions' ASC);");
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_backends_createdutc' ON 'backends' ('createdutc' ASC);");
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_backends_lastupdateutc' ON 'backends' ('lastupdateutc' ASC);");
             sql.AppendLine("CREATE INDEX IF NOT EXISTS 'idx_backends_hostname_port' ON 'backends' ('hostname' ASC, 'port' ASC);");
