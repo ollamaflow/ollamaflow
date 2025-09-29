@@ -738,6 +738,7 @@
 
         /// <summary>
         /// Get the frontend configuration based on the request context.
+        /// Matches frontends by hostname, with "*" serving as a catch-all.
         /// </summary>
         /// <param name="ctx">HTTP context.</param>
         /// <returns>Frontend configuration or null if not found.</returns>
@@ -751,22 +752,46 @@
                 return null;
             }
 
-            // For now, get the first available frontend as a simplified implementation
-            // This can be enhanced later to support hostname-based routing
-            Frontend frontend = _FrontendService.GetAll().FirstOrDefault();
-            if (frontend == null)
+            // Extract hostname from the request
+            string requestHostname = ctx.Request.Url.Host;
+            if (String.IsNullOrEmpty(requestHostname))
             {
-                _Logging.Debug(_Header + "no frontend found, using default configuration");
-                // Return a basic frontend if none exist
-                return new Frontend
-                {
-                    Identifier = "default",
-                    Name = "Default Frontend",
-                    Backends = new List<string>()
-                };
+                _Logging.Warn(_Header + "no hostname found in request");
+                return null;
             }
 
-            return frontend;
+            List<Frontend> allFrontends = _FrontendService.GetAll().ToList();
+            if (allFrontends.Count == 0)
+            {
+                _Logging.Warn(_Header + "no frontends configured");
+                return null;
+            }
+
+            // First, try to find an exact hostname match
+            Frontend exactMatch = allFrontends.FirstOrDefault(f =>
+                !String.IsNullOrEmpty(f.Hostname) &&
+                f.Hostname.Equals(requestHostname, StringComparison.InvariantCultureIgnoreCase));
+
+            if (exactMatch != null)
+            {
+                _Logging.Debug(_Header + "found exact hostname match in frontend " + exactMatch.Identifier + " for hostname " + requestHostname);
+                return exactMatch;
+            }
+
+            // If no exact match, look for a catch-all frontend with "*"
+            if (allFrontends.Any(f => !String.IsNullOrEmpty(f.Hostname) && f.Hostname.Equals("*")))
+            {
+                Frontend catchAll = allFrontends.First(f =>
+                    !String.IsNullOrEmpty(f.Hostname) &&
+                    f.Hostname == "*");
+
+                _Logging.Debug(_Header + "using catch-all frontend " + catchAll.Identifier + " for hostname " + requestHostname);
+                return catchAll;
+            }
+
+            // No matching frontend found
+            _Logging.Warn(_Header + "no frontend found for hostname: " + requestHostname);
+            return null;
         }
 
         /// <summary>

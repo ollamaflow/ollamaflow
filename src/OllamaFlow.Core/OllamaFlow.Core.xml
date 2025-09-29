@@ -2961,6 +2961,7 @@
         <member name="M:OllamaFlow.Core.Services.GatewayService.GetFrontend(WatsonWebserver.Core.HttpContextBase)">
             <summary>
             Get the frontend configuration based on the request context.
+            Matches frontends by hostname, with "*" serving as a catch-all.
             </summary>
             <param name="ctx">HTTP context.</param>
             <returns>Frontend configuration or null if not found.</returns>

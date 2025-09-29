@@ -296,6 +296,13 @@ namespace OllamaFlow.Core.Services
 
             if (_Backends.TryGetValue(backend.Identifier, out Backend cached))
             {
+                // Check if critical properties that affect health checking have changed
+                bool needsRestart = cached.Hostname != backend.Hostname ||
+                                   cached.Port != backend.Port ||
+                                   cached.Ssl != backend.Ssl ||
+                                   cached.HealthCheckMethod != backend.HealthCheckMethod ||
+                                   cached.HealthCheckUrl != backend.HealthCheckUrl;
+
                 cached.Name = backend.Name;
                 cached.Hostname = backend.Hostname;
                 cached.Port = backend.Port;
@@ -310,6 +317,14 @@ namespace OllamaFlow.Core.Services
                 cached.LogRequestBody = backend.LogRequestBody;
                 cached.LogResponseBody = backend.LogResponseBody;
                 cached.Active = backend.Active;
+
+                // Restart the health check task if critical properties changed
+                if (needsRestart)
+                {
+                    _Logging.Debug(_Header + "restarting health check task for backend " + backend.Identifier + " due to configuration changes");
+                    StopBackendHealthCheckTask(backend.Identifier);
+                    StartBackendHealthCheckTask(cached);
+                }
 
                 _Logging.Debug(_Header + "updated cached backend " + backend.Identifier);
             }

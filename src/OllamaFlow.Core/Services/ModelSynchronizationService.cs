@@ -226,6 +226,41 @@ namespace OllamaFlow.Core.Services
         public void UpdateBackend(Backend backend)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
+
+            // For Ollama backends, check if configuration changes require task restart
+            if (backend.ApiFormat == ApiFormatEnum.Ollama)
+            {
+                // Get the current backend from database to check what changed
+                Backend currentBackend = _BackendService.GetByIdentifier(backend.Identifier);
+                if (currentBackend != null)
+                {
+                    // Check if critical properties that affect synchronization have changed
+                    bool needsRestart = _BackendTasks.ContainsKey(backend.Identifier);
+
+                    if (needsRestart)
+                    {
+                        _Logging.Debug(_Header + "restarting synchronization task for backend " + backend.Identifier + " due to configuration changes");
+                        StopBackendSynchronizationTask(backend.Identifier);
+
+                        // Create new semaphore if it doesn't exist
+                        if (!_BackendSemaphores.ContainsKey(backend.Identifier))
+                        {
+                            SemaphoreSlim semaphore = new SemaphoreSlim(_MaxConcurrentDownloadsPerBackend, _MaxConcurrentDownloadsPerBackend);
+                            _BackendSemaphores.TryAdd(backend.Identifier, semaphore);
+                        }
+
+                        StartBackendSynchronizationTask(backend);
+
+                        // Trigger immediate sync for the updated backend
+                        if (_BackendWaitEvents.TryGetValue(backend.Identifier, out ManualResetEventSlim waitEvent))
+                        {
+                            _Logging.Debug(_Header + "triggering immediate sync for updated backend " + backend.Identifier);
+                            waitEvent.Set();
+                        }
+                    }
+                }
+            }
+
             _Logging.Debug(_Header + "notified of updated backend " + backend.Identifier);
         }
 
