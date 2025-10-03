@@ -248,9 +248,13 @@
             if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
             string identifier = GetParameter(ctx, "identifier");
             if (!_Services.Backend.Exists(identifier)) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
-            _Services.Backend.Delete(identifier, false);
-            ctx.Response.StatusCode = 204;
-            await ctx.Response.Send(token).ConfigureAwait(false);
+            if (_Services.Backend.Delete(identifier, false))
+            {
+                ctx.Response.StatusCode = 204;
+                await ctx.Response.Send(token).ConfigureAwait(false);
+            }
+            else
+                throw new InvalidOperationException("The specified backend is linked and cannot be deleted.");
         }
 
         /// <summary>
