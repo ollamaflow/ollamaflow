@@ -1,7 +1,6 @@
 ﻿namespace OllamaFlow.Core.Models
 {
     using OllamaFlow.Core.Enums;
-    using OllamaFlow.Core.Helpers;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -42,6 +41,11 @@
         /// Gets or sets the identifier of the client that initiated this request.
         /// </summary>
         public string ClientId { get; set; }
+
+        /// <summary>
+        /// Boolean indicating if the session is sticky.
+        /// </summary>
+        public bool IsSticky { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the transformation identifier if request/response transformation was performed.

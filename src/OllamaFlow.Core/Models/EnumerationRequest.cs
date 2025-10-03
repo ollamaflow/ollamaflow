@@ -1,6 +1,7 @@
 ﻿namespace OllamaFlow.Core
 {
     using ExpressionTree;
+    using OllamaFlow.Core.Enums;
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;

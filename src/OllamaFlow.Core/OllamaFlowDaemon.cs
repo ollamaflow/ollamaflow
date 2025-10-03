@@ -6,10 +6,9 @@
     using System.Threading;
     using OllamaFlow.Core.Database;
     using OllamaFlow.Core.Database.Sqlite;
+    using OllamaFlow.Core.Handlers;
     using OllamaFlow.Core.Serialization;
     using OllamaFlow.Core.Services;
-    using OllamaFlow.Core.Services.Transformation;
-    using OllamaFlow.Core.Services.Transformation.Interfaces;
     using SyslogLogging;
     using WatsonWebserver;
 
@@ -18,8 +17,6 @@
     /// </summary>
     public class OllamaFlowDaemon : IDisposable
     {
-        #region Public-Members
-
         /// <summary>
         /// OllamaFlow callbacks.  Attach handlers to these methods to integrate your application logic into OllamaFlow.
         /// </summary>
@@ -36,9 +33,53 @@
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Backend service.
+        /// </summary>
+        public BackendService Backends
+        {
+            get => _Services.Backend;
+        }
 
-        #region Private-Members
+        /// <summary>
+        /// Frontend service.
+        /// </summary>
+        public FrontendService Frontends
+        {
+            get => _Services.Frontend;
+        }
+
+        /// <summary>
+        /// Gateway service.
+        /// </summary>
+        public GatewayService Gateway
+        {
+            get => _Services.Gateway;
+        }
+
+        /// <summary>
+        /// Healthcheck service.
+        /// </summary>
+        public HealthCheckService HealthCheck
+        {
+            get => _Services.HealthCheck;
+        }
+
+        /// <summary>
+        /// Model synchronization service.
+        /// </summary>
+        public ModelSynchronizationService ModelSynchronization
+        {
+            get => _Services.ModelSynchronization;
+        }
+
+        /// <summary>
+        /// Session stickiness service.
+        /// </summary>
+        public SessionStickinessService SessionStickiness
+        {
+            get => _Services.SessionStickiness;
+        }
 
         private static string _Header = "[OllamaFlowDaemon] ";
         private static int _ProcessId = Environment.ProcessId;
@@ -48,22 +89,13 @@
         private LoggingModule _Logging = null;
 
         private DatabaseDriverBase _Database = null;
-        private FrontendService _FrontendService = null;
-        private BackendService _BackendService = null;
-        private SessionStickinessService _SessionStickinessService = null;
-        private HealthCheckService _HealthCheckService = null;
-        private ModelSynchronizationService _ModelSynchronizationService = null;
-        private ITransformationPipeline _TransformationPipeline = null;
-        private GatewayService _GatewayService = null;
+        private ServiceContext _Services = null;
+        private HandlerContext _Handlers = null;
         private Webserver _Webserver = null;
 
-        private bool _IsDisposed = false;
+        private bool _Disposed = false;
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
         private readonly object _DisposeLock = new object();
-
-        #endregion
-
-        #region Constructors-and-Factories
 
         /// <summary>
         /// Instantiate.
@@ -80,10 +112,6 @@
             _Logging.Info(_Header + "OllamaFlow started using process ID " + _ProcessId);
         }
 
-        #endregion
-
-        #region Public-Methods
-
         /// <summary>
         /// Dispose.
         /// </summary>
@@ -93,10 +121,6 @@
             GC.SuppressFinalize(this);
         }
 
-        #endregion
-
-        #region Protected-Methods
-
         /// <summary>
         /// Dispose.
         /// </summary>
@@ -105,8 +129,7 @@
         {
             lock (_DisposeLock)
             {
-                if (_IsDisposed)
-                    return;
+                if (_Disposed) return;
 
                 if (disposing)
                 {
@@ -114,14 +137,15 @@
                     {
                         _Logging?.Info(_Header + "disposing OllamaFlow daemon");
 
-                        // Cancel any ongoing operations
+                        // Cancel any ongoing operations and background tasks
                         if (_TokenSource != null && !_TokenSource.IsCancellationRequested)
                         {
                             _TokenSource.Cancel();
                         }
 
-                        // Dispose services in reverse order of initialization
-                        // This ensures dependencies are properly cleaned up
+                        // Dispose services and handlers
+                        _Services?.Dispose();
+                        _Handlers?.Dispose();
 
                         // Stop and dispose webserver first
                         if (_Webserver != null)
@@ -133,21 +157,13 @@
                             }
                             catch (Exception ex)
                             {
-                                _Logging?.Warn(_Header + "error stopping webserver: " + ex.Message);
+                                _Logging?.Warn($"{_Header}error stopping webserver:{Environment.NewLine}{ex.ToString()}");
                             }
                             finally
                             {
                                 _Webserver = null;
                             }
                         }
-
-                        // Dispose services
-                        DisposeService(ref _GatewayService, "GatewayService");
-                        DisposeService(ref _ModelSynchronizationService, "ModelSynchronizationService");
-                        DisposeService(ref _HealthCheckService, "HealthCheckService");
-                        DisposeService(ref _SessionStickinessService, "SessionStickinessService");
-                        DisposeService(ref _BackendService, "BackendService");
-                        DisposeService(ref _FrontendService, "FrontendService");
 
                         // Dispose database
                         if (_Database != null)
@@ -161,7 +177,7 @@
                             }
                             catch (Exception ex)
                             {
-                                _Logging?.Warn(_Header + "error disposing database: " + ex.Message);
+                                _Logging?.Warn($"{_Header}error disposing database:{Environment.NewLine}{ex.ToString()}");
                             }
                             finally
                             {
@@ -178,7 +194,7 @@
                             }
                             catch (Exception ex)
                             {
-                                _Logging?.Warn(_Header + "error disposing token source: " + ex.Message);
+                                _Logging?.Warn($"{_Header}error disposing token source:{Environment.NewLine}{ex.ToString()}");
                             }
                             finally
                             {
@@ -205,6 +221,8 @@
                         }
 
                         // Clear other references
+                        _Handlers = null;
+                        _Services = null;
                         _Serializer = null;
                         _Settings = null;
                         _Callbacks = null;
@@ -215,13 +233,9 @@
                     }
                 }
 
-                _IsDisposed = true;
+                _Disposed = true;
             }
         }
-
-        #endregion
-
-        #region Private-Methods
 
         private void InitializeGlobals()
         {
@@ -275,70 +289,24 @@
             _Database = new SqliteDatabaseDriver(_Settings, _Logging, _Serializer, _Settings.DatabaseFilename);
             _Database.InitializeRepository();
 
-            _Logging.Debug(_Header + "initializing services");
+            _Logging.Debug(_Header + "initializing services and handlers");
 
-            _FrontendService = new FrontendService(_Settings, _Logging, _Database, _TokenSource);
-            _BackendService = new BackendService(_Settings, _Logging, _Database, _TokenSource);
-            _SessionStickinessService = new SessionStickinessService(_Logging);
+            _Services = new ServiceContext(_Settings, _Logging, _Database, _Serializer, _TokenSource);
+            _Handlers = new HandlerContext(_Settings, _Logging, _Serializer, _Services, _TokenSource);
 
-            _HealthCheckService = new HealthCheckService(
-                _Settings,
-                _Logging,
-                _Serializer,
-                _FrontendService,
-                _BackendService,
-                _SessionStickinessService,
-                _TokenSource);
+            _Handlers
+                .AddStaticRoute()
+                .AddAdminApi()
+                .Initialize();
 
-            _ModelSynchronizationService = new ModelSynchronizationService(
-                _Settings,
-                _Logging,
-                _Serializer,
-                _FrontendService,
-                _BackendService,
-                _HealthCheckService,
-                _TokenSource);
-
-            _TransformationPipeline = new TransformationPipeline(_Serializer);
-
-            // Create the extracted services
-            AdminApiService adminApiService = new AdminApiService(
-                _Settings,
-                _Logging,
-                _Serializer,
-                _FrontendService,
-                _BackendService,
-                _HealthCheckService,
-                _ModelSynchronizationService,
-                _SessionStickinessService);
-
-            StaticRouteHandler staticRouteHandler = new StaticRouteHandler();
-
-            ProxyService proxyService = new ProxyService(_Logging);
-
-            RequestProcessorService requestProcessorService = new RequestProcessorService(
-                _Logging,
-                _Serializer,
-                _HealthCheckService,
-                _SessionStickinessService,
-                _TransformationPipeline,
-                proxyService);
-
-            _GatewayService = new GatewayService(
-                _Settings,
-                _Callbacks,
-                _Logging,
-                _Serializer,
-                _FrontendService,
-                _BackendService,
-                _HealthCheckService,
-                _ModelSynchronizationService,
-                _SessionStickinessService,
-                adminApiService,
-                staticRouteHandler,
-                proxyService,
-                requestProcessorService,
-                _TokenSource);
+            _Services
+                .AddBackend()
+                .AddFrontend()
+                .AddSessionStickiness()
+                .AddHealthCheck()
+                .AddModelSynchronization()
+                .AddGateway(_Callbacks, _Handlers)
+                .Initialize();
 
             #endregion
 
@@ -346,10 +314,10 @@
 
             _Logging.Debug(_Header + "initializing webserver");
 
-            _Webserver = new Webserver(_Settings.Webserver, _GatewayService.DefaultRoute);
-            _Webserver.Routes.Preflight = _GatewayService.OptionsRoute;
-            _Webserver.Routes.PreRouting = _GatewayService.PreRoutingHandler;
-            _Webserver.Routes.PostRouting = _GatewayService.PostRoutingHandler;
+            _Webserver = new Webserver(_Settings.Webserver, _Services.Gateway.DefaultRoute);
+            _Webserver.Routes.Preflight = _Services.Gateway.OptionsRoute;
+            _Webserver.Routes.PreRouting = _Services.Gateway.PreRoutingHandler;
+            _Webserver.Routes.PostRouting = _Services.Gateway.PostRoutingHandler;
 
             _Logging.Debug(_Header + "webserver routes configured successfully");
 
@@ -364,29 +332,5 @@
 
             #endregion
         }
-
-        private void DisposeService<T>(ref T service, string serviceName) where T : class
-        {
-            if (service != null)
-            {
-                try
-                {
-                    if (service is IDisposable disposable)
-                    {
-                        disposable.Dispose();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _Logging?.Warn(_Header + $"error disposing {serviceName}: " + ex.Message);
-                }
-                finally
-                {
-                    service = null;
-                }
-            }
-        }
-
-        #endregion
     }
 }

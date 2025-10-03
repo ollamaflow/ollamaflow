@@ -1,34 +1,29 @@
 ﻿namespace OllamaFlow.Core.Services
 {
+    using OllamaFlow.Core;
+    using OllamaFlow.Core.Database;
+    using OllamaFlow.Core.Enums;
+    using SyslogLogging;
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using OllamaFlow.Core;
-    using OllamaFlow.Core.Database;
-    using SyslogLogging;
 
     /// <summary>
     /// Frontend service.
     /// </summary>
-    public class FrontendService
+    public class FrontendService : IDisposable
     {
-        #region Public-Members
-        #endregion
-
-        #region Private-Members
-
         private readonly string _Header = "[FrontendService] ";
         private OllamaFlowSettings _Settings = null;
         private LoggingModule _Logging = null;
         private DatabaseDriverBase _Database = null;
+        private ServiceContext _Services = null;
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
-
-        #endregion
-
-        #region Constructors-and-Factories
+        private bool _Disposed = false;
 
         /// <summary>
         /// Frontend service.
@@ -36,20 +31,29 @@
         /// <param name="settings">Settings.</param>
         /// <param name="logging">Logging module.</param>
         /// <param name="database">Database driver.</param>
+        /// <param name="services">Service context.</param>
         /// <param name="tokenSource">Cancellation token source.</param>
-        public FrontendService(OllamaFlowSettings settings, LoggingModule logging, DatabaseDriverBase database, CancellationTokenSource tokenSource = default)
+        public FrontendService(
+            OllamaFlowSettings settings, 
+            LoggingModule logging, 
+            DatabaseDriverBase database, 
+            ServiceContext services,
+            CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _Logging = logging ?? throw new ArgumentNullException(nameof(logging));
             _Database = database ?? throw new ArgumentNullException(nameof(database));
+            _Services = services ?? throw new ArgumentNullException(nameof(services));
             _TokenSource = tokenSource ?? throw new ArgumentNullException(nameof(tokenSource));
-
-            _Logging.Debug(_Header + "initialized");
         }
 
-        #endregion
-
-        #region Public-Methods
+        /// <summary>
+        /// Initialize.
+        /// </summary>
+        public void Initialize()
+        {
+            _Logging.Debug(_Header + "initialized");
+        }
 
         /// <summary>
         /// Create a new frontend.
@@ -60,29 +64,20 @@
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
             if (string.IsNullOrEmpty(frontend.Identifier)) throw new ArgumentNullException(nameof(frontend.Identifier));
-            _Logging.Debug(_Header + "creating frontend " + frontend.Identifier);
-            return _Database.Frontend.Create(frontend);
-        }
 
-        /// <summary>
-        /// Create multiple frontends.
-        /// </summary>
-        /// <param name="frontends">Frontends to create.</param>
-        /// <returns>Created frontends.</returns>
-        public IEnumerable<Frontend> CreateMany(IEnumerable<Frontend> frontends)
-        {
-            if (frontends == null) throw new ArgumentNullException(nameof(frontends));
-
-            List<Frontend> frontendList = frontends.ToList();
-            if (!frontendList.Any()) return Enumerable.Empty<Frontend>();
-
-            foreach (Frontend frontend in frontendList)
+            if (Exists(frontend.Identifier))
             {
-                if (string.IsNullOrEmpty(frontend.Identifier)) throw new ArgumentNullException(nameof(frontend.Identifier));
+                _Logging.Warn(_Header + "frontend with identifier " + frontend.Identifier + " already exists");
+                throw new DuplicateNameException("An object with identifier " + frontend.Identifier + " already exists.");
             }
 
-            _Logging.Debug(_Header + "creating " + frontendList.Count + " frontends");
-            return _Database.Frontend.CreateMany(frontendList);
+            _Logging.Debug(_Header + "creating frontend " + frontend.Identifier);
+            Frontend created = _Database.Frontend.Create(frontend);
+
+            // Notify subordinate services
+            _Services.HealthCheck.AddFrontend(created);
+            _Services.ModelSynchronization.AddFrontend(created);
+            return created;
         }
 
         /// <summary>
@@ -143,7 +138,13 @@
             if (original == null) throw new KeyNotFoundException("The specified object could not be found by identifier " + frontend.Identifier + ".");
             frontend.LastUpdateUtc = DateTime.UtcNow;
             _Logging.Debug(_Header + "updating frontend " + frontend.Identifier);
-            return _Database.Frontend.Update(frontend);
+            Frontend updated = _Database.Frontend.Update(frontend);
+
+            // Notify subordinate services
+            _Services.HealthCheck.UpdateFrontend(updated);
+            _Services.ModelSynchronization.UpdateFrontend(updated);
+
+            return updated;
         }
 
         /// <summary>
@@ -154,22 +155,11 @@
         {
             if (string.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
             _Logging.Debug(_Header + "deleting frontend " + identifier);
+
+            // Notify subordinate services
+            _Services.HealthCheck.RemoveFrontend(identifier);
+            _Services.ModelSynchronization.RemoveFrontend(identifier);
             _Database.Frontend.DeleteByGuid(identifier);
-        }
-
-        /// <summary>
-        /// Delete multiple frontends by identifiers.
-        /// </summary>
-        /// <param name="identifiers">Frontend identifiers.</param>
-        public void DeleteMany(IEnumerable<string> identifiers)
-        {
-            if (identifiers == null) throw new ArgumentNullException(nameof(identifiers));
-
-            List<string> idList = identifiers.ToList();
-            if (!idList.Any()) return;
-
-            _Logging.Debug(_Header + "deleting " + idList.Count + " frontends");
-            _Database.Frontend.DeleteMany(idList);
         }
 
         /// <summary>
@@ -212,10 +202,33 @@
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Dispose.
+        /// </summary>
+        /// <param name="disposing">Disposing.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_Disposed)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
 
-        #region Private-Methods
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                _Disposed = true;
+            }
+        }
 
-        #endregion
+        /// <summary>
+        /// Dispose.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

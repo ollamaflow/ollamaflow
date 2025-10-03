@@ -7,6 +7,128 @@
 	},
 	"item": [
 		{
+			"name": "OpenAI APIs",
+			"item": [
+				{
+					"name": "Generate a completion",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"model\": \"Qwen/Qwen2.5-3B\",\r\n  \"prompt\": \"Once upon a time, in a distant galaxy,\",\r\n  \"max_tokens\": 512,\r\n  \"temperature\": 0.7,\r\n  \"top_p\": 0.9,\r\n  \"top_k\": 50,\r\n  \"n\": 1,\r\n  \"stream\": false,\r\n  \"logprobs\": null,\r\n  \"echo\": false,\r\n  \"stop\": [\"<|endoftext|>\", \"<|im_end|>\"],\r\n  \"presence_penalty\": 0.0,\r\n  \"frequency_penalty\": 0.0,\r\n  \"repetition_penalty\": 1.0,\r\n  \"best_of\": 1,\r\n  \"logit_bias\": {},\r\n  \"seed\": null,\r\n  \"suffix\": null,\r\n  \"use_beam_search\": false,\r\n  \"length_penalty\": 1.0,\r\n  \"early_stopping\": false,\r\n  \"skip_special_tokens\": true,\r\n  \"spaces_between_special_tokens\": true,\r\n  \"include_stop_str_in_output\": false,\r\n  \"ignore_eos\": false,\r\n  \"min_tokens\": 0,\r\n  \"stop_token_ids\": [],\r\n  \"bad_words\": [],\r\n  \"response_format\": {\r\n    \"type\": \"text\"\r\n  },\r\n  \"guided_json\": null,\r\n  \"guided_regex\": null,\r\n  \"guided_choice\": null,\r\n  \"guided_grammar\": null,\r\n  \"guided_decoding_backend\": null,\r\n  \"guided_whitespace_pattern\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{hostname}}:{{port}}/v1/completions",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"completions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate a chat completion",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"model\": \"Qwen/Qwen2.5-3B\",\r\n  \"messages\": [\r\n    {\r\n      \"role\": \"system\",\r\n      \"content\": \"You are a helpful assistant.\"\r\n    },\r\n    {\r\n      \"role\": \"user\",\r\n      \"content\": \"Hello, how can you help me today?\"\r\n    }\r\n  ],\r\n  \"temperature\": 0.7,\r\n  \"top_p\": 0.9,\r\n  \"top_k\": 50,\r\n  \"max_tokens\": 512,\r\n  \"stream\": false,\r\n  \"stop\": [\"<|endoftext|>\", \"<|im_end|>\"],\r\n  \"presence_penalty\": 0.0,\r\n  \"frequency_penalty\": 0.0,\r\n  \"repetition_penalty\": 1.0,\r\n  \"n\": 1,\r\n  \"best_of\": 1,\r\n  \"logit_bias\": {},\r\n  \"logprobs\": null,\r\n  \"top_logprobs\": null,\r\n  \"seed\": null,\r\n  \"use_beam_search\": false,\r\n  \"length_penalty\": 1.0,\r\n  \"early_stopping\": false,\r\n  \"skip_special_tokens\": true,\r\n  \"spaces_between_special_tokens\": true,\r\n  \"include_stop_str_in_output\": false,\r\n  \"ignore_eos\": false,\r\n  \"min_tokens\": 0,\r\n  \"stop_token_ids\": [],\r\n  \"bad_words\": [],\r\n  \"response_format\": {\r\n    \"type\": \"text\"\r\n  },\r\n  \"guided_json\": null,\r\n  \"guided_regex\": null,\r\n  \"guided_choice\": null,\r\n  \"guided_grammar\": null,\r\n  \"guided_decoding_backend\": null,\r\n  \"guided_whitespace_pattern\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{hostname}}:{{port}}/v1/chat/completions",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"chat",
+								"completions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate embeddings (singular)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"model\": \"all-minilm\",\r\n  \"input\": \"The quick brown fox jumps over the lazy dog\",\r\n  \"encoding_format\": \"float\",\r\n  \"dimensions\": null,\r\n  \"user\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{hostname}}:{{port}}/v1/embeddings",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"embeddings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate embeddings (multiple)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"model\": \"all-minilm\",\r\n  \"input\": [\r\n    \"The quick brown fox jumps over the lazy dog\",\r\n    \"Machine learning is a subset of artificial intelligence\",\r\n    \"OpenAI compatible APIs make integration easier\"\r\n  ],\r\n  \"encoding_format\": \"float\",\r\n  \"dimensions\": null,\r\n  \"user\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{hostname}}:{{port}}/v1/embeddings",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"embeddings"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Ollama APIs",
 			"item": [
 				{
@@ -22,7 +144,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"model\": \"Qwen/Qwen2.5-3B\",\r\n  \"prompt\": \"system: you are a helpful AI assistant, always be nice.\\nuser: give me a very long overview of the C programming language.\\nassistant:\",\r\n  \"stream\": false,\r\n  \"options\": {\r\n    \"num_keep\": 5,\r\n    \"seed\": 42,\r\n    \"num_predict\": 1000,\r\n    \"top_k\": 20,\r\n    \"top_p\": 0.9,\r\n    \"min_p\": 0.0,\r\n    \"tfs_z\": 0.5,\r\n    \"typical_p\": 0.7,\r\n    \"repeat_last_n\": 33,\r\n    \"temperature\": 0.8,\r\n    \"repeat_penalty\": 1.2,\r\n    \"presence_penalty\": 1.5,\r\n    \"frequency_penalty\": 1.0,\r\n    \"mirostat\": 1,\r\n    \"mirostat_tau\": 0.8,\r\n    \"mirostat_eta\": 0.6,\r\n    \"penalize_newline\": true,\r\n    \"stop\": [\"\\nuser:\"],\r\n    \"numa\": false,\r\n    \"num_ctx\": 1024,\r\n    \"num_batch\": 2,\r\n    \"num_gpu\": 1,\r\n    \"main_gpu\": 0,\r\n    \"low_vram\": false,\r\n    \"f16_kv\": true,\r\n    \"vocab_only\": false,\r\n    \"use_mmap\": true,\r\n    \"use_mlock\": false,\r\n    \"num_thread\": 8\r\n  }\r\n}",
+							"raw": "{\r\n  \"model\": \"gemma:2b\",\r\n  \"prompt\": \"system: you are a helpful AI assistant, always be nice.\\nuser: give me a very long overview of the C programming language.\\nassistant:\",\r\n  \"stream\": false,\r\n  \"options\": {\r\n    \"num_predict\": 1000,\r\n    \"temperature\": 0.8,\r\n    \"top_p\": 0.9,\r\n    \"repeat_penalty\": 1.1,\r\n    \"stop\": [\"\\nuser:\"],\r\n    \"num_ctx\": 2048,\r\n    \"num_batch\": 512\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -264,13 +386,7 @@
 					"name": "Generate embeddings (singular)",
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "content-type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"model\": \"all-minilm\",\r\n  \"input\": \"asdf\"\r\n}",
@@ -299,13 +415,7 @@
 					"name": "Generate embeddings (multiple)",
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "content-type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"model\": \"leliuga/all-MiniLM-L6-v2-GGUF\",\r\n  \"input\": [\r\n    \"Why is the sky blue?\", \r\n    \"Why is the grass green?\"\r\n  ]\r\n}",
@@ -364,7 +474,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/frontends/frontend",
+									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/frontends/frontend1",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{hostname}}"
@@ -373,7 +483,28 @@
 									"path": [
 										"v1.0",
 										"frontends",
-										"frontend"
+										"frontend1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Exists",
+							"request": {
+								"method": "HEAD",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/frontends/frontend1",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{hostname}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"v1.0",
+										"frontends",
+										"frontend1"
 									]
 								}
 							},
@@ -385,7 +516,7 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/frontends/frontend",
+									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/frontends/frontend1",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{hostname}}"
@@ -394,7 +525,7 @@
 									"path": [
 										"v1.0",
 										"frontends",
-										"frontend"
+										"frontend1"
 									]
 								}
 							},
@@ -436,7 +567,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"frontend1\",\r\n    \"Name\": \"My first virtual Ollama\",\r\n    \"Hostname\": \"*\",\r\n    \"TimeoutMs\": 60000,\r\n    \"LoadBalancing\": \"RoundRobin\",\r\n    \"BlockHttp10\": true,\r\n    \"MaxRequestBodySize\": 536870912,\r\n    \"AllowRetries\": true,\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { },\r\n    \"Backends\": [\r\n        \"backend1\",\r\n        \"backend2\",\r\n        \"backend3\",\r\n        \"backend4\",\r\n        \"backend5\"\r\n    ],\r\n    \"RequiredModels\": [\r\n        \"all-minilm\"\r\n    ],\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"Active\": true,\r\n    \"CreatedUtc\": \"2025-07-31T18:15:56.692931Z\",\r\n    \"LastUpdateUtc\": \"2025-07-31T18:15:56.692933Z\"\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"frontend1\",\r\n    \"Name\": \"Virtual vLLM\",\r\n    \"Hostname\": \"*\",\r\n    \"TimeoutMs\": 60000,\r\n    \"LoadBalancing\": \"RoundRobin\",\r\n    \"BlockHttp10\": true,\r\n    \"MaxRequestBodySize\": 536870912,\r\n    \"Backends\": [\r\n        \"vllm\"\r\n    ],\r\n    \"RequiredModels\": [],\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"UseStickySessions\": false,\r\n    \"StickySessionExpirationMs\": 1800000,\r\n    \"PinnedEmbeddingsProperties\": {},\r\n    \"PinnedCompletionsProperties\": {},\r\n    \"AllowEmbeddings\": false,\r\n    \"AllowCompletions\": true,\r\n    \"AllowRetries\": true,\r\n    \"Active\": true,\r\n    \"CreatedUtc\": \"2025-10-02T06:33:11.008702Z\",\r\n    \"LastUpdateUtc\": \"2025-10-02T06:33:11.008703Z\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -549,6 +680,27 @@
 							"response": []
 						},
 						{
+							"name": "Exists",
+							"request": {
+								"method": "HEAD",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{hostname}}:{{port}}/v1.0/backends/backend1",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{hostname}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"v1.0",
+										"backends",
+										"backend1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Delete",
 							"request": {
 								"method": "DELETE",
@@ -576,7 +728,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"backend5\",\r\n    \"Name\": \"backend1\",\r\n    \"Hostname\": \"astra\",\r\n    \"Port\": 11434,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": {\r\n        \"Method\": \"HEAD\"\r\n    },\r\n    \"HealthCheckUrl\": \"/\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { }\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"vllm\",\r\n    \"Name\": \"vllm\",\r\n    \"Hostname\": \"34.55.208.75\",\r\n    \"Port\": 8000,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": \"GET\",\r\n    \"HealthCheckUrl\": \"/health\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"ApiFormat\": \"OpenAI\",\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -605,7 +757,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"backend1\",\r\n    \"Name\": \"backend1\",\r\n    \"Hostname\": \"astra\",\r\n    \"Port\": 11434,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": {\r\n        \"Method\": \"HEAD\"\r\n    },\r\n    \"HealthCheckUrl\": \"/\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { }\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"backend1\",\r\n    \"Name\": \"My localhost Ollama instance\",\r\n    \"Hostname\": \"localhost\",\r\n    \"Port\": 11434,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": \"GET\",\r\n    \"HealthCheckUrl\": \"/\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"ApiFormat\": \"Ollama\",\r\n    \"PinnedEmbeddingsProperties\": {},\r\n    \"PinnedCompletionsProperties\": {},\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"Active\": true,\r\n    \"CreatedUtc\": \"2025-09-29T23:01:54.704256Z\",\r\n    \"LastUpdateUtc\": \"2025-09-29T23:01:54.704256Z\",\r\n    \"ActiveRequests\": 0,\r\n    \"IsSticky\": false\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"

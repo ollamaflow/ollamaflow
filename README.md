@@ -21,10 +21,10 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 ### Why OllamaFlow?
 
 - **🎯 Multiple Virtual Endpoints**: Create multiple frontend endpoints, each mapping to their own set of AI backends
-- **🔄 Universal API Support**: Frontend supports both Ollama and OpenAI API formats with native transformation
+- **🔄 Universal API Support**: Frontend supports both Ollama and OpenAI API formats
 - **🌐 Multi-Backend Support**: Connect to Ollama, OpenAI, [vLLM](https://vllm.ai), [SharpAI](https://github.com/jchristn/sharpai), and other OpenAI-compatible backends
 - **⚖️ Smart Load Balancing**: Distribute requests intelligently across healthy backends
-- **🔒 Security & Control**: Fine-grained control over request types and parameter enforcement for secure inference and embeddings deployments
+- **🔒 Security and Control**: Fine-grained control over request types and parameter enforcement for secure inference and embeddings deployments
 - **🔧 Automatic Model Sync**: Ensure all backends have the required models (Ollama-compatible backends only)
 - **❤️ Health Monitoring**: Real-time health checks with configurable thresholds
 - **📊 Zero Downtime**: Provide high-availability to mitigate effects of backend failures
@@ -52,7 +52,7 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 - **Request queuing** during high load
 - **Connection pooling** for optimal performance
 
-### Security & Control
+### Security and Control
 - **Request type restrictions** - Control embeddings and completions access at frontend and backend levels
 - **Pinned request properties** - Enforce or override parameters for compliance (models, context size, temperature, etc.)
 - **Bearer token authentication** for admin APIs
@@ -70,13 +70,14 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 
 ```bash
 # Pull the image
-docker pull jchristn/ollamaflow:v1.0.0
+docker pull jchristn/ollamaflow:v1.1.0
 
 # Run with default configuration
 docker run -d \
   -p 43411:43411 \
   -v $(pwd)/ollamaflow.json:/app/ollamaflow.json \
-  jchristn/ollamaflow
+  -v $(pwd)/ollamaflow.db:/app/ollamaflow.db \
+  jchristn/ollamaflow:v1.1.0
 ```
 
 ### Using .NET
@@ -94,7 +95,7 @@ dotnet OllamaFlow.Server.dll
 
 ## ⚙️ Configuration
 
-OllamaFlow uses a simple JSON configuration file. Here's a minimal example:
+OllamaFlow uses a simple JSON configuration file named `ollamaflow.json`. Here's a minimal example:
 
 ```json
 {
@@ -122,17 +123,17 @@ Frontends define your virtual Ollama endpoints:
   "Hostname": "*",
   "LoadBalancing": "RoundRobin",
   "Backends": ["gpu-1", "gpu-2", "gpu-3"],
-  "RequiredModels": ["llama3", "mistral", "codellama"],
+  "RequiredModels": ["llama3", "all-minilm"],
   "AllowEmbeddings": true,
   "AllowCompletions": true,
   "PinnedEmbeddingsProperties": {
-    "model": "nomic-embed-text"
+    "model": "all-minilm"
   },
   "PinnedCompletionsProperties": {
     "model": "llama3",
     "options": {
       "num_ctx": 4096,
-      "temperature": 0.7
+      "temperature": 0.3
     }
   }
 }
@@ -149,19 +150,20 @@ Backends represent your actual AI inference instances (Ollama, OpenAI, vLLM, Sha
   "Hostname": "192.168.1.100",
   "Port": 11434,
   "MaxParallelRequests": 4,
+  "HealthCheckMethod": "HEAD",
   "HealthCheckUrl": "/",
   "UnhealthyThreshold": 2,
   "ApiFormat": "Ollama",
   "AllowEmbeddings": true,
   "AllowCompletions": true,
   "PinnedEmbeddingsProperties": {
-    "model": "nomic-embed-text"
+    "model": "all-minilm"
   },
   "PinnedCompletionsProperties": {
     "model": "llama3",
     "options": {
-      "num_ctx": 8192,
-      "temperature": 0.8
+      "num_ctx": 4096,
+      "temperature": 0.3
     }
   }
 }
@@ -174,13 +176,12 @@ OllamaFlow provides universal API compatibility with native transformation betwe
 ### Frontend API Support
 - ✅ **Ollama API** - Complete compatibility with all Ollama endpoints
 - ✅ **OpenAI API** - Chat completions, embeddings, and model management
-- ✅ **Native Transformation** - Automatic request/response format conversion
 
 ### Supported Endpoints
 
 **Ollama API:**
 - ✅ `/api/generate` - Text generation
-- ✅ `/api/chat` - Chat completions
+- ✅ `/api/chat/generate` - Chat completions
 - ✅ `/api/pull` - Model pulling
 - ✅ `/api/push` - Model pushing
 - ✅ `/api/show` - Model information
@@ -193,7 +194,6 @@ OllamaFlow provides universal API compatibility with native transformation betwe
 - ✅ `/v1/chat/completions` - Chat completions
 - ✅ `/v1/completions` - Text completions
 - ✅ `/v1/embeddings` - Text embeddings
-- ✅ `/v1/models` - List available models
 
 ### Supported Backends
 - **[Ollama](https://ollama.ai)** - Local AI runtime
@@ -212,8 +212,8 @@ OllamaFlow provides fine-grained control over request types and parameters at bo
 
 Control which types of requests are allowed using `AllowEmbeddings` and `AllowCompletions` boolean properties:
 
-- Set on **frontends** to control which request types clients can make to that endpoint
-- Set on **backends** to control which request types can be routed to that AI instance
+- Set on **frontends** to control which request types clients can use those endpoint
+- Set on **backends** to control which request types can be routed to that backend instance
 - Both must be `true` for a request to succeed - if either the frontend or backend disallows a request type, it will fail
 
 **Example use cases:**
@@ -253,7 +253,7 @@ Force specific properties into requests using `PinnedEmbeddingsProperties` and `
   "PinnedCompletionsProperties": {
     "model": "llama3",
     "options": {
-      "temperature": 0.7,
+      "temperature": 0.3,
       "num_ctx": 4096,
       "stop": ["[DONE]", "\n\n"]
     }
@@ -325,7 +325,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- The [Ollama](https://ollama.ai) team for creating an amazing local AI runtime
+- The [Ollama](https://ollama.ai) and [vLLM](https://vllm.ai) teams for creating amazing local AI tools and model runners
 - All our contributors and users who make this project possible
 
 ---

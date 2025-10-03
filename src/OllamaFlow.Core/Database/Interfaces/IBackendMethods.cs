@@ -1,5 +1,6 @@
 ﻿namespace OllamaFlow.Core.Database.Interfaces
 {
+    using OllamaFlow.Core.Enums;
     using System;
     using System.Collections.Generic;
 
@@ -71,6 +72,11 @@
         /// </summary>
         /// <param name="ids">Identifiers.</param>
         void DeleteMany(List<string> ids);
+
+        /// <summary>
+        /// Delete all records.  Do not use this if you are not absolutely sure you want to delete all records!
+        /// </summary>
+        void DeleteAll();
 
         /// <summary>
         /// Check if a record exists by identifier.

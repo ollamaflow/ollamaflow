@@ -2,34 +2,28 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using OllamaFlow.Core;
     using OllamaFlow.Core.Database;
+    using OllamaFlow.Core.Enums;
     using SyslogLogging;
 
     /// <summary>
     /// Backend service.
     /// </summary>
-    public class BackendService
+    public class BackendService : IDisposable
     {
-        #region Public-Members
-
-        #endregion
-
-        #region Private-Members
-
         private readonly string _Header = "[BackendService] ";
         private OllamaFlowSettings _Settings = null;
         private LoggingModule _Logging = null;
         private DatabaseDriverBase _Database = null;
+        private ServiceContext _Services = null;
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
-
-        #endregion
-
-        #region Constructors-and-Factories
+        private bool _Disposed = false;
 
         /// <summary>
         /// Backend service.
@@ -37,20 +31,29 @@
         /// <param name="settings">Settings.</param>
         /// <param name="logging">Logging module.</param>
         /// <param name="database">Database driver.</param>
+        /// <param name="services">Service context.</param>
         /// <param name="tokenSource">Cancellation token source.</param>
-        public BackendService(OllamaFlowSettings settings, LoggingModule logging, DatabaseDriverBase database, CancellationTokenSource tokenSource = default)
+        public BackendService(
+            OllamaFlowSettings settings, 
+            LoggingModule logging, 
+            DatabaseDriverBase database, 
+            ServiceContext services,
+            CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _Logging = logging ?? throw new ArgumentNullException(nameof(logging));
             _Database = database ?? throw new ArgumentNullException(nameof(database));
+            _Services = services ?? throw new ArgumentNullException(nameof(services));
             _TokenSource = tokenSource ?? throw new ArgumentNullException(nameof(tokenSource));
-
-            _Logging.Debug(_Header + "initialized");
         }
 
-        #endregion
-
-        #region Public-Methods
+        /// <summary>
+        /// Initialize.
+        /// </summary>
+        public void Initialize()
+        {
+            _Logging.Debug(_Header + "initialized");
+        }
 
         /// <summary>
         /// Create a new backend.
@@ -61,29 +64,21 @@
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
             if (string.IsNullOrEmpty(backend.Identifier)) throw new ArgumentNullException(nameof(backend.Identifier));
-            _Logging.Debug(_Header + "creating backend " + backend.Identifier);
-            return _Database.Backend.Create(backend);
-        }
 
-        /// <summary>
-        /// Create multiple backends.
-        /// </summary>
-        /// <param name="backends">Backends to create.</param>
-        /// <returns>Created backends.</returns>
-        public IEnumerable<Backend> CreateMany(IEnumerable<Backend> backends)
-        {
-            if (backends == null) throw new ArgumentNullException(nameof(backends));
-
-            List<Backend> backendList = backends.ToList();
-            if (!backendList.Any()) return Enumerable.Empty<Backend>();
-
-            foreach (Backend backend in backendList)
+            if (Exists(backend.Identifier))
             {
-                if (string.IsNullOrEmpty(backend.Identifier)) throw new ArgumentNullException(nameof(backend.Identifier));
+                _Logging.Warn(_Header + "backend with identifier " + backend.Identifier + " already exists");
+                throw new DuplicateNameException("An object with identifier " + backend.Identifier + " already exists.");
             }
 
-            _Logging.Debug(_Header + "creating " + backendList.Count + " backends");
-            return _Database.Backend.CreateMany(backendList);
+            _Logging.Debug(_Header + "creating backend " + backend.Identifier);
+            Backend created = _Database.Backend.Create(backend);
+
+            // Notify subordinate services
+            _Services.HealthCheck.AddBackend(created);
+            _Services.ModelSynchronization.AddBackend(created);
+
+            return created;
         }
 
         /// <summary>
@@ -143,7 +138,12 @@
             Backend original = GetByIdentifier(backend.Identifier);
             if (original == null) throw new KeyNotFoundException("The specified object could not be found by identifier " + backend.Identifier + ".");
             backend.LastUpdateUtc = DateTime.UtcNow;
-            return _Database.Backend.Update(backend);
+            Backend updated = _Database.Backend.Update(backend);
+
+            // Notify subordinate services
+            _Services.HealthCheck.UpdateBackend(updated);
+            _Services.ModelSynchronization.UpdateBackend(updated);
+            return updated;
         }
 
         /// <summary>
@@ -163,51 +163,13 @@
             }
 
             _Logging.Debug(_Header + "deleting backend " + identifier);
+
+            // Notify subordinate services
+            _Services.HealthCheck.RemoveBackend(identifier);
+            _Services.ModelSynchronization.RemoveBackend(identifier);
+
             _Database.Backend.DeleteByIdentifier(identifier);
             return true;
-        }
-
-        /// <summary>
-        /// Delete multiple backends by identifiers.
-        /// </summary>
-        /// <param name="identifiers">Backend identifiers.</param>
-        /// <param name="force">Force deletion even if linked to frontends.</param>
-        /// <returns>Identifiers that were successfully deleted.</returns>
-        public IEnumerable<string> DeleteMany(IEnumerable<string> identifiers, bool force = false)
-        {
-            if (identifiers == null) throw new ArgumentNullException(nameof(identifiers));
-
-            List<string> idList = identifiers.ToList();
-            if (!idList.Any()) return Enumerable.Empty<string>();
-
-            List<string> toDelete = new List<string>();
-            List<string> linked = new List<string>();
-
-            // Check which backends can be deleted
-            foreach (string id in idList)
-            {
-                if (force || !_Database.Backend.IsLinked(id))
-                {
-                    toDelete.Add(id);
-                }
-                else
-                {
-                    linked.Add(id);
-                }
-            }
-
-            if (linked.Any())
-            {
-                _Logging.Warn(_Header + linked.Count + " backends are linked to frontends and will not be deleted");
-            }
-
-            if (toDelete.Any())
-            {
-                _Logging.Debug(_Header + "deleting " + toDelete.Count + " backends");
-                _Database.Backend.DeleteMany(toDelete);
-            }
-
-            return toDelete;
         }
 
         /// <summary>
@@ -256,10 +218,33 @@
             return _Database.Backend.ReadByIdentifiers(frontend.Backends);
         }
 
-        #endregion
+        /// <summary>
+        /// Dispose.
+        /// </summary>
+        /// <param name="disposing">Disposing.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_Disposed)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
 
-        #region Private-Methods
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                _Disposed = true;
+            }
+        }
 
-        #endregion
+        /// <summary>
+        /// Dispose.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

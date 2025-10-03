@@ -109,7 +109,7 @@
         /// HTTP method to use when performing a healthcheck.
         /// Default is GET.
         /// </summary>
-        public HttpMethod HealthCheckMethod
+        public string HealthCheckMethod
         {
             get
             {
@@ -117,7 +117,8 @@
             }
             set
             {
-                if (value == null) throw new ArgumentNullException(nameof(HealthCheckMethod));
+                if (String.IsNullOrEmpty(value)) value = "GET";
+                if (!value.Equals("GET") && !value.Equals("HEAD")) throw new ArgumentException("HealthCheckMethod must either be GET or HEAD.");
                 _HealthCheckMethod = value;
             }
         }
@@ -402,7 +403,7 @@
         private int _HealthyThreshold = 2;
         private int _MaxParallelRequests = 4;
         private int _RateLimitRequestsThreshold = 10;
-        private HttpMethod _HealthCheckMethod = HttpMethod.Get;
+        private string _HealthCheckMethod = "GET";
         private string _HealthCheckUrl = "/";
         private List<string> _Models = new List<string>();
         private Dictionary<string, object> _PinnedEmbeddingsProperties = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);

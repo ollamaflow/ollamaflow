@@ -7,6 +7,7 @@
     using System.Text;
     using System.Threading.Tasks;
     using ExpressionTree;
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Serialization;
 
     internal static class BackendQueries
@@ -32,7 +33,7 @@
                 + (obj.Ssl ? "1" : "0") + ","
                 + obj.UnhealthyThreshold + ","
                 + obj.HealthyThreshold + ","
-                + "'" + Sanitizer.Sanitize(obj.HealthCheckMethod.Method) + "',"
+                + "'" + Sanitizer.Sanitize(obj.HealthCheckMethod) + "',"
                 + "'" + Sanitizer.Sanitize(obj.HealthCheckUrl) + "',"
                 + obj.MaxParallelRequests + ","
                 + obj.RateLimitRequestsThreshold + ","
@@ -138,7 +139,7 @@
                 + "ssl = " + (obj.Ssl ? "1" : "0") + ","
                 + "unhealthythreshold = " + obj.UnhealthyThreshold + ","
                 + "healthythreshold = " + obj.HealthyThreshold + ","
-                + "healthcheckmethod = '" + Sanitizer.Sanitize(obj.HealthCheckMethod.Method) + "',"
+                + "healthcheckmethod = '" + Sanitizer.Sanitize(obj.HealthCheckMethod) + "',"
                 + "healthcheckurl = '" + Sanitizer.Sanitize(obj.HealthCheckUrl) + "',"
                 + "maxparallelrequests = " + obj.MaxParallelRequests + ","
                 + "ratelimitthreshold = " + obj.RateLimitRequestsThreshold + ","
@@ -159,7 +160,12 @@
         {
             return "DELETE FROM 'backends' WHERE identifier = '" + Sanitizer.Sanitize(identifier) + "';";
         }
-         
+        
+        internal static string DeleteAll()
+        {
+            return "DELETE FROM 'backends' WHERE identifier IS NOT NULL;";
+        }
+
         private static string OrderByClause(EnumerationOrderEnum order)
         {
             switch (order)

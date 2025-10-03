@@ -627,16 +627,24 @@
         {
             if (row == null) return null;
 
+            string identifier = GetDataRowStringValue(row, "identifier");
+            bool hasEmbeddingsCol = HasColumn(row.Table, "allowembeddings");
+            bool hasCompletionsCol = HasColumn(row.Table, "allowcompletions");
+            int embeddingsIntValue = hasEmbeddingsCol ? GetDataRowIntValue(row, "allowembeddings") : -1;
+            int completionsIntValue = hasCompletionsCol ? GetDataRowIntValue(row, "allowcompletions") : -1;
+            bool allowEmbeddings = hasEmbeddingsCol ? embeddingsIntValue == 1 : false;
+            bool allowCompletions = hasCompletionsCol ? completionsIntValue == 1 : false;
+
             return new Backend
             {
-                Identifier = GetDataRowStringValue(row, "identifier"),
+                Identifier = identifier,
                 Name = GetDataRowStringValue(row, "name"),
                 Hostname = GetDataRowStringValue(row, "hostname"),
                 Port = GetDataRowIntValue(row, "port"),
                 Ssl = GetDataRowIntValue(row, "ssl") > 0,
                 UnhealthyThreshold = GetDataRowIntValue(row, "unhealthythreshold"),
                 HealthyThreshold = GetDataRowIntValue(row, "healthythreshold"),
-                HealthCheckMethod = new System.Net.Http.HttpMethod(GetDataRowStringValue(row, "healthcheckmethod")),
+                HealthCheckMethod = GetDataRowStringValue(row, "healthcheckmethod"),
                 HealthCheckUrl = GetDataRowStringValue(row, "healthcheckurl"),
                 MaxParallelRequests = GetDataRowIntValue(row, "maxparallelrequests"),
                 RateLimitRequestsThreshold = GetDataRowIntValue(row, "ratelimitthreshold"),
@@ -646,8 +654,8 @@
                 ApiFormat = Enum.TryParse<ApiFormatEnum>(GetDataRowStringValue(row, "apiformat"), out ApiFormatEnum apiFormat) ? apiFormat : ApiFormatEnum.Ollama,
                 PinnedEmbeddingsPropertiesString = GetDataRowStringValue(row, "pinnedembeddingsprops"),
                 PinnedCompletionsPropertiesString = GetDataRowStringValue(row, "pinnedcompletionsprops"),
-                AllowEmbeddings = HasColumn(row.Table, "allowembeddings") ? GetDataRowIntValue(row, "allowembeddings") == 1 : false,
-                AllowCompletions = HasColumn(row.Table, "allowcompletions") ? GetDataRowIntValue(row, "allowcompletions") == 1 : false,
+                AllowEmbeddings = allowEmbeddings,
+                AllowCompletions = allowCompletions,
                 Active = GetDataRowIntValue(row, "active") == 1,
                 CreatedUtc = DateTime.Parse(row["createdutc"].ToString()),
                 LastUpdateUtc = DateTime.Parse(row["lastupdateutc"].ToString())

@@ -58,6 +58,23 @@ namespace OllamaFlow.Core.Services
             }
         }
 
+        /// <summary>
+        /// Retrieve the current list of active model pulls.
+        /// </summary>
+        public Dictionary<string, Dictionary<string, bool>> ActivePulls
+        {
+            get
+            {
+                return _ActivePulls.ToDictionary(
+                    outer => outer.Key,
+                    outer => outer.Value.ToDictionary(
+                        inner => inner.Key,
+                        inner => inner.Value
+                    )
+                );
+            }
+        }
+
         #endregion
 
         #region Private-Members
@@ -66,13 +83,9 @@ namespace OllamaFlow.Core.Services
         private OllamaFlowSettings _Settings = null;
         private LoggingModule _Logging = null;
         private Serializer _Serializer = null;
-        private bool _IsDisposed = false;
-
-        private FrontendService _FrontendService = null;
-        private BackendService _BackendService = null;
-        private HealthCheckService _HealthCheckService = null;
-
+        private ServiceContext _Services = null;
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
+        private bool _Disposed = false;
 
         private int _IntervalMs = 30000;
         private int _MaxConcurrentDownloadsPerBackend = 3;
@@ -103,31 +116,20 @@ namespace OllamaFlow.Core.Services
         /// <param name="settings">Settings.</param>
         /// <param name="logging">Logging.</param>
         /// <param name="serializer">Serializer.</param>
-        /// <param name="frontend">Frontend service.</param>
-        /// <param name="backend">Backend service.</param>
-        /// <param name="healthCheck">Healthcheck service.</param>
+        /// <param name="services">Service context.</param>
         /// <param name="tokenSource">Cancellation token source.</param>
         public ModelSynchronizationService(
             OllamaFlowSettings settings,
             LoggingModule logging,
             Serializer serializer,
-            FrontendService frontend,
-            BackendService backend,
-            HealthCheckService healthCheck,
+            ServiceContext services,
             CancellationTokenSource tokenSource = default)
         {
             _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _Logging = logging ?? throw new ArgumentNullException(nameof(logging));
             _Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            _FrontendService = frontend ?? throw new ArgumentNullException(nameof(frontend));
-            _BackendService = backend ?? throw new ArgumentNullException(nameof(backend));
-            _HealthCheckService = healthCheck ?? throw new ArgumentNullException(nameof(healthCheck));
+            _Services = services ?? throw new ArgumentNullException(nameof(services));
             _TokenSource = tokenSource ?? new CancellationTokenSource();
-
-            // Initialize existing backends from database
-            InitializeExistingBackends();
-
-            _Logging.Debug(_Header + "initialization complete");
         }
 
         #endregion
@@ -140,7 +142,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="disposing">Disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!_IsDisposed)
+            if (!_Disposed)
             {
                 if (disposing)
                 {
@@ -169,7 +171,7 @@ namespace OllamaFlow.Core.Services
                     _Settings = null;
                 }
 
-                _IsDisposed = true;
+                _Disposed = true;
             }
         }
 
@@ -183,23 +185,55 @@ namespace OllamaFlow.Core.Services
         }
 
         /// <summary>
+        /// Get discovered models for a specific backend.
+        /// </summary>
+        /// <param name="backendIdentifier">Backend identifier.</param>
+        /// <returns>List of model names, or empty list if backend not found.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when backendIdentifier is null.</exception>
+        public List<string> GetBackendModels(string backendIdentifier)
+        {
+            if (String.IsNullOrEmpty(backendIdentifier)) throw new ArgumentNullException(nameof(backendIdentifier));
+
+            if (_BackendModels.TryGetValue(backendIdentifier, out List<string> models))
+            {
+                return new List<string>(models); // Return copy to prevent external modification
+            }
+
+            return new List<string>();
+        }
+
+        #endregion
+
+        #region Internal-Methods
+
+        /// <summary>
+        /// Initialize.
+        /// </summary>
+        internal void Initialize()
+        {
+            InitializeExistingBackends();
+
+            _Logging.Debug(_Header + "initialization complete");
+        }
+
+        /// <summary>
         /// Add a backend and start model synchronization for it.
         /// Only operates on Ollama backends since OpenAI/vLLM don't support runtime model pulling.
         /// </summary>
         /// <param name="backend">Backend that was added.</param>
         /// <exception cref="ArgumentNullException">Thrown when backend is null.</exception>
-        public void AddBackend(Backend backend)
+        internal void AddBackend(Backend backend)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
 
             // Only start synchronization for Ollama backends
             if (backend.ApiFormat != ApiFormatEnum.Ollama)
             {
-                _Logging.Debug(_Header + $"skipping model synchronization for non-Ollama backend {backend.Identifier} (format: {backend.ApiFormat})");
+                _Logging.Debug($"{_Header}skipping model synchronization for non-Ollama backend {backend.Identifier} (format: {backend.ApiFormat})");
                 return;
             }
 
-            _Logging.Debug(_Header + $"adding Ollama backend {backend.Identifier} for model synchronization");
+            _Logging.Debug($"{_Header}adding Ollama backend {backend.Identifier} for model synchronization");
 
             // Create semaphore for new backend to limit concurrent downloads
             SemaphoreSlim semaphore = new SemaphoreSlim(_MaxConcurrentDownloadsPerBackend, _MaxConcurrentDownloadsPerBackend);
@@ -223,7 +257,7 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="backend">Backend that was updated.</param>
         /// <exception cref="ArgumentNullException">Thrown when backend is null.</exception>
-        public void UpdateBackend(Backend backend)
+        internal void UpdateBackend(Backend backend)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
 
@@ -231,7 +265,7 @@ namespace OllamaFlow.Core.Services
             if (backend.ApiFormat == ApiFormatEnum.Ollama)
             {
                 // Get the current backend from database to check what changed
-                Backend currentBackend = _BackendService.GetByIdentifier(backend.Identifier);
+                Backend currentBackend = _Services.Backend.GetByIdentifier(backend.Identifier);
                 if (currentBackend != null)
                 {
                     // Check if critical properties that affect synchronization have changed
@@ -269,7 +303,7 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="identifier">Identifier of backend that was removed.</param>
         /// <exception cref="ArgumentNullException">Thrown when identifier is null.</exception>
-        public void RemoveBackend(string identifier)
+        internal void RemoveBackend(string identifier)
         {
             if (String.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
 
@@ -284,7 +318,7 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="frontend">Frontend that was added.</param>
         /// <exception cref="ArgumentNullException">Thrown when frontend is null.</exception>
-        public void AddFrontend(Frontend frontend)
+        internal void AddFrontend(Frontend frontend)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
             _Logging.Debug(_Header + "notified of new frontend " + frontend.Identifier + " - will sync required models");
@@ -295,7 +329,7 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="frontend">Frontend that was updated.</param>
         /// <exception cref="ArgumentNullException">Thrown when frontend is null.</exception>
-        public void UpdateFrontend(Frontend frontend)
+        internal void UpdateFrontend(Frontend frontend)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
 
@@ -321,28 +355,10 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="identifier">Identifier of frontend that was removed.</param>
         /// <exception cref="ArgumentNullException">Thrown when identifier is null.</exception>
-        public void RemoveFrontend(string identifier)
+        internal void RemoveFrontend(string identifier)
         {
             if (String.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
             _Logging.Debug(_Header + "notified of removed frontend " + identifier);
-        }
-
-        /// <summary>
-        /// Get discovered models for a specific backend.
-        /// </summary>
-        /// <param name="backendIdentifier">Backend identifier.</param>
-        /// <returns>List of model names, or empty list if backend not found.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when backendIdentifier is null.</exception>
-        public List<string> GetBackendModels(string backendIdentifier)
-        {
-            if (String.IsNullOrEmpty(backendIdentifier)) throw new ArgumentNullException(nameof(backendIdentifier));
-
-            if (_BackendModels.TryGetValue(backendIdentifier, out List<string> models))
-            {
-                return new List<string>(models); // Return copy to prevent external modification
-            }
-
-            return new List<string>();
         }
 
         #endregion
@@ -355,10 +371,10 @@ namespace OllamaFlow.Core.Services
             {
                 // Load existing backends and start synchronization tasks
                 // Only synchronize models for Ollama backends since OpenAI/vLLM don't support runtime model pulling
-                List<Backend> allBackends = _BackendService.GetAll()?.ToList() ?? new List<Backend>();
+                List<Backend> allBackends = _Services.Backend.GetAll()?.ToList() ?? new List<Backend>();
                 List<Backend> backends = allBackends.Where(b => b.ApiFormat == ApiFormatEnum.Ollama).ToList();
 
-                _Logging.Debug(_Header + $"found {allBackends.Count} total backends, {backends.Count} Ollama backends for model synchronization");
+                _Logging.Debug($"{_Header}found {allBackends.Count} total backends, {backends.Count} Ollama backends for model synchronization");
 
                 foreach (Backend backend in backends)
                 {
@@ -370,7 +386,7 @@ namespace OllamaFlow.Core.Services
                     StartBackendSynchronizationTask(backend);
                 }
 
-                _Logging.Debug(_Header + $"initialized model synchronization for {backends.Count} backends with dedicated tasks");
+                _Logging.Debug($"{_Header}initialized model synchronization for {backends.Count} backends with dedicated tasks");
             }
             catch (Exception ex)
             {
@@ -412,7 +428,7 @@ namespace OllamaFlow.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _Logging.Warn(_Header + $"error cancelling token for backend {identifier}: {ex.Message}");
+                    _Logging.Warn($"{_Header}error cancelling token for backend {identifier}:{Environment.NewLine}{ex.ToString()}");
                 }
             }
 
@@ -425,7 +441,7 @@ namespace OllamaFlow.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _Logging.Warn(_Header + $"error signaling wait event for backend {identifier}: {ex.Message}");
+                    _Logging.Warn($"{_Header}error signaling wait event for backend {identifier}:{Environment.NewLine}{ex.ToString()}");
                 }
             }
 
@@ -437,12 +453,12 @@ namespace OllamaFlow.Core.Services
                     // Give the task a short time to terminate gracefully
                     if (!task.Wait(TimeSpan.FromSeconds(5)))
                     {
-                        _Logging.Warn(_Header + $"synchronization task for backend {identifier} did not terminate within timeout");
+                        _Logging.Warn($"{_Header}synchronization task for backend {identifier} did not terminate within timeout");
                     }
                 }
                 catch (Exception ex)
                 {
-                    _Logging.Warn(_Header + $"error waiting for synchronization task for backend {identifier}: {ex.Message}");
+                    _Logging.Warn($"{_Header}error waiting for synchronization task for backend {identifier}:{Environment.NewLine}{ex.ToString()}");
                 }
             }
 
@@ -455,7 +471,7 @@ namespace OllamaFlow.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _Logging.Warn(_Header + $"error disposing wait event for backend {identifier}: {ex.Message}");
+                    _Logging.Warn($"{_Header}error disposing wait event for backend {identifier}:{Environment.NewLine}{ex.ToString()}");
                 }
             }
 
@@ -468,12 +484,12 @@ namespace OllamaFlow.Core.Services
             // Remove any active pulls for this backend
             _ActivePulls.TryRemove(identifier, out ConcurrentDictionary<string, bool> activePulls);
 
-            _Logging.Debug(_Header + $"stopped and cleaned up synchronization task for backend {identifier}");
+            _Logging.Debug($"{_Header}stopped and cleaned up synchronization task for backend {identifier}");
         }
 
         private async Task BackendSynchronizationLoop(Backend backend, CancellationToken token)
         {
-            _Logging.Debug(_Header + $"starting model discovery and synchronization for backend {backend.Identifier}");
+            _Logging.Debug($"{_Header}starting model discovery and synchronization for backend {backend.Identifier}");
 
             while (!token.IsCancellationRequested)
             {
@@ -500,7 +516,7 @@ namespace OllamaFlow.Core.Services
                     }
 
                     // Check if backend is healthy
-                    List<Backend> healthyBackends = _HealthCheckService.Backends.Where(b => b.Identifier == backend.Identifier && b.Healthy && b.Active).ToList();
+                    List<Backend> healthyBackends = _Services.HealthCheck.Backends.Where(b => b.Identifier == backend.Identifier && b.Healthy && b.Active).ToList();
                     if (healthyBackends.Count == 0)
                     {
                         await Task.Delay(5000, token).ConfigureAwait(false); // Wait longer if unhealthy
@@ -524,7 +540,7 @@ namespace OllamaFlow.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _Logging.Error(_Header + $"error in synchronization for backend {backend.Identifier}: {ex.Message}");
+                    _Logging.Error($"{_Header}error in synchronization for backend {backend.Identifier}:{Environment.NewLine}{ex.ToString()}");
 
                     try
                     {
@@ -541,7 +557,7 @@ namespace OllamaFlow.Core.Services
                 }
             }
 
-            _Logging.Debug(_Header + $"model discovery and synchronization terminated for backend {backend.Identifier}");
+            _Logging.Debug($"{_Header}model discovery and synchronization terminated for backend {backend.Identifier}");
         }
 
         private async Task SynchronizeModelsForBackend(Backend backend, CancellationToken token)
@@ -549,7 +565,7 @@ namespace OllamaFlow.Core.Services
             try
             {
                 // Get all frontends that use this backend
-                List<Frontend> frontends = _FrontendService.GetAll()?.ToList() ?? new List<Frontend>();
+                List<Frontend> frontends = _Services.Frontend.GetAll()?.ToList() ?? new List<Frontend>();
                 List<string> requiredModels = new List<string>();
 
                 foreach (Frontend frontend in frontends)
@@ -565,12 +581,9 @@ namespace OllamaFlow.Core.Services
 
                 // Remove duplicates
                 requiredModels = requiredModels.Distinct().ToList();
-                _Logging.Debug(_Header + $"backend {backend.Identifier} required models (after distinct): [{string.Join(", ", requiredModels)}]");
+                _Logging.Debug($"{_Header}backend {backend.Identifier} distinct required models: [{string.Join(", ", requiredModels)}]");
 
-                if (requiredModels.Count == 0)
-                {
-                    return; // No models required for this backend
-                }
+                if (requiredModels.Count == 0) return; // No models required for this backend
 
                 // Discover currently available models for this backend
                 List<string> availableModels = await DiscoverModelsForBackend(backend, token).ConfigureAwait(false);
@@ -582,10 +595,10 @@ namespace OllamaFlow.Core.Services
                 ConcurrentDictionary<string, bool> backendActivePulls = _ActivePulls.GetOrAdd(backend.Identifier, new ConcurrentDictionary<string, bool>());
 
                 // Debug logging for active pulls
-                _Logging.Debug(_Header + $"backend {backend.Identifier} checking active pulls (count: {backendActivePulls.Count})");
+                _Logging.Debug($"{_Header}backend {backend.Identifier} checking active pulls (count: {backendActivePulls.Count})");
                 if (backendActivePulls.Count > 0)
                 {
-                    _Logging.Debug(_Header + $"backend {backend.Identifier} has active pulls: [{string.Join(", ", backendActivePulls.Keys)}]");
+                    _Logging.Debug($"{_Header}backend {backend.Identifier} has active pulls: [{string.Join(", ", backendActivePulls.Keys)}]");
                 }
 
                 // Find missing models with proper string matching (including partial name matching), excluding models currently being pulled
@@ -597,29 +610,29 @@ namespace OllamaFlow.Core.Services
 
                 if (missingModels.Count > 0)
                 {
-                    _Logging.Info(_Header + $"backend {backend.Identifier} is missing {missingModels.Count} required models: [{string.Join(", ", missingModels)}]");
+                    _Logging.Info($"{_Header}backend {backend.Identifier} is missing {missingModels.Count} required models: [{string.Join(", ", missingModels)}]");
 
                     // Pull missing models, but only start pulls for models not already being pulled
                     List<Task> pullTasks = new List<Task>();
-                    _Logging.Debug(_Header + $"backend {backend.Identifier} starting process for {missingModels.Count} missing models");
+                    _Logging.Debug($"{_Header}backend {backend.Identifier} starting process for {missingModels.Count} missing models");
 
                     foreach (string model in missingModels)
                     {
-                        _Logging.Debug(_Header + $"backend {backend.Identifier} checking if {model} is already being pulled...");
+                        _Logging.Debug($"{_Header}backend {backend.Identifier} checking if {model} is already being pulled...");
 
                         // Double-check and atomically add to active pulls before starting
                         if (backendActivePulls.TryAdd(model, true))
                         {
-                            _Logging.Info(_Header + $"starting pull of model {model} to backend {backend.Identifier}");
+                            _Logging.Info($"{_Header}starting pull of model {model} to backend {backend.Identifier}");
                             pullTasks.Add(PullModelToBackendInternal(backend, model, token));
                         }
                         else
                         {
-                            _Logging.Info(_Header + $"skipping pull request on backend {backend.Identifier} for model {model}, pull already in progress");
+                            _Logging.Info($"{_Header}skipping pull request on backend {backend.Identifier} for model {model}, pull already in progress");
                         }
                     }
 
-                    _Logging.Debug(_Header + $"backend {backend.Identifier} created {pullTasks.Count} pull tasks");
+                    _Logging.Debug($"{_Header}backend {backend.Identifier} created {pullTasks.Count} pull tasks");
 
                     if (pullTasks.Count > 0)
                     {
@@ -628,7 +641,7 @@ namespace OllamaFlow.Core.Services
                 }
                 else
                 {
-                    _Logging.Debug(_Header + $"backend {backend.Identifier} has all required models");
+                    _Logging.Debug($"{_Header}backend {backend.Identifier} has all required models");
                 }
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)
@@ -638,7 +651,7 @@ namespace OllamaFlow.Core.Services
             }
             catch (Exception ex)
             {
-                _Logging.Debug(_Header + $"error synchronizing models for backend {backend.Identifier}: {ex.Message}");
+                _Logging.Debug($"{_Header}error synchronizing models for backend {backend.Identifier}:{Environment.NewLine}{ex.ToString()}");
             }
         }
 
@@ -646,7 +659,7 @@ namespace OllamaFlow.Core.Services
         {
             if (!_BackendSemaphores.TryGetValue(backend.Identifier, out SemaphoreSlim semaphore))
             {
-                _Logging.Warn(_Header + $"no semaphore found for backend {backend.Identifier}, cannot pull model {modelName}");
+                _Logging.Warn($"{_Header}no semaphore found for backend {backend.Identifier}, cannot pull model {modelName}");
                 return;
             }
 
@@ -672,18 +685,18 @@ namespace OllamaFlow.Core.Services
             }
             catch (Exception ex)
             {
-                _Logging.Error(_Header + $"error pulling model {modelName} to backend {backend.Identifier}: {ex.Message}");
+                _Logging.Error($"{_Header}error pulling model {modelName} to backend {backend.Identifier}:{Environment.NewLine}{ex.ToString()}");
             }
             finally
             {
                 // Remove from active pulls
                 if (backendPulls.TryRemove(modelName, out bool removed))
                 {
-                    _Logging.Debug(_Header + $"removed {modelName} from active pulls for backend {backend.Identifier}");
+                    _Logging.Debug($"{_Header}removed {modelName} from active pulls for backend {backend.Identifier}");
                 }
                 else
                 {
-                    _Logging.Warn(_Header + $"failed to remove {modelName} from active pulls for backend {backend.Identifier} - was not found");
+                    _Logging.Warn($"{_Header}failed to remove {modelName} from active pulls for backend {backend.Identifier} - was not found");
                 }
             }
         }
@@ -704,17 +717,17 @@ namespace OllamaFlow.Core.Services
 
                     if (response.IsSuccessStatusCode)
                     {
-                        string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        string responseBody = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
 
                         // Parse the JSON response to extract model names
                         List<string> models = ParseModelsFromResponse(responseBody);
 
-                        _Logging.Debug(_Header + $"discovered {models.Count} models for backend {backend.Identifier}: [{string.Join(", ", models)}]");
+                        _Logging.Debug($"{_Header}discovered {models.Count} models for backend {backend.Identifier}: [{string.Join(", ", models)}]");
                         return models;
                     }
                     else
                     {
-                        _Logging.Debug(_Header + $"failed to discover models for backend {backend.Identifier}: HTTP {response.StatusCode}");
+                        _Logging.Debug($"{_Header}failed to discover models for backend {backend.Identifier}: HTTP {response.StatusCode}");
                         return new List<string>();
                     }
                 }
@@ -726,7 +739,7 @@ namespace OllamaFlow.Core.Services
             }
             catch (Exception ex)
             {
-                _Logging.Debug(_Header + $"error discovering models for backend {backend.Identifier}: {ex.Message}");
+                _Logging.Debug($"{_Header}error discovering models for backend {backend.Identifier}:{Environment.NewLine}{ex.ToString()}");
                 return new List<string>();
             }
         }
@@ -757,7 +770,7 @@ namespace OllamaFlow.Core.Services
             }
             catch (Exception ex)
             {
-                _Logging.Warn(_Header + $"error parsing models from response: {ex.Message}");
+                _Logging.Warn($"{_Header}error parsing models from response:{Environment.NewLine}{ex.ToString()}");
             }
 
             return models;
@@ -782,11 +795,11 @@ namespace OllamaFlow.Core.Services
 
                     if (response.IsSuccessStatusCode)
                     {
-                        _Logging.Debug(_Header + $"successfully initiated pull of model {modelName} to backend {backend.Identifier}");
+                        _Logging.Debug($"{_Header}successfully initiated pull of model {modelName} to backend {backend.Identifier}");
                     }
                     else
                     {
-                        _Logging.Warn(_Header + $"failed to pull model {modelName} to backend {backend.Identifier}: HTTP {response.StatusCode}");
+                        _Logging.Warn($"{_Header}failed to pull model {modelName} to backend {backend.Identifier}: HTTP {response.StatusCode}");
                     }
                 }
             }
@@ -797,7 +810,7 @@ namespace OllamaFlow.Core.Services
             }
             catch (Exception ex)
             {
-                _Logging.Error(_Header + $"error during model pull {modelName} to backend {backend.Identifier}: {ex.Message}");
+                _Logging.Error($"{_Header}error during model pull {modelName} to backend {backend.Identifier}:{Environment.NewLine}{ex.ToString()}");
             }
         }
 

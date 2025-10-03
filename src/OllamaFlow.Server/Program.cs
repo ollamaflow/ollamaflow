@@ -23,21 +23,11 @@
     {
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
-        #region Public-Members
-
-        #endregion
-
-        #region Private-Members
-
-        private static string _SoftwareVersion = "v1.0.0";
+        private static string _SoftwareVersion = "v1.1.0";
         private static CancellationTokenSource _TokenSource = new CancellationTokenSource();
         private static OllamaFlowSettings _Settings = null;
         private static OllamaFlowDaemon _OllamaFlow = null;
         private static Serializer _Serializer = new Serializer();
-
-        #endregion
-
-        #region Entrypoint
 
         /// <summary>
         /// Entry point.
@@ -69,14 +59,6 @@
                 while (!waitHandleSignal);
             }
         }
-
-        #endregion
-
-        #region Public-Methods
-
-        #endregion
-
-        #region Private-Methods
 
         private static void Welcome()
         {
@@ -146,8 +128,6 @@
                 });
             }
         }
-
-        #endregion
 
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     }

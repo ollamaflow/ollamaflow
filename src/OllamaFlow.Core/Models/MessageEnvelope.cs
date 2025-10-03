@@ -1,5 +1,6 @@
 ﻿namespace OllamaFlow.Core.Models
 {
+    using OllamaFlow.Core.Enums;
     using System;
     using System.Collections.Generic;
 

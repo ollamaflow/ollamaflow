@@ -8,11 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Watson" Version="6.3.15" />
-    <PackageReference Include="RestWrapper" Version="3.1.6" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\OllamaFlow.Core\OllamaFlow.Core.csproj" />
   </ItemGroup>
 

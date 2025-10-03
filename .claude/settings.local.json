@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build)",
+      "Bash(dotnet run:*)",
+      "Bash(tee:*)",
+      "Bash(curl:*)",
+      "Bash(time curl:*)",
+      "Bash(dotnet build:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $test ===\")",
+      "Bash(done)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

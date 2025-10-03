@@ -40,7 +40,7 @@ namespace Test.Ollama
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"\n❌ Test execution failed: {ex.Message}");
+                Console.WriteLine($"\n❌ Test execution failed:{Environment.NewLine}{ex.ToString()}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 Environment.Exit(1);
             }

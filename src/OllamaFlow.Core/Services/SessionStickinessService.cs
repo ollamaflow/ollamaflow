@@ -47,6 +47,20 @@ namespace OllamaFlow.Core.Services
             }
         }
 
+        /// <summary>
+        /// Retrieve the current mapping of sticky sessions.
+        /// </summary>
+        public Dictionary<string, StickySession> Sessions
+        {
+            get
+            {
+                return _Sessions.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value
+                );
+            }
+        }
+
         #endregion
 
         #region Private-Members
@@ -54,7 +68,7 @@ namespace OllamaFlow.Core.Services
         private readonly string _Header = "[SessionStickinessService] ";
         private LoggingModule _Logging = null;
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
-        private bool _IsDisposed = false;
+        private bool _Disposed = false;
 
         private ConcurrentDictionary<string, StickySession> _Sessions = new ConcurrentDictionary<string, StickySession>();
         private Task _CleanupTask = null;
@@ -68,13 +82,12 @@ namespace OllamaFlow.Core.Services
         /// Instantiate.
         /// </summary>
         /// <param name="logging">Logging module.</param>
+        /// <param name="tokenSource">Cancellation token source.</param>
         /// <exception cref="ArgumentNullException">Thrown when logging is null.</exception>
-        public SessionStickinessService(LoggingModule logging)
+        public SessionStickinessService(LoggingModule logging, CancellationTokenSource tokenSource)
         {
             _Logging = logging ?? throw new ArgumentNullException(nameof(logging));
-
-            _CleanupTask = Task.Run(CleanupWorker, _TokenSource.Token);
-            _Logging.Debug(_Header + "initialized with cleanup interval " + _CleanupIntervalMs + "ms");
+            _TokenSource = tokenSource ?? throw new ArgumentNullException(nameof(tokenSource));
         }
 
         #endregion
@@ -87,7 +100,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="disposing">Disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!_IsDisposed)
+            if (!_Disposed)
             {
                 if (disposing)
                 {
@@ -105,7 +118,7 @@ namespace OllamaFlow.Core.Services
                     _Logging = null;
                 }
 
-                _IsDisposed = true;
+                _Disposed = true;
             }
         }
 
@@ -118,6 +131,19 @@ namespace OllamaFlow.Core.Services
             GC.SuppressFinalize(this);
         }
 
+        #endregion
+
+        #region Internal-Methods
+
+        /// <summary>
+        /// Initialize.
+        /// </summary>
+        internal void Initialize()
+        {
+            _CleanupTask = Task.Run(CleanupWorker, _TokenSource.Token);
+            _Logging.Debug(_Header + "initialized");
+        }
+
         /// <summary>
         /// Get the sticky backend for a client and frontend combination.
         /// </summary>
@@ -125,7 +151,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="frontendId">Frontend identifier.</param>
         /// <returns>Backend identifier if a valid sticky session exists, null otherwise.</returns>
         /// <exception cref="ArgumentNullException">Thrown when clientId or frontendId is null or empty.</exception>
-        public string GetStickyBackend(string clientId, string frontendId)
+        internal string GetStickyBackend(string clientId, string frontendId)
         {
             if (String.IsNullOrEmpty(clientId)) throw new ArgumentNullException(nameof(clientId));
             if (String.IsNullOrEmpty(frontendId)) throw new ArgumentNullException(nameof(frontendId));
@@ -157,7 +183,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="expirationMs">Session expiration in milliseconds.</param>
         /// <exception cref="ArgumentNullException">Thrown when required parameters are null or empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when expirationMs is less than or equal to zero.</exception>
-        public void SetStickyBackend(string clientId, string frontendId, string backendId, int expirationMs)
+        internal void SetStickyBackend(string clientId, string frontendId, string backendId, int expirationMs)
         {
             if (String.IsNullOrEmpty(clientId)) throw new ArgumentNullException(nameof(clientId));
             if (String.IsNullOrEmpty(frontendId)) throw new ArgumentNullException(nameof(frontendId));
@@ -188,7 +214,7 @@ namespace OllamaFlow.Core.Services
         /// <returns>True if the session was found and updated, false otherwise.</returns>
         /// <exception cref="ArgumentNullException">Thrown when clientId or frontendId is null or empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when expirationMs is less than or equal to zero.</exception>
-        public bool TouchSession(string clientId, string frontendId, int expirationMs)
+        internal bool TouchSession(string clientId, string frontendId, int expirationMs)
         {
             if (String.IsNullOrEmpty(clientId)) throw new ArgumentNullException(nameof(clientId));
             if (String.IsNullOrEmpty(frontendId)) throw new ArgumentNullException(nameof(frontendId));
@@ -212,7 +238,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="frontendId">Frontend identifier.</param>
         /// <returns>True if the session was found and removed, false otherwise.</returns>
         /// <exception cref="ArgumentNullException">Thrown when clientId or frontendId is null or empty.</exception>
-        public bool RemoveSession(string clientId, string frontendId)
+        internal bool RemoveSession(string clientId, string frontendId)
         {
             if (String.IsNullOrEmpty(clientId)) throw new ArgumentNullException(nameof(clientId));
             if (String.IsNullOrEmpty(frontendId)) throw new ArgumentNullException(nameof(frontendId));
@@ -234,7 +260,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="clientId">Client identifier.</param>
         /// <returns>Number of sessions removed.</returns>
         /// <exception cref="ArgumentNullException">Thrown when clientId is null or empty.</exception>
-        public int RemoveClientSessions(string clientId)
+        internal int RemoveClientSessions(string clientId)
         {
             if (String.IsNullOrEmpty(clientId)) throw new ArgumentNullException(nameof(clientId));
 
@@ -271,7 +297,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="frontendId">Frontend identifier.</param>
         /// <returns>Number of sessions removed.</returns>
         /// <exception cref="ArgumentNullException">Thrown when frontendId is null or empty.</exception>
-        public int RemoveFrontendSessions(string frontendId)
+        internal int RemoveFrontendSessions(string frontendId)
         {
             if (String.IsNullOrEmpty(frontendId)) throw new ArgumentNullException(nameof(frontendId));
 
@@ -308,7 +334,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="backendId">Backend identifier.</param>
         /// <returns>Number of sessions removed.</returns>
         /// <exception cref="ArgumentNullException">Thrown when backendId is null or empty.</exception>
-        public int RemoveBackendSessions(string backendId)
+        internal int RemoveBackendSessions(string backendId)
         {
             if (String.IsNullOrEmpty(backendId)) throw new ArgumentNullException(nameof(backendId));
 
@@ -343,7 +369,7 @@ namespace OllamaFlow.Core.Services
         /// Get all active sessions.
         /// </summary>
         /// <returns>List of all active sticky sessions.</returns>
-        public List<StickySession> GetAllSessions()
+        internal List<StickySession> GetAllSessions()
         {
             return _Sessions.Values.ToList();
         }
@@ -354,7 +380,7 @@ namespace OllamaFlow.Core.Services
         /// <param name="clientId">Client identifier.</param>
         /// <returns>List of sessions for the specified client.</returns>
         /// <exception cref="ArgumentNullException">Thrown when clientId is null or empty.</exception>
-        public List<StickySession> GetClientSessions(string clientId)
+        internal List<StickySession> GetClientSessions(string clientId)
         {
             if (String.IsNullOrEmpty(clientId)) throw new ArgumentNullException(nameof(clientId));
 
@@ -365,7 +391,7 @@ namespace OllamaFlow.Core.Services
         /// Clear all sessions.
         /// </summary>
         /// <returns>Number of sessions removed.</returns>
-        public int ClearAllSessions()
+        internal int ClearAllSessions()
         {
             int count = _Sessions.Count;
             _Sessions.Clear();

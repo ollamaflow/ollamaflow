@@ -7,6 +7,7 @@
     using System.Text;
     using System.Threading.Tasks;
     using ExpressionTree;
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Serialization;
 
     internal static class FrontendQueries
@@ -154,6 +155,11 @@
         internal static string Delete(string identifier)
         {
             return "DELETE FROM 'frontends' WHERE identifier = '" + Sanitizer.Sanitize(identifier) + "';";
+        }
+
+        internal static string DeleteAll()
+        {
+            return "DELETE FROM 'frontends' WHERE identifier IS NOT NULL;";
         }
 
         private static string OrderByClause(EnumerationOrderEnum order)

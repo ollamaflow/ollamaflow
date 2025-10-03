@@ -1,5 +1,6 @@
 ﻿namespace OllamaFlow.Core
 {
+    using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Serialization;
     using System;
     using System.Collections.Generic;
@@ -208,6 +209,7 @@
         }
 
         /// <summary>
+        /// Do not use this property unless the backends mapped to this frontend use the same API format as what will be sent to this frontend.
         /// String containing JSON-serialized pinned properties, which will be applied to every embeddings request.
         /// </summary>
         [JsonIgnore]
@@ -226,6 +228,7 @@
         }
 
         /// <summary>
+        /// Do not use this property unless the backends mapped to this frontend use the same API format as what will be sent to this frontend.
         /// Dictionary containing pinned properties, which will be applied to every embeddings request.
         /// </summary>
         public Dictionary<string, object> PinnedEmbeddingsProperties
@@ -243,6 +246,7 @@
         }
 
         /// <summary>
+        /// Do not use this property unless the backends mapped to this frontend use the same API format as what will be sent to this frontend.
         /// String containing JSON-serialized pinned properties, which will be applied to every completions request.
         /// </summary>
         [JsonIgnore]
@@ -261,6 +265,7 @@
         }
 
         /// <summary>
+        /// Do not use this property unless the backends mapped to this frontend use the same API format as what will be sent to this frontend.
         /// Dictionary containing pinned properties, which will be applied to every completions request.
         /// </summary>
         public Dictionary<string, object> PinnedCompletionsProperties

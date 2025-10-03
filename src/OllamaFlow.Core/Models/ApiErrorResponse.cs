@@ -1,5 +1,6 @@
 ﻿namespace OllamaFlow.Core
 {
+    using OllamaFlow.Core.Enums;
     using System;
 
     /// <summary>

@@ -40,7 +40,7 @@ namespace Test.OpenAI
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"\n❌ Test execution failed: {ex.Message}");
+                Console.WriteLine($"\n❌ Test execution failed:{Environment.NewLine}{ex.ToString()}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 Environment.Exit(1);
             }
@@ -847,7 +847,7 @@ namespace Test.OpenAI
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[MOCK SERVER] Error: {ex.Message}");
+                Console.WriteLine($"[MOCK SERVER] Error:{Environment.NewLine}{ex.ToString()}");
                 ctx.Response.StatusCode = 500;
                 await ctx.Response.Send(JsonSerializer.Serialize(new
                 {

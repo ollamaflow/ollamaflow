@@ -8,6 +8,7 @@
     using OllamaFlow.Core.Database.Interfaces;
     using OllamaFlow.Core.Database.Sqlite;
     using OllamaFlow.Core.Database.Sqlite.Queries;
+    using OllamaFlow.Core.Enums;
 
     /// <summary>
     /// Frontend methods.
@@ -280,6 +281,12 @@
             }
 
             _Repo.ExecuteQueries(queries, true);
+        }
+
+        /// <inheritdoc />
+        public void DeleteAll()
+        {
+            _Repo.ExecuteQuery(FrontendQueries.DeleteAll(), true);
         }
 
         /// <inheritdoc />
