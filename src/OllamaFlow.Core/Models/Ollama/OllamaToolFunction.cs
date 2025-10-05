@@ -53,7 +53,6 @@
         [JsonPropertyName("parameters")]
         public OllamaToolParameters Parameters { get; set; } = null;
 
-        // Private backing fields
         private string _Name;
         private string _Description;
 

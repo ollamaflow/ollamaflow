@@ -4,45 +4,42 @@
     using System.Collections.Specialized;
 
     /// <summary>
-    /// Success test.
+    /// Failure test.
     /// </summary>
-    public class SuccessTest : TestBase
+    public class FailureTest: TestBase
     {
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-
         /// <summary>
-        /// Success test.
+        /// Failure test.
         /// </summary>
-        public SuccessTest()
+        public FailureTest()
         {
-            Name = "Success test";
+            Name = "Failure test";
             TestEnvironment = new TestEnvironment();
         }
 
         /// <summary>
-        /// Success test.
+        /// Failure test.
         /// </summary>
         /// <param name="test">Test results.</param>
         /// <returns>Task.</returns>
         public override async Task Run(TestResult result)
         {
-            result.Success = true;
+            result.Success = false;
 
             ApiDetails details = new ApiDetails
             {
-                Step = "Success test",
-                Request = "Success request",
-                Response = "Success response",
+                Step = "Failure test",
+                Request = "Failure request",
+                Response = "Failure response",
                 Headers = new NameValueCollection(),
-                StatusCode = 200
+                StatusCode = 400,
             };
 
             result.ApiDetails.Add(details);
-            result.Exception = null;
+            result.Exception = new ArgumentException("This was supposed to fail");
+            
             await Task.Delay(250);
             result.EndUtc = DateTime.UtcNow;
         }
-
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
     }
 }

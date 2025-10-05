@@ -9,7 +9,9 @@
       "Bash(dotnet build:*)",
       "Bash(for:*)",
       "Bash(do echo \"=== $test ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "WebSearch",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []

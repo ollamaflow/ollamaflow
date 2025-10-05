@@ -65,6 +65,24 @@
         }
 
         /// <summary>
+        /// Checks if the result contains a single embedding.
+        /// </summary>
+        /// <returns>True if single embedding, false if multiple.</returns>
+        public bool IsSingleEmbedding()
+        {
+            return Data != null && Data.Count == 1;
+        }
+
+        /// <summary>
+        /// Checks if the result contains multiple embeddings.
+        /// </summary>
+        /// <returns>True if multiple embeddings, false if single.</returns>
+        public bool IsMultiEmbeddings()
+        {
+            return Data != null && Data.Count > 1;
+        }
+
+        /// <summary>
         /// Gets the number of embeddings in the result.
         /// </summary>
         public int GetEmbeddingCount()

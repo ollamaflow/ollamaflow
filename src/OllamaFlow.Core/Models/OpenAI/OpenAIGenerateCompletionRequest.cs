@@ -193,7 +193,6 @@
         [JsonPropertyName("seed")]
         public int? Seed { get; set; } = null;
 
-        // Private backing fields
         private object _Prompt;
         private int? _MaxTokens;
         private float? _Temperature;

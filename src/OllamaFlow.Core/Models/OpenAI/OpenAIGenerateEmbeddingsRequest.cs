@@ -58,7 +58,6 @@
         [JsonPropertyName("user")]
         public string User { get; set; } = null;
 
-        // Private backing fields
         private object _Input;
         private int? _Dimensions;
 

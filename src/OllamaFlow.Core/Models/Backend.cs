@@ -72,6 +72,18 @@
         public bool Ssl { get; set; } = false;
 
         /// <summary>
+        /// URL prefix.
+        /// </summary>
+        [JsonIgnore]
+        public string UrlPrefix
+        {
+            get
+            {
+                return (Ssl ? "https://" : "http://") + Hostname + ":" + Port;
+            }
+        }
+
+        /// <summary>
         /// Number of consecutive failed health checks before marking a server as unhealthy.
         /// Default is 2.
         /// </summary>
@@ -171,18 +183,6 @@
             {
                 if (value < 1) throw new ArgumentOutOfRangeException(nameof(RateLimitRequestsThreshold));
                 _RateLimitRequestsThreshold = value;
-            }
-        }
-
-        /// <summary>
-        /// URL prefix.
-        /// </summary>
-        [JsonIgnore]
-        public string UrlPrefix
-        {
-            get
-            {
-                return (Ssl ? "https://" : "http://") + Hostname + ":" + Port;
             }
         }
 

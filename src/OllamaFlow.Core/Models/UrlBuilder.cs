@@ -16,6 +16,50 @@
         /// <summary>
         /// Build the URL for a given request.
         /// </summary>
+        /// <param name="settings">Settings.</param>
+        /// <param name="frontend">Frontend.</param>
+        /// <param name="requestType">Request type.</param>
+        /// <returns>URL.</returns>
+        public static string BuildUrl(OllamaFlowSettings settings, Frontend frontend, RequestTypeEnum requestType)
+        {
+            if (frontend == null) throw new ArgumentNullException(nameof(frontend));
+
+            string hostname = "localhost";
+            if (settings.Webserver.Hostname != "*") hostname = settings.Webserver.Hostname;
+            string prefix = (settings.Webserver.Ssl.Enable ? "https://" : "http://") + hostname + ":" + settings.Webserver.Port;
+
+            switch (requestType)
+            {
+                case RequestTypeEnum.OllamaPullModel:
+                    return prefix + "/api/pull";
+                case RequestTypeEnum.OllamaDeleteModel:
+                    return prefix + "/api/delete";
+                case RequestTypeEnum.OllamaListModels:
+                    return prefix + "/api/tags";
+                case RequestTypeEnum.OllamaShowModelInformation:
+                    return prefix + "/api/show";
+                case RequestTypeEnum.OllamaListRunningModels:
+                    return prefix + "/api/ps";
+                case RequestTypeEnum.OllamaGenerateCompletion:
+                    return prefix + "/api/generate";
+                case RequestTypeEnum.OllamaGenerateChatCompletion:
+                    return prefix + "/api/chat";
+                case RequestTypeEnum.OllamaGenerateEmbeddings:
+                    return prefix + "/api/embed";
+                case RequestTypeEnum.OpenAIGenerateCompletion:
+                    return prefix + "/v1/completions";
+                case RequestTypeEnum.OpenAIGenerateChatCompletion:
+                    return prefix + "/v1/chat/completions";
+                case RequestTypeEnum.OpenAIGenerateEmbeddings:
+                    return prefix + "/v1/embeddings";
+                default:
+                    throw new ArgumentException($"Unsupported request type {requestType.ToString()} for backend {frontend.Identifier}.");
+            }
+        }
+
+        /// <summary>
+        /// Build the URL for a given request.
+        /// </summary>
         /// <param name="backend">Backend.</param>
         /// <param name="requestType">Request type.</param>
         /// <returns>URL.</returns>
@@ -74,8 +118,18 @@
         public static HttpMethod GetMethod(Backend backend, RequestTypeEnum requestType)
         {
             if (backend == null) throw new ArgumentNullException(nameof(backend));
+            return GetMethod(backend.ApiFormat, requestType);
+        }
 
-            if (backend.ApiFormat == ApiFormatEnum.Ollama)
+        /// <summary>
+        /// Get the HTTP method used for a given request type.
+        /// </summary>
+        /// <param name="apiFormat">API format.</param>
+        /// <param name="requestType">Request type.</param>
+        /// <returns>HTTP method.</returns>
+        public static HttpMethod GetMethod(ApiFormatEnum apiFormat, RequestTypeEnum requestType)
+        {
+            if (apiFormat == ApiFormatEnum.Ollama)
             {
                 switch (requestType)
                 {
@@ -92,7 +146,7 @@
                         return HttpMethod.Delete;
                 }
             }
-            else if (backend.ApiFormat == ApiFormatEnum.OpenAI)
+            else if (apiFormat == ApiFormatEnum.OpenAI)
             {
                 switch (requestType)
                 {
@@ -104,10 +158,10 @@
             }
             else
             {
-                throw new ArgumentException($"Unsupported backend API format {backend.ApiFormat.ToString()} in backend {backend.Identifier}.");
+                throw new ArgumentException($"Unsupported backend API format {apiFormat.ToString()}");
             }
 
-            throw new ArgumentException($"Unsupported request type {requestType.ToString()} for backend {backend.Identifier} with API format {backend.ApiFormat.ToString()}.");
+            throw new ArgumentException($"Unsupported request type {requestType.ToString()} with API format {apiFormat.ToString()}.");
         }
     }
 }

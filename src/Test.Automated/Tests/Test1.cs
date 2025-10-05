@@ -1,248 +1,228 @@
 ﻿namespace Test.Automated.Tests
 {
-    using System;
-    using System.Collections.Specialized;
-    using System.Net.WebSockets;
-    using System.Runtime.CompilerServices;
     using OllamaFlow.Core;
     using OllamaFlow.Core.Enums;
     using OllamaFlow.Core.Models;
     using OllamaFlow.Core.Models.Ollama;
     using OllamaFlow.Core.Serialization;
     using RestWrapper;
+    using System;
+    using System.Collections.Specialized;
+    using System.Net.WebSockets;
+    using System.Runtime.CompilerServices;
+    using System.Xml.Linq;
 
-    public class Test1 
+    /// <summary>
+    /// Test 1: Ollama backend, Ollama APIs, single embeddings, multiple embeddings, completions, and chat completions test
+    /// </summary>
+    public class Test1 : TestBase
     {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
-        #region Test-Setup
-
-        private static string _OllamaFlowHostname = "localhost";
-        private static int _OllamaFlowPort = 10000;
-        private static string _StickyHeader = "x-thread-id";
-        
-        private static string _OllamaUrl = "http://astra:11434";
-        private static List<string> _OllamaRequiredModels = new List<string> { "all-minilm", "gemma3:4b" };
-        private static string _OllamaEmbeddingsModel = "all-minilm";
-        private static string _OllamaCompletionsModel = "gemma3:4b";
-
-        private static string _VllmUrl = "http://34.55.208.75:8000";
-        private static List<string> _VllmModels = new List<string> { "Qwen/Qwen2.5-3B" };
-        private static string _VllmCompletionsModel = "Qwen/Qwen2.5-3B";
-
-        private static Serializer _Serializer = new Serializer();
-
-        private static string _Line = new string('-', Console.WindowWidth - 1);
-        private static string _Json = "application/json";
-
-        #endregion
-
-        public static async Task Main(string[] args)
+        /// <summary>
+        /// Test 1: Ollama backend, Ollama APIs, single embeddings, multiple embeddings, completions, and chat completions test
+        /// </summary>
+        public Test1()
         {
-            #region Welcome
+            Name = "Test 1: Ollama backend, Ollama APIs, single embeddings, multiple embeddings, completions, and chat completions test";
 
-            Console.WriteLine();
-            Console.WriteLine("OllamaFlow Automated Tests");
-            Console.WriteLine(_Line);
-
-            List<TestResult> results = new List<TestResult>();
-
-            #endregion
-
-            #region Tests
-
-            Console.WriteLine("Running tests");
-            results.Add(await RunTest("Sample success test", SuccessTest));
-            results.Add(await RunTest("Sample failure test", FailureTest));
-
-            // Simple tests
-            results.Add(await RunTest("Test 1: One Ollama backend, Ollama APIs, single embeddings request", Test1));
-
-            #endregion
-
-            #region Summary
-
-            Console.WriteLine();
-            Console.WriteLine("Summary results");
-            Console.WriteLine(_Line);
-
-            int success = 0;
-            int failure = 0;
-
-            foreach (TestResult result in results)
+            Backend ollama1 = new Backend
             {
-                if (result.Success) success++;
-                else failure++;
-                Console.WriteLine($"| {result.ToString()}");
-
-                if (!result.Success)
-                {
-                    Console.WriteLine(_Serializer.SerializeJson(result, true));
-
-                    if (result.Exception != null)
-                        Console.WriteLine(result.Exception.ToString());
-
-                    Console.WriteLine();
-                }
-            }
-
-            Console.WriteLine();
-            Console.WriteLine($"{success} test(s) passed");
-            Console.WriteLine($"{failure} test(s) failed (1 failed test expected, 'Sample failure test')");
-            Console.WriteLine();
-
-            if (failure < 2) Console.WriteLine("Test succeeded"); // account for the failure test at the beginning
-            else Console.WriteLine("Test failed");
-            Console.WriteLine();
-
-            #endregion
-        }
-
-        private static async Task<TestResult> RunTest(string name, Func<TestResult, Task> func)
-        {
-            TestResult result = new TestResult
-            {
-                Name = name,
-                StartUtc = DateTime.Now
+                Identifier = "ollama1",
+                Name = "ollama1",
+                Hostname = "localhost",
+                Port = 11434,
+                Ssl = false,
+                HealthCheckMethod = "HEAD",
+                HealthCheckUrl = "/",
+                ApiFormat = ApiFormatEnum.Ollama,
+                PinnedEmbeddingsProperties = null,
+                PinnedCompletionsProperties = null,
+                AllowEmbeddings = true,
+                AllowCompletions = true
             };
 
-            try
+            TestEnvironment.Backends.Add(ollama1);
+
+            Frontend frontend1 = new Frontend
             {
-                await func(result); // Pass result to the test function
-                result.Success = true;
-            }
-            catch (Exception ex)
-            {
-                result.Success = false;
-                result.Exception = ex;
-            }
+                Identifier = "frontend1",
+                Name = "frontend1",
+                Hostname = "localhost",
+                LoadBalancing = LoadBalancingMode.RoundRobin,
+                Backends = new List<string> { "ollama1" },
+                RequiredModels = new List<string> { "all-minilm", "gemma3:4b" },
+                UseStickySessions = false,
+                AllowEmbeddings = true,
+                AllowCompletions = true,
+                AllowRetries = true
+            };
 
-            result.EndUtc = DateTime.Now;
-            return result;
+            TestEnvironment.Frontends.Add(frontend1);
+
+            InitializeTestEnvironment(true);
         }
-
-        #region Sample-Tests
-
-        private static async Task SuccessTest(TestResult test)
-        {
-            test.Success = true;
-            test.Request = "Success request";
-            test.Response = "Success response";
-            test.Headers = new NameValueCollection();
-            test.StatusCode = 200;
-            await Task.Delay(250);
-            test.EndUtc = DateTime.UtcNow;
-        }
-
-        private static async Task FailureTest(TestResult test)
-        {
-            test.Success = false;
-            test.Request = "Failure request";
-            test.Response = "Failure response";
-            test.Headers = new NameValueCollection();
-            test.StatusCode = 400;
-            await Task.Delay(100);
-            throw new DivideByZeroException();
-        }
-
-        #endregion
-
-        #region Tests
 
         /// <summary>
-        /// Test 1: One Ollama backend, Ollama APIs, single embeddings request
+        /// Test 1: Ollama backend, Ollama APIs, single embeddings, multiple embeddings, completions, and chat completions test
         /// </summary>
         /// <param name="test">Test results.</param>
         /// <returns>Task.</returns>
-        private static async Task Test1(TestResult test)
+        public override async Task Run(TestResult test)
         {
-            try
+            test.Success = true; // default to true
+
+            await Helpers.WaitForHealthyBackend(OllamaFlowDaemon, "ollama1");
+            Frontend frontend = OllamaFlowDaemon.Frontends.GetAll().ToList()[0];
+            Backend backend = OllamaFlowDaemon.Backends.GetAll().ToList()[0];
+
+            #region Embeddings
+
+            string embeddingsUrl = UrlBuilder.BuildUrl(OllamaFlowSettings, frontend, RequestTypeEnum.OllamaGenerateEmbeddings);
+            HttpMethod method = UrlBuilder.GetMethod(backend, RequestTypeEnum.OllamaGenerateEmbeddings);
+
+            #region Single-Embeddings
+
+            string body = Helpers.OllamaSingleEmbeddingsRequestBody(TestEnvironment.EmbeddingsModel, "test");
+            ApiDetails singleEmbeddings = new ApiDetails
             {
-                OllamaFlowSettings settings = new OllamaFlowSettings
+                Step = "Ollama Single Embeddings",
+                Request = body
+            };
+
+            using (RestResponse resp = await SendRestRequest<string>(method, embeddingsUrl, body, Constants.JsonContentType))
+            {
+                OllamaGenerateEmbeddingsResult result = await Helpers.GetOllamaEmbeddingsResult(resp);
+                if (result == null)
                 {
-                    Webserver = new WatsonWebserver.Core.WebserverSettings
-                    {
-                        Port = _OllamaFlowPort,
-                        Hostname = _OllamaFlowHostname
-                    },
-                    StickyHeaders = new List<string> { _StickyHeader }
-                };
+                    Console.WriteLine("No response for single embeddings request");
+                    singleEmbeddings.Response = null;
+                    singleEmbeddings.StatusCode = 0;
+                    singleEmbeddings.EndUtc = DateTime.UtcNow;
 
-                using (OllamaFlowDaemon daemon = new OllamaFlowDaemon(settings))
+                    test.Success = false;
+                    test.ApiDetails.Add(singleEmbeddings);
+                    return;
+                }
+                else
                 {
-                    RemoveDefaultRecords(daemon);
+                    singleEmbeddings.Response = resp;
+                    singleEmbeddings.StatusCode = resp.StatusCode;
+                    singleEmbeddings.EndUtc = DateTime.UtcNow;
 
-                    Backend backend1 = Helpers.CreateOllamaBackend(daemon, "ollama1", "localhost");
-                    Frontend frontend1 = Helpers.CreateFrontend(
-                        daemon,
-                        "frontend1",
-                        LoadBalancingMode.RoundRobin,
-                        new List<Backend> { backend1 },
-                        _OllamaRequiredModels);
-
-                    if (!await Helpers.WaitForHealthyBackend(daemon, backend1))
+                    if (!resp.IsSuccessStatusCode)
                     {
+                        Console.WriteLine("Non-success response for single embeddings request");
                         test.Success = false;
-                        throw new TimeoutException($"Backend {backend1.Identifier} failed to become healthy");
+                        test.ApiDetails.Add(singleEmbeddings);
+                        return;
                     }
-
-                    // single embeddings request
-                    string embeddingsUrl = UrlBuilder.BuildUrl(backend1, RequestTypeEnum.OllamaGenerateEmbeddings);
-                    HttpMethod method = UrlBuilder.GetMethod(backend1, RequestTypeEnum.OllamaGenerateEmbeddings);
-
-                    OllamaGenerateEmbeddingsRequest embedReq = new OllamaGenerateEmbeddingsRequest
+                    else
                     {
-                        Model = _OllamaEmbeddingsModel,
-                        Input = "test"
-                    };
+                        singleEmbeddings.Response = resp;
+                        singleEmbeddings.StatusCode = resp.StatusCode;
 
-                    test.Request = embedReq;
-
-                    using (RestRequest restReq = new RestRequest(embeddingsUrl, method, _Json))
-                    {
-                        test.Request = embedReq;
-
-                        using (RestResponse restResp = await restReq.SendAsync(_Serializer.SerializeJson(embedReq, false)))
+                        if (result.Embeddings == null)
                         {
-                            if (restResp == null)
+                            Console.WriteLine("No embeddings returned for single embeddings request");
+                            test.Success = false;
+                            test.ApiDetails.Add(singleEmbeddings);
+                            return;
+                        }
+                        else
+                        {
+                            // Ollama always returns array of arrays, even for single input
+                            if (result.GetEmbeddingCount() != 1)
                             {
+                                Console.WriteLine($"Expected 1 embedding, got {result.GetEmbeddingCount()} for single embeddings request");
                                 test.Success = false;
-                                throw new IOException($"Unable to connect to frontend {frontend1.Identifier}");
+                                test.ApiDetails.Add(singleEmbeddings);
+                                return;
                             }
                             else
                             {
-                                if (restResp.StatusCode < 200 || restResp.StatusCode > 299)
-                                {
-                                    test.Success = false;
-                                    throw new IOException($"Bad request returned from frontend {frontend1.Identifier}");
-                                }
-                                else
-                                {
-                                    test.Success = true;
-                                    test.Response = restResp.DataAsString;
-                                }
+                                test.Success = true;
+                                test.ApiDetails.Add(singleEmbeddings);
                             }
                         }
                     }
                 }
             }
-            finally
+
+            #endregion
+
+            #region Multiple-Embeddings
+
+            body = Helpers.OllamaMultipleEmbeddingsRequestBody(TestEnvironment.EmbeddingsModel, new List<string> { "hello", "workd" });
+            ApiDetails multiEmbeddings = new ApiDetails
             {
-                Helpers.Cleanup();
+                Step = "Ollama Multi Embeddings",
+                Request = body
+            };
+
+            using (RestResponse resp = await SendRestRequest<string>(method, embeddingsUrl, body, Constants.JsonContentType))
+            {
+                OllamaGenerateEmbeddingsResult result = await Helpers.GetOllamaEmbeddingsResult(resp);
+                if (result == null)
+                {
+                    Console.WriteLine("No response for multiple embeddings request");
+                    multiEmbeddings.Response = null;
+                    multiEmbeddings.StatusCode = 0;
+                    multiEmbeddings.EndUtc = DateTime.UtcNow;
+
+                    test.Success = false;
+                    test.ApiDetails.Add(multiEmbeddings);
+                    return;
+                }
+                else
+                {
+                    multiEmbeddings.Response = resp;
+                    multiEmbeddings.StatusCode = resp.StatusCode;
+                    multiEmbeddings.EndUtc = DateTime.UtcNow;
+
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Non-success response for multiple embeddings request");
+                        test.Success = false;
+                        test.ApiDetails.Add(multiEmbeddings);
+                        return;
+                    }
+                    else
+                    {
+                        multiEmbeddings.Response = resp;
+                        multiEmbeddings.StatusCode = resp.StatusCode;
+
+                        if (result.Embeddings == null)
+                        {
+                            Console.WriteLine("No embeddings returned for multiple embeddings request");
+                            test.Success = false;
+                            test.ApiDetails.Add(multiEmbeddings);
+                            return;
+                        }
+                        else
+                        {
+                            if (result.GetEmbeddingCount() != 2)
+                            {
+                                Console.WriteLine($"Expected 2 embeddings, got {result.GetEmbeddingCount()} for multiple embeddings request");
+                                test.Success = false;
+                                test.ApiDetails.Add(multiEmbeddings);
+                                return;
+                            }
+                            else
+                            {
+                                test.Success = true;
+                                test.ApiDetails.Add(multiEmbeddings);
+                            }
+                        }
+                    }
+                }
             }
+
+            #endregion
+
+            #endregion
         }
-
-        #endregion
-
-        #region Support-Methods
-
-        private static void RemoveDefaultRecords(OllamaFlowDaemon daemon)
-        {
-
-        }
-
-        #endregion
 
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.

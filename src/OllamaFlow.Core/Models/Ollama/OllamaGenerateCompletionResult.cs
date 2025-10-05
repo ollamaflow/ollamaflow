@@ -28,12 +28,6 @@
         public string Response { get; set; }
 
         /// <summary>
-        /// Whether the response is complete (for streaming responses).
-        /// </summary>
-        [JsonPropertyName("done")]
-        public bool? Done { get; set; }
-
-        /// <summary>
         /// Context for maintaining conversation state.
         /// Can be passed in the next request to continue the conversation.
         /// </summary>
@@ -152,15 +146,6 @@
                 return EvalDuration.Value / 1_000_000.0;
             }
             return null;
-        }
-
-        /// <summary>
-        /// Checks if this is a final response (for streaming).
-        /// </summary>
-        /// <returns>True if this is the final response in a stream.</returns>
-        public bool IsFinalResponse()
-        {
-            return Done.HasValue && Done.Value;
         }
 
         /// <summary>

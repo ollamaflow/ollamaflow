@@ -105,7 +105,6 @@
         [JsonPropertyName("use_mlock")]
         public bool? UseMlock { get; set; }
 
-        // Private backing fields
         private int? _NumThread;
         private int? _NumCtx;
         private int? _NumGpu;

@@ -31,7 +31,6 @@
         [JsonPropertyName("function")]
         public OllamaToolFunction Function { get; set; } = null;
 
-        // Private backing fields
         private string _Type;
 
         /// <summary>

@@ -393,7 +393,6 @@
         [JsonPropertyName("logits_all")]
         public bool? LogitsAll { get; set; }
 
-        // Private backing fields
         private int? _Seed;
         private int? _NumPredict;
         private int? _NumGpu;

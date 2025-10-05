@@ -38,7 +38,6 @@
         [JsonPropertyName("required")]
         public List<string> Required { get; set; } = null;
 
-        // Private backing fields
         private string _Type;
 
         /// <summary>

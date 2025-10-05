@@ -63,7 +63,6 @@
             }
         }
 
-        // Private backing fields
         private string _Role;
         private List<string> _Images;
         private List<OllamaToolCall> _ToolCalls;

@@ -41,7 +41,6 @@
             }
         }
 
-        // Private backing fields
         private string _Model;
 
         /// <summary>

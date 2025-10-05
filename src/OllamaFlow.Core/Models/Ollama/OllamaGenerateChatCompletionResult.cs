@@ -28,12 +28,6 @@
         public OllamaChatMessage Message { get; set; }
 
         /// <summary>
-        /// Whether the response is complete (for streaming responses).
-        /// </summary>
-        [JsonPropertyName("done")]
-        public bool? Done { get; set; }
-
-        /// <summary>
         /// Reason why the response is done.
         /// Examples: "stop", "length", "function_call"
         /// </summary>
@@ -126,15 +120,6 @@
                 return LoadDuration.Value / 1_000_000.0;
             }
             return null;
-        }
-
-        /// <summary>
-        /// Checks if this is a final response (for streaming).
-        /// </summary>
-        /// <returns>True if this is the final response in a stream.</returns>
-        public bool IsFinalResponse()
-        {
-            return Done.HasValue && Done.Value;
         }
 
         /// <summary>

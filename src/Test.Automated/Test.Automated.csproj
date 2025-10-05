@@ -11,4 +11,8 @@
     <ProjectReference Include="..\OllamaFlow.Core\OllamaFlow.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MockServers\" />
+  </ItemGroup>
+
 </Project>

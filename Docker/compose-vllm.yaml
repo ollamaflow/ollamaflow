@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  vllm1:
+    image: vllm/vllm-openai
+    ports:
+      - "8001:8000"
+    volumes:
+      - vllm1:/root/.cache/huggingface
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+    command: --model meta-llama/Llama-3.2-3B-Instruct --host 0.0.0.0 --port 8000
+
+  vllm2:
+    image: vllm/vllm-openai
+    ports:
+      - "8002:8000"
+    volumes:
+      - vllm2:/root/.cache/huggingface
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+    command: --model meta-llama/Llama-3.2-3B-Instruct --host 0.0.0.0 --port 8000
+
+  vllm3:
+    image: vllm/vllm-openai
+    ports:
+      - "8003:8000"
+    volumes:
+      - vllm3:/root/.cache/huggingface
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+    command: --model meta-llama/Llama-3.2-3B-Instruct --host 0.0.0.0 --port 8000
+
+  vllm4:
+    image: vllm/vllm-openai
+    ports:
+      - "8004:8000"
+    volumes:
+      - vllm4:/root/.cache/huggingface
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+    command: --model meta-llama/Llama-3.2-3B-Instruct --host 0.0.0.0 --port 8000
+
+volumes:
+  vllm1:
+  vllm2:
+  vllm3:
+  vllm4:

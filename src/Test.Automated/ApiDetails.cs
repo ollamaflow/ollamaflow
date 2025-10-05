@@ -9,35 +9,36 @@
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Test result.
+    /// API details containing request, response, headers, status, and exception.
     /// </summary>
-    public class TestResult
+    public class ApiDetails
     {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 
         /// <summary>
-        /// Name of the test.
+        /// Name of the step.
         /// </summary>
-        public string Name { get; set; } = null;
+        public string Step { get; set; } = null;
+        
+        /// <summary>
+        /// Request.
+        /// </summary>
+        public object Request { get; set; } = null;
 
         /// <summary>
-        /// Test environment.
+        /// Response.
         /// </summary>
-        public TestEnvironment TestEnvironemnt { get; set; } = null;
+        public object Response { get; set; } = null;
 
         /// <summary>
-        /// Boolean indicating if the test succeeded.
+        /// Headers.
         /// </summary>
-        public bool Success { get; set; } = false;
-
+        public NameValueCollection Headers { get; set; } = new NameValueCollection();
+        
         /// <summary>
-        /// API invocation details.
+        /// Status code.
         /// </summary>
-        public List<ApiDetails> ApiDetails
-        {
-            get => _ApiDetails;
-            set => _ApiDetails = (value != null ? value : new List<ApiDetails>());
-        }
+        public int StatusCode { get; set; } = 0;
 
         /// <summary>
         /// Start timestamp in UTC time.
@@ -57,29 +58,12 @@
             get => (EndUtc - StartUtc);
         }
 
-        private List<ApiDetails> _ApiDetails = new List<ApiDetails>();
-
         /// <summary>
-        /// Exception.
+        /// API details containing request, response, headers, status, and exception.
         /// </summary>
-        [JsonIgnore]
-        public Exception Exception { get; set; } = null;
-
-        /// <summary>
-        /// Test result.
-        /// </summary>
-        public TestResult()
+        public ApiDetails()
         {
 
-        }
-
-        /// <summary>
-        /// Produce a human-readable string version of the object.
-        /// </summary>
-        /// <returns>String.</returns>
-        public override string ToString()
-        {
-            return $"{Name} success {Success} runtime {Runtime.TotalMilliseconds}ms";
         }
 
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.

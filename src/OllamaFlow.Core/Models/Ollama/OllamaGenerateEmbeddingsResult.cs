@@ -48,7 +48,6 @@
         [JsonPropertyName("prompt_eval_count")]
         public int? PromptEvalCount { get; set; }
 
-        // Private backing fields
         private object _Embeddings;
 
         /// <summary>
@@ -100,6 +99,15 @@
         public bool IsSingleEmbedding()
         {
             return _Embeddings is List<float>;
+        }
+
+        /// <summary>
+        /// Checks if the result contains multiple embeddings.
+        /// </summary>
+        /// <returns>True if multiple embeddings, false if single.</returns>
+        public bool IsMultiEmbeddings()
+        {
+            return _Embeddings is List<List<float>>;
         }
 
         /// <summary>

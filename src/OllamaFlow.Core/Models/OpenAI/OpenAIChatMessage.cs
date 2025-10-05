@@ -52,7 +52,6 @@
         [JsonPropertyName("tool_call_id")]
         public string ToolCallId { get; set; } = null;
 
-        // Private backing fields
         private string _Role;
 
         /// <summary>

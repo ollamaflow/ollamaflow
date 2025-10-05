@@ -49,7 +49,6 @@
         [JsonPropertyName("truncate")]
         public bool? Truncate { get; set; } = null;
 
-        // Private backing fields
         private object _Input;
 
         /// <summary>

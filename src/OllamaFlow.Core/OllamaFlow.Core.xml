@@ -1178,6 +1178,11 @@
             Enable or disable SSL.
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.Backend.UrlPrefix">
+            <summary>
+            URL prefix.
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.Backend.UnhealthyThreshold">
             <summary>
             Number of consecutive failed health checks before marking a server as unhealthy.
@@ -1212,11 +1217,6 @@
             <summary>
             Threshold at which 429 rate limit responses are sent.
             Default is 10.
-            </summary>
-        </member>
-        <member name="P:OllamaFlow.Core.Backend.UrlPrefix">
-            <summary>
-            URL prefix.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Backend.LogRequestFull">
@@ -2332,11 +2332,6 @@
             The generated text response.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionResult.Done">
-            <summary>
-            Whether the response is complete (for streaming responses).
-            </summary>
-        </member>
         <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionResult.Context">
             <summary>
             Context for maintaining conversation state.
@@ -2408,12 +2403,6 @@
             Gets the generation time in milliseconds.
             </summary>
             <returns>Generation duration in milliseconds, or null if unavailable.</returns>
-        </member>
-        <member name="M:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionResult.IsFinalResponse">
-            <summary>
-            Checks if this is a final response (for streaming).
-            </summary>
-            <returns>True if this is the final response in a stream.</returns>
         </member>
         <member name="M:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionResult.GetTotalTokenCount">
             <summary>
@@ -2552,6 +2541,12 @@
             Checks if the result contains a single embedding.
             </summary>
             <returns>True if single embedding, false if multiple.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.Ollama.OllamaGenerateEmbeddingsResult.IsMultiEmbeddings">
+            <summary>
+            Checks if the result contains multiple embeddings.
+            </summary>
+            <returns>True if multiple embeddings, false if single.</returns>
         </member>
         <member name="M:OllamaFlow.Core.Models.Ollama.OllamaGenerateEmbeddingsResult.GetEmbeddingCount">
             <summary>
@@ -4422,6 +4417,18 @@
             Gets all embeddings as a list of arrays.
             </summary>
         </member>
+        <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateEmbeddingsResult.IsSingleEmbedding">
+            <summary>
+            Checks if the result contains a single embedding.
+            </summary>
+            <returns>True if single embedding, false if multiple.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateEmbeddingsResult.IsMultiEmbeddings">
+            <summary>
+            Checks if the result contains multiple embeddings.
+            </summary>
+            <returns>True if multiple embeddings, false if single.</returns>
+        </member>
         <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateEmbeddingsResult.GetEmbeddingCount">
             <summary>
             Gets the number of embeddings in the result.
@@ -5031,6 +5038,15 @@
             URL builder.
             </summary>
         </member>
+        <member name="M:OllamaFlow.Core.Models.UrlBuilder.BuildUrl(OllamaFlow.Core.OllamaFlowSettings,OllamaFlow.Core.Frontend,OllamaFlow.Core.Enums.RequestTypeEnum)">
+            <summary>
+            Build the URL for a given request.
+            </summary>
+            <param name="settings">Settings.</param>
+            <param name="frontend">Frontend.</param>
+            <param name="requestType">Request type.</param>
+            <returns>URL.</returns>
+        </member>
         <member name="M:OllamaFlow.Core.Models.UrlBuilder.BuildUrl(OllamaFlow.Core.Backend,OllamaFlow.Core.Enums.RequestTypeEnum)">
             <summary>
             Build the URL for a given request.
@@ -5044,6 +5060,14 @@
             Get the HTTP method used for a given request type.
             </summary>
             <param name="backend">Backend.</param>
+            <param name="requestType">Request type.</param>
+            <returns>HTTP method.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.UrlBuilder.GetMethod(OllamaFlow.Core.Enums.ApiFormatEnum,OllamaFlow.Core.Enums.RequestTypeEnum)">
+            <summary>
+            Get the HTTP method used for a given request type.
+            </summary>
+            <param name="apiFormat">API format.</param>
             <param name="requestType">Request type.</param>
             <returns>HTTP method.</returns>
         </member>

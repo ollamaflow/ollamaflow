@@ -55,7 +55,6 @@
             }
         }
 
-        // Private backing fields
         private string _Name;
         private string _Arguments;
 
