@@ -28,6 +28,12 @@
         public OllamaChatMessage Message { get; set; }
 
         /// <summary>
+        /// Whether the response is complete.
+        /// </summary>
+        [JsonPropertyName("done")]
+        public bool Done { get; set; }
+
+        /// <summary>
         /// Reason why the response is done.
         /// Examples: "stop", "length", "function_call"
         /// </summary>
