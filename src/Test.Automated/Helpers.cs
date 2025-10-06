@@ -369,6 +369,75 @@
             return _Serializer.SerializeJson(request, false);
         }
 
+        internal static string OpenAIStreamingCompletionsRequestBody(string model, string prompt, bool stream = true)
+        {
+            OpenAIGenerateCompletionRequest request = new OpenAIGenerateCompletionRequest
+            {
+                Model = model,
+                Stream = stream
+            };
+            request.SetPrompt(prompt);
+            return _Serializer.SerializeJson(request, false);
+        }
+
+        internal static string OpenAIStreamingChatCompletionsRequestBody(string model, List<OpenAIChatMessage> messages, bool stream = true)
+        {
+            OpenAIGenerateChatCompletionRequest request = new OpenAIGenerateChatCompletionRequest
+            {
+                Model = model,
+                Messages = messages,
+                Stream = stream
+            };
+            return _Serializer.SerializeJson(request, false);
+        }
+
+        internal static async Task<OpenAIGenerateCompletionResult> GetOpenAICompletionsResult(RestResponse resp)
+        {
+            if (resp == null) return null;
+            if (!resp.IsSuccessStatusCode) return null;
+
+            string responseData = "";
+            if (resp.ChunkedTransferEncoding)
+            {
+                while (true)
+                {
+                    ChunkData chunk = await resp.ReadChunkAsync();
+                    if (chunk == null) break;
+                    if (chunk.Data != null) responseData += Encoding.UTF8.GetString(chunk.Data);
+                    if (chunk.IsFinal) break;
+                }
+            }
+            else
+            {
+                responseData = resp.DataAsString;
+            }
+
+            return _Serializer.DeserializeJson<OpenAIGenerateCompletionResult>(responseData);
+        }
+
+        internal static async Task<OpenAIGenerateChatCompletionResult> GetOpenAIChatCompletionsResult(RestResponse resp)
+        {
+            if (resp == null) return null;
+            if (!resp.IsSuccessStatusCode) return null;
+
+            string responseData = "";
+            if (resp.ChunkedTransferEncoding)
+            {
+                while (true)
+                {
+                    ChunkData chunk = await resp.ReadChunkAsync();
+                    if (chunk == null) break;
+                    if (chunk.Data != null) responseData += Encoding.UTF8.GetString(chunk.Data);
+                    if (chunk.IsFinal) break;
+                }
+            }
+            else
+            {
+                responseData = resp.DataAsString;
+            }
+            return _Serializer.DeserializeJson<OpenAIGenerateChatCompletionResult>(responseData);
+        }
+
 #pragma warning restore CS8603 // Possible null reference return.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
