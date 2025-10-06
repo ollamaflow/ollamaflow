@@ -17,7 +17,7 @@ namespace Test.Automated.MockServers
     /// </summary>
     internal class OllamaApiServer : IDisposable
     {
-        private Webserver _Server = null;
+        private Webserver _Server = null!;
         private Serializer _Serializer = new Serializer();
         private bool _Disposed = false;
 
@@ -86,7 +86,7 @@ namespace Test.Automated.MockServers
                 {
                     _Server.Stop();
                     _Server.Dispose();
-                    _Server = null;
+                    _Server = null!;
                 }
             }
 
@@ -101,7 +101,7 @@ namespace Test.Automated.MockServers
 
         private async Task GenerateRoute(HttpContextBase ctx)
         {
-            string requestBody = null;
+            string requestBody = null!;
             if (ctx.Request.Data != null && ctx.Request.ContentLength > 0)
             {
                 using (StreamReader reader = new StreamReader(ctx.Request.Data, Encoding.UTF8))
@@ -170,7 +170,7 @@ namespace Test.Automated.MockServers
 
         private async Task ChatRoute(HttpContextBase ctx)
         {
-            string requestBody = null;
+            string requestBody = null!;
             if (ctx.Request.Data != null && ctx.Request.ContentLength > 0)
             {
                 using (StreamReader reader = new StreamReader(ctx.Request.Data, Encoding.UTF8))
@@ -259,7 +259,7 @@ namespace Test.Automated.MockServers
 
         private async Task EmbeddingsRoute(HttpContextBase ctx)
         {
-            string requestBody = null;
+            string requestBody = null!;
             if (ctx.Request.Data != null && ctx.Request.ContentLength > 0)
             {
                 using (StreamReader reader = new StreamReader(ctx.Request.Data, Encoding.UTF8))

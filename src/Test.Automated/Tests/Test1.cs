@@ -7,6 +7,7 @@
     using OllamaFlow.Core.Serialization;
     using RestWrapper;
     using System;
+    using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Net.WebSockets;
     using System.Runtime.CompilerServices;
@@ -32,7 +33,7 @@
                 Identifier = "ollama1",
                 Name = "ollama1",
                 Hostname = "localhost",
-                Port = 11434,
+                Port = 11435,
                 Ssl = false,
                 HealthCheckMethod = "HEAD",
                 HealthCheckUrl = "/",
@@ -214,6 +215,247 @@
                                 test.Success = true;
                                 test.ApiDetails.Add(multiEmbeddings);
                             }
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            #endregion
+
+            #region Completions
+
+            string completionsUrl = UrlBuilder.BuildUrl(OllamaFlowSettings, frontend, RequestTypeEnum.OllamaGenerateCompletion);
+            HttpMethod completionsMethod = UrlBuilder.GetMethod(backend, RequestTypeEnum.OllamaGenerateCompletion);
+
+            #region Non-Streaming-Completions
+
+            body = Helpers.OllamaStreamingCompletionsRequestBody(TestEnvironment.CompletionsModel, "What is the capital of France?", false);
+            ApiDetails nonStreamingCompletions = new ApiDetails
+            {
+                Step = "Ollama Non-Streaming Completions",
+                Request = body
+            };
+
+            using (RestResponse resp = await SendRestRequest<string>(completionsMethod, completionsUrl, body, Constants.JsonContentType))
+            {
+                OllamaGenerateCompletionResult result = await Helpers.GetOllamaCompletionsResult(resp);
+                if (result == null)
+                {
+                    Console.WriteLine("No response for non-streaming completions request");
+                    nonStreamingCompletions.Response = null;
+                    nonStreamingCompletions.StatusCode = 0;
+                    nonStreamingCompletions.EndUtc = DateTime.UtcNow;
+
+                    test.Success = false;
+                    test.ApiDetails.Add(nonStreamingCompletions);
+                    return;
+                }
+                else
+                {
+                    nonStreamingCompletions.Response = resp;
+                    nonStreamingCompletions.StatusCode = resp.StatusCode;
+                    nonStreamingCompletions.EndUtc = DateTime.UtcNow;
+
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Non-success response for non-streaming completions request");
+                        test.Success = false;
+                        test.ApiDetails.Add(nonStreamingCompletions);
+                        return;
+                    }
+                    else
+                    {
+                        if (String.IsNullOrEmpty(result.Response))
+                        {
+                            Console.WriteLine("No response text returned for non-streaming completions request");
+                            test.Success = false;
+                            test.ApiDetails.Add(nonStreamingCompletions);
+                            return;
+                        }
+                        else
+                        {
+                            test.Success = true;
+                            test.ApiDetails.Add(nonStreamingCompletions);
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            #region Streaming-Completions
+
+            body = Helpers.OllamaStreamingCompletionsRequestBody(TestEnvironment.CompletionsModel, "What is the capital of Germany?", true);
+            ApiDetails streamingCompletions = new ApiDetails
+            {
+                Step = "Ollama Streaming Completions",
+                Request = body
+            };
+
+            using (RestResponse resp = await SendRestRequest<string>(completionsMethod, completionsUrl, body, Constants.JsonContentType))
+            {
+                if (resp == null)
+                {
+                    Console.WriteLine("No response for streaming completions request");
+                    streamingCompletions.Response = null;
+                    streamingCompletions.StatusCode = 0;
+                    streamingCompletions.EndUtc = DateTime.UtcNow;
+
+                    test.Success = false;
+                    test.ApiDetails.Add(streamingCompletions);
+                    return;
+                }
+                else
+                {
+                    streamingCompletions.Response = resp;
+                    streamingCompletions.StatusCode = resp.StatusCode;
+                    streamingCompletions.EndUtc = DateTime.UtcNow;
+
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Non-success response for streaming completions request");
+                        test.Success = false;
+                        test.ApiDetails.Add(streamingCompletions);
+                        return;
+                    }
+                    else
+                    {
+                        if (!resp.ChunkedTransferEncoding)
+                        {
+                            Console.WriteLine("Expected chunked transfer encoding for streaming completions request");
+                            test.Success = false;
+                            test.ApiDetails.Add(streamingCompletions);
+                            return;
+                        }
+                        else
+                        {
+                            test.Success = true;
+                            test.ApiDetails.Add(streamingCompletions);
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            #endregion
+
+            #region Chat Completions
+
+            string chatCompletionsUrl = UrlBuilder.BuildUrl(OllamaFlowSettings, frontend, RequestTypeEnum.OllamaGenerateChatCompletion);
+            HttpMethod chatCompletionsMethod = UrlBuilder.GetMethod(backend, RequestTypeEnum.OllamaGenerateChatCompletion);
+
+            #region Non-Streaming-Chat-Completions
+
+            List<OllamaChatMessage> messages = new List<OllamaChatMessage>
+            {
+                new OllamaChatMessage { Role = "user", Content = "Hello, how are you?" }
+            };
+
+            body = Helpers.OllamaStreamingChatCompletionsRequestBody(TestEnvironment.CompletionsModel, messages, false);
+            ApiDetails nonStreamingChatCompletions = new ApiDetails
+            {
+                Step = "Ollama Non-Streaming Chat Completions",
+                Request = body
+            };
+
+            using (RestResponse resp = await SendRestRequest<string>(chatCompletionsMethod, chatCompletionsUrl, body, Constants.JsonContentType))
+            {
+                OllamaGenerateChatCompletionResult result = await Helpers.GetOllamaChatCompletionsResult(resp);
+                if (result == null)
+                {
+                    Console.WriteLine("No response for non-streaming chat completions request");
+                    nonStreamingChatCompletions.Response = null;
+                    nonStreamingChatCompletions.StatusCode = 0;
+                    nonStreamingChatCompletions.EndUtc = DateTime.UtcNow;
+
+                    test.Success = false;
+                    test.ApiDetails.Add(nonStreamingChatCompletions);
+                    return;
+                }
+                else
+                {
+                    nonStreamingChatCompletions.Response = resp;
+                    nonStreamingChatCompletions.StatusCode = resp.StatusCode;
+                    nonStreamingChatCompletions.EndUtc = DateTime.UtcNow;
+
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Non-success response for non-streaming chat completions request");
+                        test.Success = false;
+                        test.ApiDetails.Add(nonStreamingChatCompletions);
+                        return;
+                    }
+                    else
+                    {
+                        if (result.Message == null || String.IsNullOrEmpty(result.Message.Content))
+                        {
+                            Console.WriteLine("No message content returned for non-streaming chat completions request");
+                            test.Success = false;
+                            test.ApiDetails.Add(nonStreamingChatCompletions);
+                            return;
+                        }
+                        else
+                        {
+                            test.Success = true;
+                            test.ApiDetails.Add(nonStreamingChatCompletions);
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            #region Streaming-Chat-Completions
+
+            body = Helpers.OllamaStreamingChatCompletionsRequestBody(TestEnvironment.CompletionsModel, messages, true);
+            ApiDetails streamingChatCompletions = new ApiDetails
+            {
+                Step = "Ollama Streaming Chat Completions",
+                Request = body
+            };
+
+            using (RestResponse resp = await SendRestRequest<string>(chatCompletionsMethod, chatCompletionsUrl, body, Constants.JsonContentType))
+            {
+                if (resp == null)
+                {
+                    Console.WriteLine("No response for streaming chat completions request");
+                    streamingChatCompletions.Response = null;
+                    streamingChatCompletions.StatusCode = 0;
+                    streamingChatCompletions.EndUtc = DateTime.UtcNow;
+
+                    test.Success = false;
+                    test.ApiDetails.Add(streamingChatCompletions);
+                    return;
+                }
+                else
+                {
+                    streamingChatCompletions.Response = resp;
+                    streamingChatCompletions.StatusCode = resp.StatusCode;
+                    streamingChatCompletions.EndUtc = DateTime.UtcNow;
+
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Non-success response for streaming chat completions request");
+                        test.Success = false;
+                        test.ApiDetails.Add(streamingChatCompletions);
+                        return;
+                    }
+                    else
+                    {
+                        if (!resp.ChunkedTransferEncoding)
+                        {
+                            Console.WriteLine("Expected chunked transfer encoding for streaming chat completions request");
+                            test.Success = false;
+                            test.ApiDetails.Add(streamingChatCompletions);
+                            return;
+                        }
+                        else
+                        {
+                            test.Success = true;
+                            test.ApiDetails.Add(streamingChatCompletions);
                         }
                     }
                 }

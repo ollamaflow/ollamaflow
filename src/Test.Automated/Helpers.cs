@@ -303,6 +303,72 @@
             }
         }
 
+        internal static async Task<OllamaGenerateCompletionResult> GetOllamaCompletionsResult(RestResponse resp)
+        {
+            if (resp == null) return null;
+            if (!resp.IsSuccessStatusCode) return null;
+
+            string responseData = "";
+            if (resp.ChunkedTransferEncoding)
+            {
+                while (true)
+                {
+                    ChunkData chunk = await resp.ReadChunkAsync();
+                    if (chunk == null) break;
+                    if (chunk.Data != null) responseData += Encoding.UTF8.GetString(chunk.Data);
+                    if (chunk.IsFinal) break;
+                }
+            }
+            else
+                responseData = resp.DataAsString;
+
+            return _Serializer.DeserializeJson<OllamaGenerateCompletionResult>(responseData);
+        }
+
+        internal static async Task<OllamaGenerateChatCompletionResult> GetOllamaChatCompletionsResult(RestResponse resp)
+        {
+            if (resp == null) return null;
+            if (!resp.IsSuccessStatusCode) return null;
+
+            string responseData = "";
+            if (resp.ChunkedTransferEncoding)
+            {
+                while (true)
+                {
+                    ChunkData chunk = await resp.ReadChunkAsync();
+                    if (chunk == null) break;
+                    if (chunk.Data != null) responseData += Encoding.UTF8.GetString(chunk.Data);
+                    if (chunk.IsFinal) break;
+                }
+            }
+            else
+                responseData = resp.DataAsString;
+
+            return _Serializer.DeserializeJson<OllamaGenerateChatCompletionResult>(responseData);
+        }
+
+        internal static string OllamaStreamingCompletionsRequestBody(string model, string prompt, bool stream = true)
+        {
+            OllamaGenerateCompletion request = new OllamaGenerateCompletion
+            {
+                Model = model,
+                Prompt = prompt,
+                Stream = stream
+            };
+            return _Serializer.SerializeJson(request, false);
+        }
+
+        internal static string OllamaStreamingChatCompletionsRequestBody(string model, List<OllamaChatMessage> messages, bool stream = true)
+        {
+            OllamaGenerateChatCompletionRequest request = new OllamaGenerateChatCompletionRequest
+            {
+                Model = model,
+                Messages = messages,
+                Stream = stream
+            };
+            return _Serializer.SerializeJson(request, false);
+        }
+
 #pragma warning restore CS8603 // Possible null reference return.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
