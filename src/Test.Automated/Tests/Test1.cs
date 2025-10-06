@@ -57,7 +57,8 @@
                 UseStickySessions = false,
                 AllowEmbeddings = true,
                 AllowCompletions = true,
-                AllowRetries = true
+                AllowRetries = true,
+                TimeoutMs = 120000,
             };
 
             TestEnvironment.Frontends.Add(frontend1);
