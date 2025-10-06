@@ -27,8 +27,8 @@ namespace Test.Automated.Tests
             {
                 Identifier = "vllm1",
                 Name = "vllm1",
-                Hostname = "localhost",
-                Port = 8001,
+                Hostname = "34.55.208.75",
+                Port = 8000,
                 Ssl = false,
                 HealthCheckMethod = "GET",
                 HealthCheckUrl = "/health",

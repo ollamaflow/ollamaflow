@@ -33,7 +33,7 @@
                 Identifier = "ollama1",
                 Name = "ollama1",
                 Hostname = "localhost",
-                Port = 11435,
+                Port = 11434,
                 Ssl = false,
                 HealthCheckMethod = "HEAD",
                 HealthCheckUrl = "/",
