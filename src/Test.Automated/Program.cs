@@ -60,6 +60,7 @@
             results.Add(await RunTest(new Test6(), true));
             results.Add(await RunTest(new Test7(), true));
             results.Add(await RunTest(new Test8(), true));
+            results.Add(await RunTest(new Test9(), true));
 
             #endregion
 
