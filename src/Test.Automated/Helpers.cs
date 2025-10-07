@@ -438,6 +438,57 @@
             return _Serializer.DeserializeJson<OpenAIGenerateChatCompletionResult>(responseData);
         }
 
+        internal static async Task<bool> WaitForModelSynchronization(OllamaFlowDaemon daemon, string backendIdentifier, string modelName, int timeoutMs = 300000)
+        {
+            try
+            {
+                Console.WriteLine($"Waiting for model {modelName} to be synchronized on backend {backendIdentifier}...");
+                
+                int waited = 0;
+                int intervalMs = 5000;
+                
+                while (waited < timeoutMs)
+                {
+                    await Task.Delay(intervalMs);
+                    waited += intervalMs;
+                    
+                    Backend backend = daemon.Backends.GetByIdentifier(backendIdentifier);
+                    if (backend == null)
+                    {
+                        Console.WriteLine($"Backend {backendIdentifier} not found");
+                        return false;
+                    }
+                    
+                    string listModelsUrl = $"http://{backend.Hostname}:{backend.Port}/api/tags";
+                    
+                    using (RestRequest req = new RestRequest(listModelsUrl, HttpMethod.Get))
+                    {
+                        RestResponse resp = await req.SendAsync();
+                        
+                        if (resp != null && resp.IsSuccessStatusCode)
+                        {
+                            string responseData = resp.DataAsString;
+                            if (responseData.Contains($"\"name\":\"{modelName}\"") || responseData.Contains($"\"name\":\"{modelName}:"))
+                            {
+                                Console.WriteLine($"Model {modelName} is now available on backend {backendIdentifier}");
+                                return true;
+                            }
+                        }
+                    }
+                    
+                    Console.WriteLine($"Model {modelName} not yet available on backend {backendIdentifier}, waiting... ({waited}/{timeoutMs}ms)");
+                }
+                
+                Console.WriteLine($"Timeout waiting for model {modelName} on backend {backendIdentifier} after {timeoutMs}ms");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception while waiting for model {modelName} on backend {backendIdentifier}: {ex.Message}");
+                return false;
+            }
+        }
+
 #pragma warning restore CS8603 // Possible null reference return.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.

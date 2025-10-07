@@ -57,7 +57,7 @@ namespace Test.Automated.Tests
             };
 
             TestEnvironment.Frontends.Add(frontend1);
-
+            TestEnvironment.CompletionsModel = "Qwen/Qwen2.5-3B";
             InitializeTestEnvironment(true);
         }
 
@@ -257,7 +257,7 @@ namespace Test.Automated.Tests
             }
 
             #endregion
-            
+
             #region Streaming-Chat-Completions
 
             body = Helpers.OpenAIStreamingChatCompletionsRequestBody(TestEnvironment.CompletionsModel, messages, true);
