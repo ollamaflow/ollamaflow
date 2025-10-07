@@ -192,7 +192,6 @@ namespace Test.Automated.Tests
 
             #region Multiple Embeddings Request with Model Override
 
-            // Request with a different model - should be overridden by frontend configuration
             body = Helpers.OllamaMultipleEmbeddingsRequestBody("all-minilm", new List<string> { "hello", "world" });
             ApiDetails multipleEmbeddingsWithOverride = new ApiDetails
             {
@@ -265,7 +264,6 @@ namespace Test.Automated.Tests
 
             #region Embeddings Request with Correct Model (Should Still Work)
 
-            // Request with the correct model that matches the override - should work normally
             body = Helpers.OllamaSingleEmbeddingsRequestBody("nomic-embed-text", "test embeddings with correct model");
             ApiDetails embeddingsWithCorrectModel = new ApiDetails
             {
