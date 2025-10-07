@@ -56,7 +56,6 @@ namespace Test.Automated.Tests
                 AllowEmbeddings = true,
                 AllowCompletions = true,
                 AllowRetries = true,
-                // Override the model for embeddings requests - force all embeddings to use "nomic-embed-text"
                 PinnedEmbeddingsProperties = new Dictionary<string, object>
                 {
                     { "model", "nomic-embed-text" }
