@@ -131,7 +131,6 @@ namespace Test.Automated.Tests
             string embeddingsUrl = UrlBuilder.BuildUrl(OllamaFlowSettings, frontend, RequestTypeEnum.OllamaGenerateEmbeddings);
             HttpMethod embeddingsMethod = UrlBuilder.GetMethod(backend, RequestTypeEnum.OllamaGenerateEmbeddings);
 
-            // Request with a different model - should be overridden by frontend configuration
             string body = Helpers.OllamaSingleEmbeddingsRequestBody("all-minilm", "test embeddings with model override");
             ApiDetails singleEmbeddingsWithOverride = new ApiDetails
             {
