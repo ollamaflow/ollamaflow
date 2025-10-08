@@ -24,7 +24,7 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 - **🔄 Universal API Support**: Frontend supports both Ollama and OpenAI API formats
 - **🌐 Multi-Backend Support**: Connect to Ollama, OpenAI, [vLLM](https://vllm.ai), [SharpAI](https://github.com/jchristn/sharpai), and other OpenAI-compatible backends
 - **⚖️ Smart Load Balancing**: Distribute requests intelligently across healthy backends
-- **🔒 Security and Control**: Fine-grained control over request types and parameter enforcement for secure inference and embeddings deployments
+- **🔒 Security and Control**: Fine-grained control over request types, parameter enforcement, and backend selection for secure inference and embeddings deployments
 - **🔧 Automatic Model Sync**: Ensure all backends have the required models (Ollama-compatible backends only)
 - **❤️ Health Monitoring**: Real-time health checks with configurable thresholds
 - **📊 Zero Downtime**: Provide high-availability to mitigate effects of backend failures
@@ -55,6 +55,7 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 ### Security and Control
 - **Request type restrictions** - Control embeddings and completions access at frontend and backend levels
 - **Pinned request properties** - Enforce or override parameters for compliance (models, context size, temperature, etc.)
+- **Backend selection** - Force backend selection based on labels attached to incoming requests for compliance and other use cases
 - **Bearer token authentication** for admin APIs
 - **Multi-tenant isolation** through separate virtual frontends
 
@@ -156,6 +157,10 @@ Backends represent your actual AI inference instances (Ollama, OpenAI, vLLM, Sha
   "ApiFormat": "Ollama",
   "AllowEmbeddings": true,
   "AllowCompletions": true,
+  "Labels": [
+    "eu-central-1",
+    "has-nvidia-gpu"
+  ],
   "PinnedEmbeddingsProperties": {
     "model": "all-minilm"
   },
@@ -206,7 +211,7 @@ OllamaFlow provides universal API compatibility with native transformation betwe
 
 ### Request Control & Security
 
-OllamaFlow provides fine-grained control over request types and parameters at both the frontend and backend levels:
+OllamaFlow provides fine-grained control over request types, request parameters, and backend selection. 
 
 #### Request Type Restrictions
 
@@ -259,6 +264,19 @@ Force specific properties into requests using `PinnedEmbeddingsProperties` and `
     }
   }
 }
+```
+
+#### Backend Selection
+
+Numerous reasons exist why someone would want to dictate which backends can be used for a given operation, and the combination of `Backend.Labels` and requests with the `X-OllamaFlow-Label` allow you to do exactly this.  For example, a backend might be labeled `americas` whereas another might be labeled `europe`.  To ensure requests that are in scope for GDPR happen only in Europe, add the `X-OllamaFlow-Label: europe` header to the incoming request, which will force OllamaFlow to only consider backends with that label.
+
+Backend:
+```json
+...
+  "Labels": [
+    "europe"
+  ],
+...
 ```
 
 ### Multi-Backend Testing
