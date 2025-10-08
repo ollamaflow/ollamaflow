@@ -6,6 +6,7 @@
     using System.Data;
     using System.Linq;
     using System.Net.Http;
+    using System.Text;
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
@@ -672,7 +673,10 @@
                             }
                             else
                             {
-                                await ctx.Response.SendChunk(chunk.Data, chunk.IsFinal, token).ConfigureAwait(false);
+                                byte[] chunkBytes = new byte[chunk.Data.Length + 1];
+                                Buffer.BlockCopy(chunk.Data, 0, chunkBytes, 0, chunk.Data.Length);
+                                Buffer.BlockCopy(Encoding.UTF8.GetBytes("\n"), 0, chunkBytes, (chunkBytes.Length - 1), 1);
+                                await ctx.Response.SendChunk(chunkBytes, chunk.IsFinal, token).ConfigureAwait(false);
                                 if (chunk.IsFinal) break;
                             }
                         }
