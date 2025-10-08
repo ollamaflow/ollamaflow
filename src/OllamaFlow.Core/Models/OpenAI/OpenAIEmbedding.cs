@@ -18,16 +18,16 @@
         public string Object { get; set; }
 
         /// <summary>
-        /// The embedding vector.
-        /// </summary>
-        [JsonPropertyName("embedding")]
-        public List<float> Embedding { get; set; }
-
-        /// <summary>
         /// Index of this embedding in the input array.
         /// </summary>
         [JsonPropertyName("index")]
         public int Index { get; set; }
+
+        /// <summary>
+        /// The embedding vector.
+        /// </summary>
+        [JsonPropertyName("embedding")]
+        public float[] Embedding { get; set; }
 
         /// <summary>
         /// OpenAI embedding.

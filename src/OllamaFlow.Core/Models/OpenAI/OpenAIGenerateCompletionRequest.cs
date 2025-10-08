@@ -1,5 +1,6 @@
 ﻿namespace OllamaFlow.Core.Models.OpenAI
 {
+    using OllamaFlow.Core.Models.OpenAI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -204,8 +205,51 @@
         private int? _BestOf;
 
         /// <summary>
+        /// Gets the prompt as a single string.
+        /// Throws an exception if the prompt is a list.
+        /// </summary>
+        /// <returns>The prompt string.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when prompt is a list instead of a single string.</exception>
+        public string GetPrompt()
+        {
+            if (_Prompt == null)
+                return null;
+
+            if (_Prompt is string singlePrompt)
+                return singlePrompt;
+
+            if (_Prompt is List<string> || _Prompt is string[])
+                throw new InvalidOperationException("Prompt is a list. Use GetPrompts() to retrieve multiple prompt strings.");
+
+            throw new InvalidOperationException($"Prompt is of unexpected type: {_Prompt.GetType()}");
+        }
+
+        /// <summary>
+        /// Gets the prompt as an array of strings.
+        /// If prompt is a single string, returns an array with one element.
+        /// </summary>
+        /// <returns>Array of prompt strings.</returns>
+        public string[] GetPrompts()
+        {
+            if (_Prompt == null)
+                return null;
+
+            if (_Prompt is string singlePrompt)
+                return new string[] { singlePrompt };
+
+            if (_Prompt is string[] arrayPrompts)
+                return arrayPrompts;
+
+            if (_Prompt is List<string> listPrompts)
+                return listPrompts.ToArray();
+
+            throw new InvalidOperationException($"Prompt is of unexpected type: {_Prompt.GetType()}");
+        }
+
+        /// <summary>
         /// Sets a single prompt string.
         /// </summary>
+        /// <param name="prompt">The prompt string.</param>
         public void SetPrompt(string prompt)
         {
             if (string.IsNullOrEmpty(prompt))
@@ -214,8 +258,9 @@
         }
 
         /// <summary>
-        /// Sets multiple prompts.
+        /// Sets multiple prompts from a List.
         /// </summary>
+        /// <param name="prompts">The list of prompt strings.</param>
         public void SetPrompts(List<string> prompts)
         {
             if (prompts == null || prompts.Count == 0)
@@ -223,6 +268,28 @@
             if (prompts.Any(string.IsNullOrEmpty))
                 throw new ArgumentException("Prompts cannot contain null or empty strings", nameof(prompts));
             _Prompt = prompts;
+        }
+
+        /// <summary>
+        /// Sets multiple prompts from an array.
+        /// </summary>
+        /// <param name="prompts">The array of prompt strings.</param>
+        public void SetPrompts(string[] prompts)
+        {
+            if (prompts == null || prompts.Length == 0)
+                throw new ArgumentException("Prompts cannot be null or empty", nameof(prompts));
+            if (prompts.Any(string.IsNullOrEmpty))
+                throw new ArgumentException("Prompt array cannot contain null or empty strings", nameof(prompts));
+            _Prompt = prompts;
+        }
+
+        /// <summary>
+        /// Checks if the prompt is a single string.
+        /// </summary>
+        /// <returns>True if prompt is a single string, false otherwise.</returns>
+        public bool IsSinglePrompt()
+        {
+            return _Prompt is string;
         }
 
         /// <summary>

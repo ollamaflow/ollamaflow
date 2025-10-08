@@ -1,5 +1,6 @@
 ﻿namespace OllamaFlow.Core.Models.OpenAI
 {
+    using OllamaFlow.Core.Models.OpenAI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -39,7 +40,7 @@
         /// Gets a single embedding array.
         /// Throws if the result contains multiple embeddings.
         /// </summary>
-        public List<float> GetEmbedding()
+        public float[] GetEmbedding()
         {
             if (Data == null || Data.Count == 0)
                 return null;
@@ -53,15 +54,29 @@
         /// <summary>
         /// Gets all embeddings as a list of arrays.
         /// </summary>
-        public List<List<float>> GetEmbeddings()
+        public List<float[]> GetEmbeddings()
         {
             if (Data == null || Data.Count == 0)
-                return new List<List<float>>();
+                return new List<float[]>();
 
             return Data
                 .OrderBy(e => e.Index)
                 .Select(e => e.Embedding)
                 .ToList();
+        }
+
+        /// <summary>
+        /// Gets all embeddings as a jagged array.
+        /// </summary>
+        public float[][] GetEmbeddingsArray()
+        {
+            if (Data == null || Data.Count == 0)
+                return new float[0][];
+
+            return Data
+                .OrderBy(e => e.Index)
+                .Select(e => e.Embedding)
+                .ToArray();
         }
 
         /// <summary>
@@ -98,7 +113,7 @@
             if (Data == null || Data.Count == 0)
                 return null;
 
-            return Data[0].Embedding?.Count;
+            return Data[0].Embedding?.Length;
         }
 
         /// <summary>

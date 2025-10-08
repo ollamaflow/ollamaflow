@@ -4276,14 +4276,14 @@
             Object type (always "embedding").
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.OpenAI.OpenAIEmbedding.Embedding">
-            <summary>
-            The embedding vector.
-            </summary>
-        </member>
         <member name="P:OllamaFlow.Core.Models.OpenAI.OpenAIEmbedding.Index">
             <summary>
             Index of this embedding in the input array.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.OpenAI.OpenAIEmbedding.Embedding">
+            <summary>
+            The embedding vector.
             </summary>
         </member>
         <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIEmbedding.#ctor">
@@ -4314,6 +4314,51 @@
         <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIEmbeddingUsage.#ctor">
             <summary>
             OpenAI embedding usage.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.OpenAI.OpenAIError">
+            <summary>
+            OpenAI error message.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.OpenAI.OpenAIError.Error">
+            <summary>
+            Error details.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIError.#ctor">
+            <summary>
+            OpenAI error message.
+            </summary>
+        </member>
+        <member name="T:OllamaFlow.Core.Models.OpenAI.OpenAIErrorDetails">
+            <summary>
+            OpenAI error details.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.OpenAI.OpenAIErrorDetails.Message">
+            <summary>
+            Message.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.OpenAI.OpenAIErrorDetails.Type">
+            <summary>
+            Type.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.OpenAI.OpenAIErrorDetails.Parameters">
+            <summary>
+            Parameters.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Models.OpenAI.OpenAIErrorDetails.Code">
+            <summary>
+            Code.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIErrorDetails.#ctor">
+            <summary>
+            OpenAI error details.
             </summary>
         </member>
         <member name="T:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateChatCompletionRequest">
@@ -4595,15 +4640,44 @@
             Random seed for deterministic generation.
             </summary>
         </member>
+        <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest.GetPrompt">
+            <summary>
+            Gets the prompt as a single string.
+            Throws an exception if the prompt is a list.
+            </summary>
+            <returns>The prompt string.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when prompt is a list instead of a single string.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest.GetPrompts">
+            <summary>
+            Gets the prompt as an array of strings.
+            If prompt is a single string, returns an array with one element.
+            </summary>
+            <returns>Array of prompt strings.</returns>
+        </member>
         <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest.SetPrompt(System.String)">
             <summary>
             Sets a single prompt string.
             </summary>
+            <param name="prompt">The prompt string.</param>
         </member>
         <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest.SetPrompts(System.Collections.Generic.List{System.String})">
             <summary>
-            Sets multiple prompts.
+            Sets multiple prompts from a List.
             </summary>
+            <param name="prompts">The list of prompt strings.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest.SetPrompts(System.String[])">
+            <summary>
+            Sets multiple prompts from an array.
+            </summary>
+            <param name="prompts">The array of prompt strings.</param>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest.IsSinglePrompt">
+            <summary>
+            Checks if the prompt is a single string.
+            </summary>
+            <returns>True if prompt is a single string, false otherwise.</returns>
         </member>
         <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest.#ctor">
             <summary>
@@ -4769,6 +4843,11 @@
         <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateEmbeddingsResult.GetEmbeddings">
             <summary>
             Gets all embeddings as a list of arrays.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateEmbeddingsResult.GetEmbeddingsArray">
+            <summary>
+            Gets all embeddings as a jagged array.
             </summary>
         </member>
         <member name="M:OllamaFlow.Core.Models.OpenAI.OpenAIGenerateEmbeddingsResult.IsSingleEmbedding">

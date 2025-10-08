@@ -330,10 +330,10 @@ namespace Test.Automated.MockServers
             List<OpenAIEmbedding> embeddings = new List<OpenAIEmbedding>();
             for (int i = 0; i < numInputs; i++)
             {
-                List<float> embedding = new List<float>();
+                float[] embedding = new float[1536];
                 for (int j = 0; j < 1536; j++)
                 {
-                    embedding.Add(0.01f * (i + 1) * (j + 1));
+                    embedding[j] = (0.01f * (i + 1) * (j + 1));
                 }
 
                 embeddings.Add(new OpenAIEmbedding
