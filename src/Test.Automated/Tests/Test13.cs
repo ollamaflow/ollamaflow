@@ -9,7 +9,7 @@ namespace Test.Automated.Tests
     using RestWrapper;
 
     /// <summary>
-    /// Test 13: Two Ollama backends, sticky sessions enabled, ensure A) the request is pinned properly (three consecutive requests) and B) the request is unpinned and moved to another backend when the original backend goes offline
+    /// Test 13: Sticky session pinning and failover test with two Ollama backends
     /// </summary>
     public class Test13 : TestBase
     {
@@ -17,11 +17,11 @@ namespace Test.Automated.Tests
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
         /// <summary>
-        /// Test 13: Two Ollama backends, sticky sessions enabled, ensure A) the request is pinned properly (three consecutive requests) and B) the request is unpinned and moved to another backend when the original backend goes offline
+        /// Test 13: Sticky session pinning and failover test with two Ollama backends
         /// </summary>
         public Test13()
         {
-            Name = "Test 13: Two Ollama backends, sticky sessions enabled, ensure A) the request is pinned properly (three consecutive requests) and B) the request is unpinned and moved to another backend when the original backend goes offline";
+            Name = "Test 13: Sticky session pinning and failover test with two Ollama backends";
 
             // Create 2 Ollama backends
             Backend ollama1 = new Backend
@@ -80,7 +80,7 @@ namespace Test.Automated.Tests
         }
 
         /// <summary>
-        /// Test 13: Two Ollama backends, sticky sessions enabled, ensure A) the request is pinned properly (three consecutive requests) and B) the request is unpinned and moved to another backend when the original backend goes offline
+        /// Test 13: Sticky session pinning and failover test with two Ollama backends
         /// </summary>
         /// <param name="test">Test results.</param>
         /// <returns>Task.</returns>
