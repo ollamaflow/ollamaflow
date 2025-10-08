@@ -57,10 +57,10 @@ namespace Test.Automated.Tests
                 AllowCompletions = true,
                 AllowRetries = true,
                 PinnedEmbeddingsProperties = null,
-                // Override the model for completions requests - force all completions to use "llama3:latest"
+                // Override the model for completions requests - force all completions to use "gemma3:4b"
                 PinnedCompletionsProperties = new Dictionary<string, object>
                 {
-                    { "model", "llama3:latest" }
+                    { "model", "gemma3:4b" }
                 }
             };
 
@@ -82,56 +82,12 @@ namespace Test.Automated.Tests
             Frontend frontend = OllamaFlowDaemon.Frontends.GetAll().ToList()[0];
             Backend backend = OllamaFlowDaemon.Backends.GetAll().ToList()[0];
 
-            #region Wait for Model Synchronization
-
-            string overrideModel = "llama3:latest";
-            Console.WriteLine($"Waiting for OllamaFlow to synchronize model {overrideModel}...");
-            
-            bool modelSynchronized = await Helpers.WaitForModelSynchronization(OllamaFlowDaemon, "ollama1", overrideModel, 300000); // 5 minute timeout
-            
-            if (!modelSynchronized)
-            {
-                Console.WriteLine($"Model {overrideModel} was not synchronized within timeout period");
-                test.Success = false;
-                
-                ApiDetails modelSyncFailure = new ApiDetails
-                {
-                    Step = "Model Synchronization Wait",
-                    Request = $"Waiting for OllamaFlow to synchronize {overrideModel} model",
-                    Response = $"Model {overrideModel} was not synchronized within timeout period",
-                    StatusCode = 408, // Request Timeout
-                    StartUtc = DateTime.UtcNow,
-                    EndUtc = DateTime.UtcNow
-                };
-                
-                test.ApiDetails.Add(modelSyncFailure);
-                return;
-            }
-            else
-            {
-                Console.WriteLine($"Model {overrideModel} has been synchronized and is ready for testing");
-                
-                ApiDetails modelSyncSuccess = new ApiDetails
-                {
-                    Step = "Model Synchronization Wait",
-                    Request = $"Waiting for OllamaFlow to synchronize {overrideModel} model",
-                    Response = $"{overrideModel} model has been synchronized successfully",
-                    StatusCode = 200,
-                    StartUtc = DateTime.UtcNow,
-                    EndUtc = DateTime.UtcNow
-                };
-                
-                test.ApiDetails.Add(modelSyncSuccess);
-            }
-
-            #endregion
-
             #region Non-Streaming Completions Request with Model Override
 
             string completionsUrl = UrlBuilder.BuildUrl(OllamaFlowSettings, frontend, RequestTypeEnum.OllamaGenerateCompletion);
             HttpMethod completionsMethod = UrlBuilder.GetMethod(backend, RequestTypeEnum.OllamaGenerateCompletion);
 
-            string body = Helpers.OllamaStreamingCompletionsRequestBody("gemma3:4b", "What is the capital of France?", false);
+            string body = Helpers.OllamaStreamingCompletionsRequestBody("llama3:latest", "What is the capital of France?", false);
             ApiDetails nonStreamingCompletionsWithOverride = new ApiDetails
             {
                 Step = "Non-Streaming Completions Request with Model Override",
@@ -193,7 +149,7 @@ namespace Test.Automated.Tests
 
             #region Streaming Completions Request with Model Override
 
-            body = Helpers.OllamaStreamingCompletionsRequestBody("gemma3:4b", "What is the capital of Germany?", true);
+            body = Helpers.OllamaStreamingCompletionsRequestBody("llama3:latest", "What is the capital of Germany?", true);
             ApiDetails streamingCompletionsWithOverride = new ApiDetails
             {
                 Step = "Streaming Completions Request with Model Override",
@@ -262,7 +218,7 @@ namespace Test.Automated.Tests
                 new OllamaChatMessage { Role = "user", Content = "Hello, how are you? This is a test with completions model override." }
             };
 
-            body = Helpers.OllamaStreamingChatCompletionsRequestBody("gemma3:4b", messages, false);
+            body = Helpers.OllamaStreamingChatCompletionsRequestBody("llama3:latest", messages, false);
             ApiDetails chatCompletionsWithOverride = new ApiDetails
             {
                 Step = "Chat Completions Request with Model Override",
@@ -324,7 +280,7 @@ namespace Test.Automated.Tests
 
             #region Completions Request with Correct Model (Should Still Work)
 
-            body = Helpers.OllamaStreamingCompletionsRequestBody("llama3:latest", "What is the capital of Italy?", false);
+            body = Helpers.OllamaStreamingCompletionsRequestBody("gemma3:4b", "What is the capital of Italy?", false);
             ApiDetails completionsWithCorrectModel = new ApiDetails
             {
                 Step = "Completions Request with Correct Model",

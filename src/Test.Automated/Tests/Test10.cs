@@ -50,7 +50,7 @@ namespace Test.Automated.Tests
                 Hostname = "localhost",
                 LoadBalancing = LoadBalancingMode.RoundRobin,
                 Backends = new List<string> { "ollama1" },
-                RequiredModels = new List<string> { "all-minilm", "nomic-embed-text", "gemma3:4b" },
+                RequiredModels = new List<string> { "all-minilm", "gemma3:4b" },
                 UseStickySessions = false,
                 TimeoutMs = 120000,
                 AllowEmbeddings = true,
@@ -58,7 +58,7 @@ namespace Test.Automated.Tests
                 AllowRetries = true,
                 PinnedEmbeddingsProperties = new Dictionary<string, object>
                 {
-                    { "model", "nomic-embed-text" }
+                    { "model", "all-minilm" }
                 },
                 PinnedCompletionsProperties = null
             };
@@ -81,56 +81,12 @@ namespace Test.Automated.Tests
             Frontend frontend = OllamaFlowDaemon.Frontends.GetAll().ToList()[0];
             Backend backend = OllamaFlowDaemon.Backends.GetAll().ToList()[0];
 
-            #region Wait for Model Synchronization
-
-            string overrideModel = "nomic-embed-text";
-            Console.WriteLine($"Waiting for OllamaFlow to synchronize model {overrideModel}...");
-            
-            bool modelSynchronized = await Helpers.WaitForModelSynchronization(OllamaFlowDaemon, "ollama1", overrideModel, 300000);
-            
-            if (!modelSynchronized)
-            {
-                Console.WriteLine($"Model {overrideModel} was not synchronized within timeout period");
-                test.Success = false;
-                
-                ApiDetails modelSyncFailure = new ApiDetails
-                {
-                    Step = "Model Synchronization Wait",
-                    Request = $"Waiting for OllamaFlow to synchronize {overrideModel} model",
-                    Response = $"Model {overrideModel} was not synchronized within timeout period",
-                    StatusCode = 408,
-                    StartUtc = DateTime.UtcNow,
-                    EndUtc = DateTime.UtcNow
-                };
-                
-                test.ApiDetails.Add(modelSyncFailure);
-                return;
-            }
-            else
-            {
-                Console.WriteLine($"Model {overrideModel} has been synchronized and is ready for testing");
-                
-                ApiDetails modelSyncSuccess = new ApiDetails
-                {
-                    Step = "Model Synchronization Wait",
-                    Request = $"Waiting for OllamaFlow to synchronize {overrideModel} model",
-                    Response = $"{overrideModel} model has been synchronized successfully",
-                    StatusCode = 200,
-                    StartUtc = DateTime.UtcNow,
-                    EndUtc = DateTime.UtcNow
-                };
-                
-                test.ApiDetails.Add(modelSyncSuccess);
-            }
-
-            #endregion
-
             #region Single Embeddings Request with Model Override
 
             string embeddingsUrl = UrlBuilder.BuildUrl(OllamaFlowSettings, frontend, RequestTypeEnum.OllamaGenerateEmbeddings);
             HttpMethod embeddingsMethod = UrlBuilder.GetMethod(backend, RequestTypeEnum.OllamaGenerateEmbeddings);
 
-            string body = Helpers.OllamaSingleEmbeddingsRequestBody("all-minilm", "test embeddings with model override");
+            string body = Helpers.OllamaSingleEmbeddingsRequestBody("nomic-embed-text", "test embeddings with model override");
             ApiDetails singleEmbeddingsWithOverride = new ApiDetails
             {
                 Step = "Single Embeddings Request with Model Override",
@@ -192,7 +148,7 @@ namespace Test.Automated.Tests
 
             #region Multiple Embeddings Request with Model Override
 
-            body = Helpers.OllamaMultipleEmbeddingsRequestBody("all-minilm", new List<string> { "hello", "world" });
+            body = Helpers.OllamaMultipleEmbeddingsRequestBody("nomic-embed-text", new List<string> { "hello", "world" });
             ApiDetails multipleEmbeddingsWithOverride = new ApiDetails
             {
                 Step = "Multiple Embeddings Request with Model Override",
@@ -264,7 +220,7 @@ namespace Test.Automated.Tests
 
             #region Embeddings Request with Correct Model (Should Still Work)
 
-            body = Helpers.OllamaSingleEmbeddingsRequestBody("nomic-embed-text", "test embeddings with correct model");
+            body = Helpers.OllamaSingleEmbeddingsRequestBody("all-minilm", "test embeddings with correct model");
             ApiDetails embeddingsWithCorrectModel = new ApiDetails
             {
                 Step = "Embeddings Request with Correct Model",
