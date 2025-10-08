@@ -9,8 +9,15 @@
     /// <summary>
     /// Custom JSON converter for flexible embeddings handling (single array or array of arrays).
     /// </summary>
-    internal class OllamaEmbeddingsOutputConverter : JsonConverter<object>
+    public class OllamaEmbeddingsOutputConverter : JsonConverter<object>
     {
+        /// <summary>
+        /// Read.
+        /// </summary>
+        /// <param name="reader">Reader.</param>
+        /// <param name="typeToConvert">Type to convert.</param>
+        /// <param name="options">Options.</param>
+        /// <returns>Object.</returns>
         public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.StartArray)
@@ -111,6 +118,12 @@
             return embeddings;
         }
 
+        /// <summary>
+        /// Write.
+        /// </summary>
+        /// <param name="writer">Writer.</param>
+        /// <param name="value">Value.</param>
+        /// <param name="options">Options.</param>
         public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
         {
             if (value == null)

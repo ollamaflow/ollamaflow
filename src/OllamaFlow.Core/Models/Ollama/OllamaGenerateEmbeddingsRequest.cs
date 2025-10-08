@@ -76,20 +76,43 @@
         }
 
         /// <summary>
-        /// Gets the input as a list of strings.
-        /// If input is a single string, returns a list with one element.
+        /// Gets the input as a single string.
+        /// Throws an exception if the input is a list.
         /// </summary>
-        /// <returns>List of input strings.</returns>
-        public List<string> GetInputs()
+        /// <returns>The input string.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when input is a list instead of a single string.</exception>
+        public string GetInput()
         {
             if (_Input == null)
                 return null;
 
             if (_Input is string singleInput)
-                return new List<string> { singleInput };
+                return singleInput;
 
-            if (_Input is List<string> multipleInputs)
-                return multipleInputs;
+            if (_Input is List<string>)
+                throw new InvalidOperationException("Input is a list. Use GetInputs() to retrieve multiple input strings.");
+
+            throw new InvalidOperationException($"Input is of unexpected type: {_Input.GetType()}");
+        }
+
+        /// <summary>
+        /// Gets the input as an array of strings.
+        /// If input is a single string, returns an array with one element.
+        /// </summary>
+        /// <returns>Array of input strings.</returns>
+        public string[] GetInputs()
+        {
+            if (_Input == null)
+                return null;
+
+            if (_Input is string singleInput)
+                return new string[] { singleInput };
+
+            if (_Input is string[] arrayInputs)
+                return arrayInputs;
+
+            if (_Input is List<string> listInputs)
+                return listInputs.ToArray();
 
             throw new InvalidOperationException($"Input is of unexpected type: {_Input.GetType()}");
         }

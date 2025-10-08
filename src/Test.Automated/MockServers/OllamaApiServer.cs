@@ -110,7 +110,7 @@ namespace Test.Automated.MockServers
                 }
             }
 
-            OllamaGenerateCompletion request = _Serializer.DeserializeJson<OllamaGenerateCompletion>(requestBody);
+            OllamaGenerateCompletionRequest request = _Serializer.DeserializeJson<OllamaGenerateCompletionRequest>(requestBody);
 
             bool stream = request.Stream ?? true;
 
@@ -270,8 +270,8 @@ namespace Test.Automated.MockServers
 
             OllamaGenerateEmbeddingsRequest request = _Serializer.DeserializeJson<OllamaGenerateEmbeddingsRequest>(requestBody);
 
-            List<string> inputs = request.GetInputs();
-            int numInputs = inputs?.Count ?? 1;
+            string[] inputs = request.GetInputs();
+            int numInputs = inputs?.Length ?? 1;
 
             List<List<float>> embeddings = new List<List<float>>();
             for (int i = 0; i < numInputs; i++)

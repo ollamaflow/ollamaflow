@@ -6,7 +6,7 @@
     /// <summary>
     /// Ollama generate completion request.
     /// </summary>
-    public class OllamaGenerateCompletion
+    public class OllamaGenerateCompletionRequest
     {
         /// <summary>
         /// Model name to use for generation (required).
@@ -89,7 +89,7 @@
         /// <summary>
         /// Ollama generate completion request.
         /// </summary>
-        public OllamaGenerateCompletion()
+        public OllamaGenerateCompletionRequest()
         {
         }
     }

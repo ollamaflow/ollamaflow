@@ -2040,6 +2040,23 @@
             Custom JSON converter for flexible input handling (string or array of strings).
             </summary>
         </member>
+        <member name="M:OllamaFlow.Core.Models.Ollama.OllamaEmbeddingsInputConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Read.
+            </summary>
+            <param name="reader">Reader.</param>
+            <param name="typeToConvert">Type to convert.</param>
+            <param name="options">Options.</param>
+            <returns>Object.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.Ollama.OllamaEmbeddingsInputConverter.Write(System.Text.Json.Utf8JsonWriter,System.Object,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Write.
+            </summary>
+            <param name="writer">Writer.</param>
+            <param name="value">Value.</param>
+            <param name="options">Options.</param>
+        </member>
         <member name="T:OllamaFlow.Core.Models.Ollama.OllamaEmbeddingsOptions">
             <summary>
             Ollama embeddings options.
@@ -2103,6 +2120,23 @@
             <summary>
             Custom JSON converter for flexible embeddings handling (single array or array of arrays).
             </summary>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.Ollama.OllamaEmbeddingsOutputConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Read.
+            </summary>
+            <param name="reader">Reader.</param>
+            <param name="typeToConvert">Type to convert.</param>
+            <param name="options">Options.</param>
+            <returns>Object.</returns>
+        </member>
+        <member name="M:OllamaFlow.Core.Models.Ollama.OllamaEmbeddingsOutputConverter.Write(System.Text.Json.Utf8JsonWriter,System.Object,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Write.
+            </summary>
+            <param name="writer">Writer.</param>
+            <param name="value">Value.</param>
+            <param name="options">Options.</param>
         </member>
         <member name="T:OllamaFlow.Core.Models.Ollama.OllamaGenerateChatCompletionChunk">
             <summary>
@@ -2421,68 +2455,68 @@
             Ollama generate completion chunk.
             </summary>
         </member>
-        <member name="T:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion">
+        <member name="T:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest">
             <summary>
             Ollama generate completion request.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.Model">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.Model">
             <summary>
             Model name to use for generation (required).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.Prompt">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.Prompt">
             <summary>
             The prompt to generate a response for (required).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.Options">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.Options">
             <summary>
             Additional model parameters (optional).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.System">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.System">
             <summary>
             System message to use (overrides what is defined in the Modelfile) (optional).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.Template">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.Template">
             <summary>
             The full prompt or prompt template (overrides what is defined in the Modelfile) (optional).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.Context">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.Context">
             <summary>
             The context from a previous request, used to keep a conversation going (optional).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.Stream">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.Stream">
             <summary>
             Enable streaming of generated text (optional, defaults to true).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.Raw">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.Raw">
             <summary>
             If false, the response will not include the prompt (optional).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.Format">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.Format">
             <summary>
             Format to return the response in. Currently only "json" is supported (optional).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.Images">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.Images">
             <summary>
             Base64-encoded images for multimodal models (optional).
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.KeepAlive">
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.KeepAlive">
             <summary>
             How long to keep the model loaded in memory (optional).
             Examples: "5m", "10m", "1h", "never"
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion.#ctor">
+        <member name="M:OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletionRequest.#ctor">
             <summary>
             Ollama generate completion request.
             </summary>
@@ -2664,12 +2698,20 @@
             </summary>
             <param name="inputs">The array of input strings.</param>
         </member>
+        <member name="M:OllamaFlow.Core.Models.Ollama.OllamaGenerateEmbeddingsRequest.GetInput">
+            <summary>
+            Gets the input as a single string.
+            Throws an exception if the input is a list.
+            </summary>
+            <returns>The input string.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when input is a list instead of a single string.</exception>
+        </member>
         <member name="M:OllamaFlow.Core.Models.Ollama.OllamaGenerateEmbeddingsRequest.GetInputs">
             <summary>
-            Gets the input as a list of strings.
-            If input is a single string, returns a list with one element.
+            Gets the input as an array of strings.
+            If input is a single string, returns an array with one element.
             </summary>
-            <returns>List of input strings.</returns>
+            <returns>Array of input strings.</returns>
         </member>
         <member name="M:OllamaFlow.Core.Models.Ollama.OllamaGenerateEmbeddingsRequest.IsSingleInput">
             <summary>

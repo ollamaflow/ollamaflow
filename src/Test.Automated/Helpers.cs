@@ -156,7 +156,7 @@
             string model,
             string prompt)
         {
-            OllamaGenerateCompletion request = new OllamaGenerateCompletion
+            OllamaGenerateCompletionRequest request = new OllamaGenerateCompletionRequest
             {
                 Model = model,
                 Prompt = prompt
@@ -349,7 +349,7 @@
 
         internal static string OllamaStreamingCompletionsRequestBody(string model, string prompt, bool stream = true)
         {
-            OllamaGenerateCompletion request = new OllamaGenerateCompletion
+            OllamaGenerateCompletionRequest request = new OllamaGenerateCompletionRequest
             {
                 Model = model,
                 Prompt = prompt,
