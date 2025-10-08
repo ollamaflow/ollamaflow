@@ -202,7 +202,10 @@
         /// <param name="e">Exception.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>Task.</returns>
-        internal async Task ExceptionRoute(HttpContextBase ctx, Exception e, CancellationToken token = default)
+        internal async Task ExceptionRoute(
+            HttpContextBase ctx, 
+            Exception e, 
+            CancellationToken token = default)
         {
             _Logging.Warn(_Header + "exception of type " + e.GetType().Name + " encountered:" + Environment.NewLine + e.ToString());
 
@@ -447,7 +450,10 @@
         /// <param name="req">Request context.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>True if the request is handled and complete, false otherwise.</returns>
-        private async Task<bool> HandleAdminApiRequest(HttpContextBase ctx, RequestContext req, CancellationToken token = default)
+        private async Task<bool> HandleAdminApiRequest(
+            HttpContextBase ctx, 
+            RequestContext req, 
+            CancellationToken token = default)
         {
             switch (req.RequestType)
             {
@@ -513,7 +519,7 @@
         {
             #region Get-Backend
 
-            Backend backend = _Services.HealthCheck.GetNextBackend(req, frontend); // considers stickiness
+            Backend backend = _Services.HealthCheck.GetNextBackend(req, frontend); // considers stickiness, labels
             if (backend == null)
             {
                 _Logging.Warn($"{_Header}no healthy backend found for frontend {frontend.Identifier}");

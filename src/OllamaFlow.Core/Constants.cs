@@ -148,6 +148,11 @@ namespace OllamaFlow.Core
         public static string StickyServerHeader = "X-OllamaFlow-Sticky";
 
         /// <summary>
+        /// Label header.
+        /// </summary>
+        public static string LabelHeader = "X-OllamaFlow-Label";
+
+        /// <summary>
         /// Expose headers header.
         /// </summary>
         public static string ExposeHeadersHeader = "Access-Control-Expose-Headers";

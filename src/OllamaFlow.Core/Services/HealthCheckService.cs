@@ -197,9 +197,10 @@ namespace OllamaFlow.Core.Services
         /// </summary>
         /// <param name="frontend">Frontend.</param>
         /// <param name="requestType">Type of request to filter backends by capability.</param>
+        /// <param name="label">Label on which to match.</param>
         /// <returns>Backend.</returns>
         /// <exception cref="ArgumentNullException">Thrown when frontend is null.</exception>
-        internal Backend GetNextBackend(Frontend frontend, RequestTypeEnum requestType)
+        internal Backend GetNextBackend(Frontend frontend, RequestTypeEnum requestType, string label)
         {
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
 
@@ -213,6 +214,15 @@ namespace OllamaFlow.Core.Services
                     {
                         if (backend.Active && backend.Healthy)
                         {
+                            if (!String.IsNullOrEmpty(label))
+                            {
+                                if (!backend.Labels.Any(l => l.Contains(label)))
+                                {
+                                    _Logging.Debug(_Header + "backend " + backend.Identifier + " does not contain label " + label + ", skipping");
+                                    continue;
+                                }
+                            }
+
                             if (RequestTypeHelper.IsEmbeddingsRequest(requestType) && !backend.AllowEmbeddings) continue;
                             if (RequestTypeHelper.IsCompletionsRequest(requestType) && !backend.AllowCompletions) continue;
                             candidates.Add(backend);
@@ -281,6 +291,8 @@ namespace OllamaFlow.Core.Services
             if (req == null) throw new ArgumentNullException(nameof(req));
             if (frontend == null) throw new ArgumentNullException(nameof(frontend));
 
+            string label = req.Headers.Get(Constants.LabelHeader);
+
             if (frontend.UseStickySessions)
             {
                 string stickyBackendId = _Services.SessionStickiness.GetStickyBackend(req.ClientIdentifier, frontend.Identifier);
@@ -330,7 +342,7 @@ namespace OllamaFlow.Core.Services
                 }
 
                 // No valid sticky session, select a new backend using normal load balancing
-                Backend selectedBackend = GetNextBackend(frontend, req.RequestType);
+                Backend selectedBackend = GetNextBackend(frontend, req.RequestType, label);
 
                 if (selectedBackend != null)
                 {
@@ -344,7 +356,7 @@ namespace OllamaFlow.Core.Services
             else
             {
                 // Sticky sessions not enabled, use normal load balancing
-                return GetNextBackend(frontend, req.RequestType);
+                return GetNextBackend(frontend, req.RequestType, label);
             }
         }
 
@@ -382,6 +394,7 @@ namespace OllamaFlow.Core.Services
                 cached.ApiFormat = backend.ApiFormat;
                 cached.AllowEmbeddings = backend.AllowEmbeddings;
                 cached.AllowCompletions = backend.AllowCompletions;
+                cached.Labels = backend.Labels;
                 cached.PinnedEmbeddingsProperties = backend.PinnedEmbeddingsProperties;
                 cached.PinnedCompletionsProperties = backend.PinnedCompletionsProperties;
                 cached.Active = backend.Active;

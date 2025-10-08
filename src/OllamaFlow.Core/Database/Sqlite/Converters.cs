@@ -652,6 +652,7 @@
                 LogRequestBody = GetDataRowIntValue(row, "logrequestbody") == 1,
                 LogResponseBody = GetDataRowIntValue(row, "logresponsebody") == 1,
                 ApiFormat = Enum.TryParse<ApiFormatEnum>(GetDataRowStringValue(row, "apiformat"), out ApiFormatEnum apiFormat) ? apiFormat : ApiFormatEnum.Ollama,
+                LabelsString = GetDataRowStringValue(row, "labels"),
                 PinnedEmbeddingsPropertiesString = GetDataRowStringValue(row, "pinnedembeddingsprops"),
                 PinnedCompletionsPropertiesString = GetDataRowStringValue(row, "pinnedcompletionsprops"),
                 AllowEmbeddings = allowEmbeddings,

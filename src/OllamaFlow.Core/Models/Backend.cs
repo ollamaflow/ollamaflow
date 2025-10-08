@@ -226,6 +226,43 @@
         }
 
         /// <summary>
+        /// List of string labels for the backend; these are used in load-balancing decisions.  
+        /// When a request is received with a label, only backends with matching labels will be considered.
+        /// </summary>
+        public List<string> Labels
+        {
+            get
+            {
+                return _Labels;
+            }
+            set
+            {
+                if (value == null) value = new List<string>();
+                _Labels = value;
+                _LabelsString = Serializer.SerializeJson(value, false);
+            }
+        }
+
+        /// <summary>
+        /// String containing JSON-serialized labels for the backend; these are used in load-balancing decisions.  
+        /// When a request is received with a label, only backends with matching labels will be considered.
+        /// </summary>
+        [JsonIgnore]
+        public string LabelsString
+        {
+            get
+            {
+                return _LabelsString;
+            }
+            set
+            {
+                if (String.IsNullOrEmpty(value)) value = "[]";
+                _LabelsString = value;
+                _Labels = Serializer.DeserializeJson<List<string>>(value);
+            }
+        }
+
+        /// <summary>
         /// Dictionary containing pinned properties, which will be applied to every embeddings request.
         /// </summary>
         public Dictionary<string, object> PinnedEmbeddingsProperties
@@ -406,6 +443,8 @@
         private string _HealthCheckMethod = "GET";
         private string _HealthCheckUrl = "/";
         private List<string> _Models = new List<string>();
+        private List<string> _Labels = new List<string>();
+        private string _LabelsString = "[]";
         private Dictionary<string, object> _PinnedEmbeddingsProperties = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         private string _PinnedEmbeddingsPropertiesString = "{}";
         private Dictionary<string, object> _PinnedCompletionsProperties = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);

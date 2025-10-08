@@ -100,6 +100,11 @@
             Sticky server header.
             </summary>
         </member>
+        <member name="F:OllamaFlow.Core.Constants.LabelHeader">
+            <summary>
+            Label header.
+            </summary>
+        </member>
         <member name="F:OllamaFlow.Core.Constants.ExposeHeadersHeader">
             <summary>
             Expose headers header.
@@ -1243,6 +1248,18 @@
         <member name="P:OllamaFlow.Core.Backend.PinnedEmbeddingsPropertiesString">
             <summary>
             String containing JSON-serialized pinned properties, which will be applied to every embeddings request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.Labels">
+            <summary>
+            List of string labels for the backend; these are used in load-balancing decisions.  
+            When a request is received with a label, only backends with matching labels will be considered.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.LabelsString">
+            <summary>
+            String containing JSON-serialized labels for the backend; these are used in load-balancing decisions.  
+            When a request is received with a label, only backends with matching labels will be considered.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Backend.PinnedEmbeddingsProperties">
@@ -5963,12 +5980,13 @@
             Initialize.
             </summary>
         </member>
-        <member name="M:OllamaFlow.Core.Services.HealthCheckService.GetNextBackend(OllamaFlow.Core.Frontend,OllamaFlow.Core.Enums.RequestTypeEnum)">
+        <member name="M:OllamaFlow.Core.Services.HealthCheckService.GetNextBackend(OllamaFlow.Core.Frontend,OllamaFlow.Core.Enums.RequestTypeEnum,System.String)">
             <summary>
             Retrieve the next backend that should be used for a request to a given frontend.
             </summary>
             <param name="frontend">Frontend.</param>
             <param name="requestType">Type of request to filter backends by capability.</param>
+            <param name="label">Label on which to match.</param>
             <returns>Backend.</returns>
             <exception cref="T:System.ArgumentNullException">Thrown when frontend is null.</exception>
         </member>

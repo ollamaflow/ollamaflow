@@ -66,6 +66,7 @@
                 + "logrequestbody INT NOT NULL, "
                 + "logresponsebody INT NOT NULL, "
                 + "apiformat VARCHAR(32) DEFAULT 'Ollama', "
+                + "labels VARCHAR(512) NOT NULL, "
                 + "pinnedembeddingsprops VARCHAR(2048) NOT NULL, "
                 + "pinnedcompletionsprops VARCHAR(2048) NOT NULL, "
                 + "allowembeddings INT NOT NULL DEFAULT 1, "
