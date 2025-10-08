@@ -64,6 +64,7 @@
             results.Add(await RunTest(new Test10(), true));
             results.Add(await RunTest(new Test11(), true));
             results.Add(await RunTest(new Test12(), true));
+            results.Add(await RunTest(new Test13(), true));
 
             #endregion
 
