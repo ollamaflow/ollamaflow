@@ -357,7 +357,18 @@
                 if (req.RequestType == RequestTypeEnum.OllamaPullModel)
                 {
                     OllamaPullModelRequest opmr = _Serializer.DeserializeJson<OllamaPullModelRequest>(ctx.Request.DataAsString);
-                    if (opmr == null || String.IsNullOrEmpty(opmr.Model))
+                    if (opmr == null)
+                    {
+                        _Logging.Warn($"{_Header}no model supplied in pull model request");
+                        await SendBadRequest(ctx, "No model property supplied in pull model request.", _TokenSource.Token).ConfigureAwait(false);
+                        return;
+                    }
+
+                    string modelName = null;
+                    if (!String.IsNullOrEmpty(opmr.Name)) modelName = opmr.Name;
+                    if (!String.IsNullOrEmpty(opmr.Model)) modelName = opmr.Model;
+
+                    if (String.IsNullOrEmpty(modelName))
                     {
                         _Logging.Warn($"{_Header}no model supplied in pull model request");
                         await SendBadRequest(ctx, "No model property supplied in pull model request.", _TokenSource.Token).ConfigureAwait(false);
@@ -366,15 +377,15 @@
 
                     lock (frontend.Lock)
                     {
-                        if (!frontend.RequiredModels.Contains(opmr.Model))
+                        if (!frontend.RequiredModels.Contains(modelName))
                         {
-                            frontend.RequiredModels.Add(opmr.Model);
+                            frontend.RequiredModels.Add(modelName);
                             Frontend updated = _Services.Frontend.Update(frontend);
-                            _Logging.Debug($"{_Header}added model {opmr.Model} to required models for frontend {frontend.Identifier}");
+                            _Logging.Debug($"{_Header}added model {modelName} to required models for frontend {frontend.Identifier}");
                         }
                         else
                         {
-                            _Logging.Debug($"{_Header}model {opmr.Model} already required by frontend {frontend.Identifier}");
+                            _Logging.Debug($"{_Header}model {modelName} already required by frontend {frontend.Identifier}");
                         }
                     }
                 }

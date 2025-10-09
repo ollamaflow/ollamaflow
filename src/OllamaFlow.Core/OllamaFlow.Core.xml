@@ -3290,6 +3290,11 @@
             Model name to pull (required).
             </summary>
         </member>
+        <member name="P:OllamaFlow.Core.Models.Ollama.OllamaPullModelRequest.Name">
+            <summary>
+            Model name to pull (required).
+            </summary>
+        </member>
         <member name="P:OllamaFlow.Core.Models.Ollama.OllamaPullModelRequest.Insecure">
             <summary>
             Allow insecure connections to the registry (optional).

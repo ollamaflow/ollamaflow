@@ -14,6 +14,12 @@
         public string Model { get; set; } = null;
 
         /// <summary>
+        /// Model name to pull (required).
+        /// </summary>
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = null;
+
+        /// <summary>
         /// Allow insecure connections to the registry (optional).
         /// </summary>
         [JsonPropertyName("insecure")]
