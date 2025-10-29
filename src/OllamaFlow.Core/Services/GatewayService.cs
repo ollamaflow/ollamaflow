@@ -474,6 +474,9 @@
                 case RequestTypeEnum.AdminGetFrontend:
                     await _Handlers.AdminApi.GetFrontendRoute(ctx, token).ConfigureAwait(false);
                     return true;
+                case RequestTypeEnum.AdminExistsFrontend:
+                    await _Handlers.AdminApi.ExistsFrontendRoute(ctx, token).ConfigureAwait(false);
+                    return true;
                 case RequestTypeEnum.AdminCreateFrontend:
                     await _Handlers.AdminApi.CreateFrontendRoute(ctx, token).ConfigureAwait(false);
                     return true;
@@ -488,6 +491,9 @@
                     return true;
                 case RequestTypeEnum.AdminGetBackend:
                     await _Handlers.AdminApi.GetBackendRoute(ctx, token).ConfigureAwait(false);
+                    return true;
+                case RequestTypeEnum.AdminExistsBackend:
+                    await _Handlers.AdminApi.ExistsBackendRoute(ctx, token).ConfigureAwait(false);
                     return true;
                 case RequestTypeEnum.AdminCreateBackend:
                     await _Handlers.AdminApi.CreateBackendRoute(ctx, token).ConfigureAwait(false);
