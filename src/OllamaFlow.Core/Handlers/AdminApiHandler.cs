@@ -106,6 +106,31 @@
         }
 
         /// <summary>
+        /// Check if a frontend exists by identifier.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>Task.</returns>
+        /// <exception cref="UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        public async Task ExistsFrontendRoute(HttpContextBase ctx, CancellationToken token = default)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string identifier = GetParameter(ctx, "identifier");
+            bool exists = _Services.Frontend.Exists(identifier);
+            
+            if (exists)
+            {
+                ctx.Response.StatusCode = 200;
+                await ctx.Response.Send("true", token).ConfigureAwait(false);
+            }
+            else
+            {
+                ctx.Response.StatusCode = 404;
+                await ctx.Response.Send("false", token).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
         /// Delete a frontend by identifier.
         /// </summary>
         /// <param name="ctx">HTTP context.</param>
@@ -209,6 +234,31 @@
             Backend obj = _Services.Backend.GetByIdentifier(identifier);
             if (obj == null) throw new KeyNotFoundException("Unable to find object with identifier " + identifier + ".");
             await ctx.Response.Send(_Serializer.SerializeJson(obj, true), token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Check if a backend exists by identifier.
+        /// </summary>
+        /// <param name="ctx">HTTP context.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>Task.</returns>
+        /// <exception cref="UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        public async Task ExistsBackendRoute(HttpContextBase ctx, CancellationToken token = default)
+        {
+            if (!IsAuthenticated(ctx)) throw new UnauthorizedAccessException();
+            string identifier = GetParameter(ctx, "identifier");
+            bool exists = _Services.Backend.Exists(identifier);
+            
+            if (exists)
+            {
+                ctx.Response.StatusCode = 200;
+                await ctx.Response.Send("true", token).ConfigureAwait(false);
+            }
+            else
+            {
+                ctx.Response.StatusCode = 404;
+                await ctx.Response.Send("false", token).ConfigureAwait(false);
+            }
         }
 
         /// <summary>

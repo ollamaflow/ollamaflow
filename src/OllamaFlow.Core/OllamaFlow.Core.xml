@@ -849,6 +849,15 @@
             <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when frontend with specified identifier is not found.</exception>
         </member>
+        <member name="M:OllamaFlow.Core.Handlers.AdminApiHandler.ExistsFrontendRoute(WatsonWebserver.Core.HttpContextBase,System.Threading.CancellationToken)">
+            <summary>
+            Check if a frontend exists by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <param name="token">Cancellation token.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
+        </member>
         <member name="M:OllamaFlow.Core.Handlers.AdminApiHandler.DeleteFrontendRoute(WatsonWebserver.Core.HttpContextBase,System.Threading.CancellationToken)">
             <summary>
             Delete a frontend by identifier.
@@ -906,6 +915,15 @@
             <returns>Task.</returns>
             <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when backend with specified identifier is not found.</exception>
+        </member>
+        <member name="M:OllamaFlow.Core.Handlers.AdminApiHandler.ExistsBackendRoute(WatsonWebserver.Core.HttpContextBase,System.Threading.CancellationToken)">
+            <summary>
+            Check if a backend exists by identifier.
+            </summary>
+            <param name="ctx">HTTP context.</param>
+            <param name="token">Cancellation token.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when request is not authenticated.</exception>
         </member>
         <member name="M:OllamaFlow.Core.Handlers.AdminApiHandler.GetBackendHealthRoute(WatsonWebserver.Core.HttpContextBase,System.Threading.CancellationToken)">
             <summary>
