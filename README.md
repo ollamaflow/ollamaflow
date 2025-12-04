@@ -71,14 +71,14 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 
 ```bash
 # Pull the image
-docker pull jchristn/ollamaflow:v1.1.0
+docker pull jchristn/ollamaflow:v1.2.0
 
 # Run with default configuration
 docker run -d \
   -p 43411:43411 \
   -v $(pwd)/ollamaflow.json:/app/ollamaflow.json \
   -v $(pwd)/ollamaflow.db:/app/ollamaflow.db \
-  jchristn/ollamaflow:v1.1.0
+  jchristn/ollamaflow:v1.2.0
 ```
 
 ### Using .NET
@@ -161,6 +161,9 @@ Backends represent your actual AI inference instances (Ollama, OpenAI, vLLM, Sha
     "eu-central-1",
     "has-nvidia-gpu"
   ],
+  "BearerToken": null,
+  "Querystring": null,
+  "Headers": {},
   "PinnedEmbeddingsProperties": {
     "model": "all-minilm"
   },
@@ -170,6 +173,33 @@ Backends represent your actual AI inference instances (Ollama, OpenAI, vLLM, Sha
       "num_ctx": 4096,
       "temperature": 0.3
     }
+  }
+}
+```
+
+#### Backend Request Customization
+
+Backends support additional properties for authenticating with and customizing requests to upstream services:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `BearerToken` | string | If set, adds `Authorization: Bearer {token}` header to all requests |
+| `Querystring` | string | If set, appends to the URL (e.g., `api-version=2024-01`) |
+| `Headers` | object | Custom headers added to all requests (e.g., `{"X-Custom": "value"}`) |
+
+**Example: Azure OpenAI Backend**
+```json
+{
+  "Identifier": "azure-openai",
+  "Name": "Azure OpenAI Service",
+  "Hostname": "my-resource.openai.azure.com",
+  "Port": 443,
+  "Ssl": true,
+  "ApiFormat": "OpenAI",
+  "BearerToken": "your-azure-api-key",
+  "Querystring": "api-version=2024-02-15-preview",
+  "Headers": {
+    "X-MS-Region": "eastus"
   }
 }
 ```
