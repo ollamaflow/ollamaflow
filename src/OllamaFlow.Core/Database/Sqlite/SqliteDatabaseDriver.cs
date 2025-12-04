@@ -144,6 +144,22 @@
         {
             ThrowIfDisposed();
             ExecuteQuery(SetupQueries.CreateTablesAndIndices());
+
+            #region Apply-Migrations
+
+            foreach (string migration in SetupQueries.GetBackendColumnMigrations())
+            {
+                try
+                {
+                    ExecuteQuery(migration);
+                }
+                catch (Exception)
+                {
+                    // Swallow exceptions - column may already exist
+                }
+            }
+
+            #endregion
         }
 
         /// <summary>
