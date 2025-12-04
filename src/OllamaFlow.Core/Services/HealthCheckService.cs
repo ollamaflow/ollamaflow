@@ -678,7 +678,42 @@ namespace OllamaFlow.Core.Services
 
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethodHelper.ToHttpMethod(backend.HealthCheckMethod), healthCheckUrl);
+                    #region Apply-Backend-Querystring
+
+                    string url = healthCheckUrl;
+                    if (!String.IsNullOrEmpty(backend.Querystring))
+                    {
+                        if (url.Contains("?"))
+                        {
+                            url += "&" + backend.Querystring;
+                        }
+                        else
+                        {
+                            url += "?" + backend.Querystring;
+                        }
+                    }
+
+                    #endregion
+
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethodHelper.ToHttpMethod(backend.HealthCheckMethod), url);
+
+                    #region Apply-Backend-Headers
+
+                    if (!String.IsNullOrEmpty(backend.BearerToken))
+                    {
+                        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", backend.BearerToken);
+                    }
+
+                    if (backend.Headers != null && backend.Headers.Count > 0)
+                    {
+                        foreach (KeyValuePair<string, string> header in backend.Headers)
+                        {
+                            request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                        }
+                    }
+
+                    #endregion
+
                     HttpResponseMessage response = await client.SendAsync(request, token).ConfigureAwait(false);
 
                     if (response.IsSuccessStatusCode)

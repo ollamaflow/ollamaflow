@@ -708,11 +708,45 @@ namespace OllamaFlow.Core.Services
                 string baseUrl = (backend.Ssl ? "https://" : "http://") + backend.Hostname + ":" + backend.Port;
                 string tagsUrl = baseUrl + "/api/tags";
 
+                #region Apply-Backend-Querystring
+
+                if (!String.IsNullOrEmpty(backend.Querystring))
+                {
+                    if (tagsUrl.Contains("?"))
+                    {
+                        tagsUrl += "&" + backend.Querystring;
+                    }
+                    else
+                    {
+                        tagsUrl += "?" + backend.Querystring;
+                    }
+                }
+
+                #endregion
+
                 using (HttpClient client = new HttpClient())
                 {
                     client.Timeout = TimeSpan.FromSeconds(30);
 
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, tagsUrl);
+
+                    #region Apply-Backend-Headers
+
+                    if (!String.IsNullOrEmpty(backend.BearerToken))
+                    {
+                        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", backend.BearerToken);
+                    }
+
+                    if (backend.Headers != null && backend.Headers.Count > 0)
+                    {
+                        foreach (KeyValuePair<string, string> header in backend.Headers)
+                        {
+                            request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                        }
+                    }
+
+                    #endregion
+
                     HttpResponseMessage response = await client.SendAsync(request, token).ConfigureAwait(false);
 
                     if (response.IsSuccessStatusCode)
@@ -783,6 +817,22 @@ namespace OllamaFlow.Core.Services
                 string baseUrl = (backend.Ssl ? "https://" : "http://") + backend.Hostname + ":" + backend.Port;
                 string pullUrl = baseUrl + "/api/pull";
 
+                #region Apply-Backend-Querystring
+
+                if (!String.IsNullOrEmpty(backend.Querystring))
+                {
+                    if (pullUrl.Contains("?"))
+                    {
+                        pullUrl += "&" + backend.Querystring;
+                    }
+                    else
+                    {
+                        pullUrl += "?" + backend.Querystring;
+                    }
+                }
+
+                #endregion
+
                 using (HttpClient client = new HttpClient())
                 {
                     client.Timeout = TimeSpan.FromMinutes(30); // Long timeout for model pulls
@@ -790,8 +840,27 @@ namespace OllamaFlow.Core.Services
                     string jsonBody = JsonSerializer.Serialize(new { name = modelName });
                     StringContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, pullUrl);
+                    request.Content = content;
 
-                    HttpResponseMessage response = await client.PostAsync(pullUrl, content, token).ConfigureAwait(false);
+                    #region Apply-Backend-Headers
+
+                    if (!String.IsNullOrEmpty(backend.BearerToken))
+                    {
+                        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", backend.BearerToken);
+                    }
+
+                    if (backend.Headers != null && backend.Headers.Count > 0)
+                    {
+                        foreach (KeyValuePair<string, string> header in backend.Headers)
+                        {
+                            request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                        }
+                    }
+
+                    #endregion
+
+                    HttpResponseMessage response = await client.SendAsync(request, token).ConfigureAwait(false);
 
                     if (response.IsSuccessStatusCode)
                     {
