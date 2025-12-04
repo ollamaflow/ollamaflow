@@ -8,7 +8,7 @@ services:
 
   ollamaflow:
     container_name: 'ollamaflow'
-    image: 'jchristn/ollamaflow:v1.0.0'
+    image: 'jchristn/ollamaflow:v1.2.0'
     ports:
       - "43411:43411"
     stdin_open: true
