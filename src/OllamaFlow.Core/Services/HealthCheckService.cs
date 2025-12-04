@@ -398,6 +398,9 @@ namespace OllamaFlow.Core.Services
                 cached.PinnedEmbeddingsProperties = backend.PinnedEmbeddingsProperties;
                 cached.PinnedCompletionsProperties = backend.PinnedCompletionsProperties;
                 cached.Active = backend.Active;
+                cached.BearerToken = backend.BearerToken;
+                cached.Querystring = backend.Querystring;
+                cached.Headers = backend.Headers;
 
                 if (needsRestart)
                 {
@@ -442,7 +445,11 @@ namespace OllamaFlow.Core.Services
                 PinnedCompletionsProperties = backend.PinnedCompletionsProperties,
                 Active = backend.Active,
                 UnhealthySinceUtc = DateTime.UtcNow,
-                Healthy = false
+                Healthy = false,
+                BearerToken = backend.BearerToken,
+                Querystring = backend.Querystring,
+                Headers = backend.Headers,
+                Labels = backend.Labels
             };
 
             if (_Backends.TryAdd(newBackend.Identifier, newBackend))
@@ -716,12 +723,17 @@ namespace OllamaFlow.Core.Services
 
                     HttpResponseMessage response = await client.SendAsync(request, token).ConfigureAwait(false);
 
+                    string? content = response.Content != null
+                        ? await response.Content.ReadAsStringAsync(token).ConfigureAwait(false)
+                        : null;
+
                     if (response.IsSuccessStatusCode)
                     {
                         HandleHealthCheckSuccess(backend, healthCheckUrl);
                     }
                     else
                     {
+                        _Logging.Warn(_Header + "non-success status returned for healthcheck to backend " + backend.Identifier + " at " + url + ": " + ((int)response.StatusCode));
                         HandleHealthCheckFailure(backend, healthCheckUrl, $"HTTP {response.StatusCode}");
                     }
                 }
