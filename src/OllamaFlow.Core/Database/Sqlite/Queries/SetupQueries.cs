@@ -1,5 +1,6 @@
 ﻿namespace OllamaFlow.Core.Database.Sqlite.Queries
 {
+    using System.Collections.Generic;
     using System.Text;
 
     internal static class SetupQueries
@@ -69,6 +70,9 @@
                 + "labels VARCHAR(512) NOT NULL, "
                 + "pinnedembeddingsprops VARCHAR(2048) NOT NULL, "
                 + "pinnedcompletionsprops VARCHAR(2048) NOT NULL, "
+                + "bearertoken VARCHAR(512), "
+                + "querystring VARCHAR(2048), "
+                + "headers VARCHAR(4096) NOT NULL DEFAULT '{}', "
                 + "allowembeddings INT NOT NULL DEFAULT 1, "
                 + "allowcompletions INT NOT NULL DEFAULT 1, "
                 + "active INT NOT NULL, "
@@ -90,5 +94,24 @@
 
             return sql.ToString();
         }
+
+        #region Updates
+
+        /// <summary>
+        /// Returns a list of ALTER TABLE statements to add columns that may not exist in older databases.
+        /// Each statement should be executed individually with error handling to ignore "duplicate column name" errors.
+        /// </summary>
+        /// <returns>List of ALTER TABLE SQL statements.</returns>
+        internal static List<string> GetBackendColumnMigrations()
+        {
+            return new List<string>
+            {
+                "ALTER TABLE 'backends' ADD COLUMN bearertoken VARCHAR(512);",
+                "ALTER TABLE 'backends' ADD COLUMN querystring VARCHAR(2048);",
+                "ALTER TABLE 'backends' ADD COLUMN headers VARCHAR(4096) NOT NULL DEFAULT '{}';"
+            };
+        }
+
+        #endregion
     }
 }

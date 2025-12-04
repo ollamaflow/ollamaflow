@@ -386,7 +386,14 @@
 					"name": "Generate embeddings (singular)",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "X-OllamaFlow-Label",
+								"value": "mylabel",
+								"type": "text",
+								"disabled": true
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"model\": \"all-minilm\",\r\n  \"input\": \"asdf\"\r\n}",
@@ -728,7 +735,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"vllm\",\r\n    \"Name\": \"vllm\",\r\n    \"Hostname\": \"34.55.208.75\",\r\n    \"Port\": 8000,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": \"GET\",\r\n    \"HealthCheckUrl\": \"/health\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"ApiFormat\": \"OpenAI\",\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { }\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"vllm\",\r\n    \"Name\": \"vllm\",\r\n    \"Hostname\": \"34.55.208.75\",\r\n    \"Port\": 8000,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": \"GET\",\r\n    \"HealthCheckUrl\": \"/health\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"ApiFormat\": \"OpenAI\",\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"BearerToken\": null,\r\n    \"Querystring\": \"\",\r\n    \"Headers\": {},\r\n    \"PinnedEmbeddingsProperties\": { },\r\n    \"PinnedCompletionsProperties\": { }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -757,7 +764,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Identifier\": \"backend1\",\r\n    \"Name\": \"My localhost Ollama instance\",\r\n    \"Hostname\": \"localhost\",\r\n    \"Port\": 11434,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": \"GET\",\r\n    \"HealthCheckUrl\": \"/\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"ApiFormat\": \"Ollama\",\r\n    \"PinnedEmbeddingsProperties\": {},\r\n    \"PinnedCompletionsProperties\": {},\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"Active\": true,\r\n    \"CreatedUtc\": \"2025-09-29T23:01:54.704256Z\",\r\n    \"LastUpdateUtc\": \"2025-09-29T23:01:54.704256Z\",\r\n    \"ActiveRequests\": 0,\r\n    \"IsSticky\": false\r\n}",
+									"raw": "{\r\n    \"Identifier\": \"backend1\",\r\n    \"Name\": \"My localhost Ollama instance\",\r\n    \"Hostname\": \"localhost\",\r\n    \"Port\": 11434,\r\n    \"Ssl\": false,\r\n    \"UnhealthyThreshold\": 2,\r\n    \"HealthyThreshold\": 2,\r\n    \"HealthCheckMethod\": \"GET\",\r\n    \"HealthCheckUrl\": \"/\",\r\n    \"MaxParallelRequests\": 4,\r\n    \"RateLimitRequestsThreshold\": 10,\r\n    \"LogRequestFull\": false,\r\n    \"LogRequestBody\": false,\r\n    \"LogResponseBody\": false,\r\n    \"ApiFormat\": \"Ollama\",\r\n    \"PinnedEmbeddingsProperties\": {},\r\n    \"PinnedCompletionsProperties\": {},\r\n    \"AllowEmbeddings\": true,\r\n    \"AllowCompletions\": true,\r\n    \"BearerToken\": null,\r\n    \"Querystring\": \"\",\r\n    \"Headers\": {},\r\n    \"Active\": true,\r\n    \"CreatedUtc\": \"2025-09-29T23:01:54.704256Z\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -859,6 +866,7 @@
 			"listen": "prerequest",
 			"script": {
 				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -868,6 +876,7 @@
 			"listen": "test",
 			"script": {
 				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -877,18 +886,15 @@
 	"variable": [
 		{
 			"key": "protocol",
-			"value": "http",
-			"type": "string"
+			"value": "http"
 		},
 		{
 			"key": "hostname",
-			"value": "localhost",
-			"type": "string"
+			"value": "localhost"
 		},
 		{
 			"key": "port",
-			"value": "43411",
-			"type": "string"
+			"value": "43411"
 		}
 	]
 }

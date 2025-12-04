@@ -428,6 +428,13 @@
         <member name="M:OllamaFlow.Core.Database.Sqlite.Implementations.FrontendMethods.ExistsByIdentifier(System.String)">
             <inheritdoc />
         </member>
+        <member name="M:OllamaFlow.Core.Database.Sqlite.Queries.SetupQueries.GetBackendColumnMigrations">
+            <summary>
+            Returns a list of ALTER TABLE statements to add columns that may not exist in older databases.
+            Each statement should be executed individually with error handling to ignore "duplicate column name" errors.
+            </summary>
+            <returns>List of ALTER TABLE SQL statements.</returns>
+        </member>
         <member name="T:OllamaFlow.Core.Database.Sqlite.SqliteDatabaseDriver">
             <summary>
             Sqlite database driver.
@@ -1263,11 +1270,6 @@
             Default is Ollama.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Backend.PinnedEmbeddingsPropertiesString">
-            <summary>
-            String containing JSON-serialized pinned properties, which will be applied to every embeddings request.
-            </summary>
-        </member>
         <member name="P:OllamaFlow.Core.Backend.Labels">
             <summary>
             List of string labels for the backend; these are used in load-balancing decisions.  
@@ -1285,14 +1287,19 @@
             Dictionary containing pinned properties, which will be applied to every embeddings request.
             </summary>
         </member>
-        <member name="P:OllamaFlow.Core.Backend.PinnedCompletionsPropertiesString">
+        <member name="P:OllamaFlow.Core.Backend.PinnedEmbeddingsPropertiesString">
             <summary>
-            String containing JSON-serialized pinned properties, which will be applied to every completions request.
+            String containing JSON-serialized pinned properties, which will be applied to every embeddings request.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Backend.PinnedCompletionsProperties">
             <summary>
             Dictionary containing pinned properties, which will be applied to every completions request.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.PinnedCompletionsPropertiesString">
+            <summary>
+            String containing JSON-serialized pinned properties, which will be applied to every completions request.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Backend.AllowEmbeddings">
@@ -1303,6 +1310,28 @@
         <member name="P:OllamaFlow.Core.Backend.AllowCompletions">
             <summary>
             Boolean indicating if completions requests are allowed.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.BearerToken">
+            <summary>
+            Bearer token to include in the Authorization header for requests to this backend.
+            If set, the Authorization header will be set to "Bearer {BearerToken}".
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.Querystring">
+            <summary>
+            Querystring to append to the URL when communicating with this backend.
+            Should not include the leading '?' character.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.Headers">
+            <summary>
+            Dictionary containing custom headers to include in requests to this backend.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Core.Backend.HeadersString">
+            <summary>
+            String containing JSON-serialized custom headers to include in requests to this backend.
             </summary>
         </member>
         <member name="P:OllamaFlow.Core.Backend.Active">

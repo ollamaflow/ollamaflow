@@ -208,24 +208,6 @@
         public ApiFormatEnum ApiFormat { get; set; } = ApiFormatEnum.Ollama;
 
         /// <summary>
-        /// String containing JSON-serialized pinned properties, which will be applied to every embeddings request.
-        /// </summary>
-        [JsonIgnore]
-        public string PinnedEmbeddingsPropertiesString
-        {
-            get
-            {
-                return _PinnedEmbeddingsPropertiesString;
-            }
-            set
-            {
-                if (String.IsNullOrEmpty(value)) value = "{}";
-                _PinnedEmbeddingsPropertiesString = value;
-                _PinnedEmbeddingsProperties = Serializer.DeserializeJson<Dictionary<string, object>>(value);
-            }
-        }
-
-        /// <summary>
         /// List of string labels for the backend; these are used in load-balancing decisions.  
         /// When a request is received with a label, only backends with matching labels will be considered.
         /// </summary>
@@ -280,20 +262,20 @@
         }
 
         /// <summary>
-        /// String containing JSON-serialized pinned properties, which will be applied to every completions request.
+        /// String containing JSON-serialized pinned properties, which will be applied to every embeddings request.
         /// </summary>
         [JsonIgnore]
-        public string PinnedCompletionsPropertiesString
+        public string PinnedEmbeddingsPropertiesString
         {
             get
             {
-                return _PinnedCompletionsPropertiesString;
+                return _PinnedEmbeddingsPropertiesString;
             }
             set
             {
                 if (String.IsNullOrEmpty(value)) value = "{}";
-                _PinnedCompletionsPropertiesString = value;
-                _PinnedCompletionsProperties = Serializer.DeserializeJson<Dictionary<string, object>>(value);
+                _PinnedEmbeddingsPropertiesString = value;
+                _PinnedEmbeddingsProperties = Serializer.DeserializeJson<Dictionary<string, object>>(value);
             }
         }
 
@@ -315,6 +297,24 @@
         }
 
         /// <summary>
+        /// String containing JSON-serialized pinned properties, which will be applied to every completions request.
+        /// </summary>
+        [JsonIgnore]
+        public string PinnedCompletionsPropertiesString
+        {
+            get
+            {
+                return _PinnedCompletionsPropertiesString;
+            }
+            set
+            {
+                if (String.IsNullOrEmpty(value)) value = "{}";
+                _PinnedCompletionsPropertiesString = value;
+                _PinnedCompletionsProperties = Serializer.DeserializeJson<Dictionary<string, object>>(value);
+            }
+        }
+
+        /// <summary>
         /// Boolean indicating if embeddings requests are allowed.
         /// </summary>
         public bool AllowEmbeddings { get; set; } = true;
@@ -323,6 +323,53 @@
         /// Boolean indicating if completions requests are allowed.
         /// </summary>
         public bool AllowCompletions { get; set; } = true;
+
+        /// <summary>
+        /// Bearer token to include in the Authorization header for requests to this backend.
+        /// If set, the Authorization header will be set to "Bearer {BearerToken}".
+        /// </summary>
+        public string BearerToken { get; set; } = null;
+
+        /// <summary>
+        /// Querystring to append to the URL when communicating with this backend.
+        /// Should not include the leading '?' character.
+        /// </summary>
+        public string Querystring { get; set; } = null;
+
+        /// <summary>
+        /// Dictionary containing custom headers to include in requests to this backend.
+        /// </summary>
+        public Dictionary<string, string> Headers
+        {
+            get
+            {
+                return _Headers;
+            }
+            set
+            {
+                if (value == null) value = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+                _Headers = value;
+                _HeadersString = Serializer.SerializeJson(value, false);
+            }
+        }
+
+        /// <summary>
+        /// String containing JSON-serialized custom headers to include in requests to this backend.
+        /// </summary>
+        [JsonIgnore]
+        public string HeadersString
+        {
+            get
+            {
+                return _HeadersString;
+            }
+            set
+            {
+                if (String.IsNullOrEmpty(value)) value = "{}";
+                _HeadersString = value;
+                _Headers = Serializer.DeserializeJson<Dictionary<string, string>>(value);
+            }
+        }
 
         /// <summary>
         /// Boolean indicating if the object is active or not.
@@ -449,6 +496,8 @@
         private string _PinnedEmbeddingsPropertiesString = "{}";
         private Dictionary<string, object> _PinnedCompletionsProperties = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         private string _PinnedCompletionsPropertiesString = "{}";
+        private Dictionary<string, string> _Headers = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+        private string _HeadersString = "{}";
         private SemaphoreSlim _Semaphore = null;
 
         #endregion

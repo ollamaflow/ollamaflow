@@ -586,6 +586,22 @@
             string url = UrlBuilder.BuildUrl(backend, req.RequestType);
             System.Net.Http.HttpMethod method = UrlBuilder.GetMethod(backend, req.RequestType);
 
+            #region Apply-Backend-Querystring
+
+            if (!String.IsNullOrEmpty(backend.Querystring))
+            {
+                if (url.Contains("?"))
+                {
+                    url += "&" + backend.Querystring;
+                }
+                else
+                {
+                    url += "?" + backend.Querystring;
+                }
+            }
+
+            #endregion
+
             RestResponse restResponse = null;
 
             try
@@ -603,6 +619,23 @@
                     if (requestBody.Length > 0)
                     {
                         restRequest.ContentLength = requestBody.Length;
+                    }
+
+                    #endregion
+
+                    #region Apply-Backend-Headers
+
+                    if (!String.IsNullOrEmpty(backend.BearerToken))
+                    {
+                        restRequest.Authorization.BearerToken = backend.BearerToken;
+                    }
+
+                    if (backend.Headers != null && backend.Headers.Count > 0)
+                    {
+                        foreach (KeyValuePair<string, string> header in backend.Headers)
+                        {
+                            restRequest.Headers.Add(header.Key, header.Value);
+                        }
                     }
 
                     #endregion
