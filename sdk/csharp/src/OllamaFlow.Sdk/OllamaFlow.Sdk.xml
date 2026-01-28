@@ -1,0 +1,581 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OllamaFlow.Sdk</name>
+    </assembly>
+    <members>
+        <member name="T:OllamaFlow.Sdk.Implementations.BackendMethods">
+            <summary>
+            Implementation of Backend API methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.BackendMethods.#ctor(OllamaFlow.Sdk.OllamaFlowSdk)">
+            <summary>
+            Initializes a new instance of the BackendMethods class.
+            </summary>
+            <param name="sdk">The OllamaFlowSdk instance to use for API calls.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when sdk is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.BackendMethods.RetrieveMany(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.BackendMethods.RetrieveAllHealth(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.BackendMethods.Retrieve(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.BackendMethods.RetrieveHealth(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.BackendMethods.Exists(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.BackendMethods.Delete(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.BackendMethods.Create(OllamaFlow.Core.Backend,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.BackendMethods.Update(System.String,OllamaFlow.Core.Backend,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OllamaFlow.Sdk.Implementations.FrontendMethods">
+            <summary>
+            Implementation of Frontend management methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.FrontendMethods.#ctor(OllamaFlow.Sdk.OllamaFlowSdk)">
+            <summary>
+            Initialize the FrontendMethods.
+            </summary>
+            <param name="sdk">OllamaFlowSdk instance.</param>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.FrontendMethods.RetrieveMany(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.FrontendMethods.Retrieve(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.FrontendMethods.Exists(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.FrontendMethods.Delete(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.FrontendMethods.Create(OllamaFlow.Core.Frontend,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.FrontendMethods.Update(System.String,OllamaFlow.Core.Frontend,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OllamaFlow.Sdk.Implementations.OllamaMethods">
+            <summary>
+            Implementation of Ollama API methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.#ctor(OllamaFlow.Sdk.OllamaFlowSdk)">
+            <summary>
+            Initializes a new instance of the OllamaMethods class.
+            </summary>
+            <param name="sdk">The OllamaFlowSdk instance to use for API calls.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when sdk is null.</exception>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.PullModel(OllamaFlow.Core.Models.Ollama.OllamaPullModelRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.DeleteModel(OllamaFlow.Core.Models.Ollama.OllamaDeleteModelRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.ListLocalModels(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.ListRunningModels(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.ShowModelInfo(OllamaFlow.Core.Models.Ollama.OllamaShowModelInfoRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.GenerateEmbeddings(OllamaFlow.Core.Models.Ollama.OllamaGenerateEmbeddingsRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.GenerateCompletion(OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.GenerateChatCompletion(OllamaFlow.Core.Models.Ollama.OllamaGenerateChatCompletionRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.GenerateChatCompletionStream(OllamaFlow.Core.Models.Ollama.OllamaGenerateChatCompletionRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OllamaMethods.GenerateCompletionStream(OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OllamaFlow.Sdk.Implementations.OpenAIMethods">
+            <summary>
+            Implementation of OpenAI-compatible API methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OpenAIMethods.#ctor(OllamaFlow.Sdk.OllamaFlowSdk)">
+            <summary>
+            Initialize the OpenAIMethods.
+            </summary>
+            <param name="sdk">OllamaFlowSdk instance.</param>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OpenAIMethods.GenerateCompletion(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OpenAIMethods.GenerateChatCompletion(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateChatCompletionRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OpenAIMethods.GenerateEmbeddings(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateEmbeddingsRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OpenAIMethods.GenerateCompletionStream(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Implementations.OpenAIMethods.GenerateChatCompletionStream(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateChatCompletionRequest,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OllamaFlow.Sdk.Interfaces.IBackendMethods">
+            <summary>
+            Interface for Backend API methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IBackendMethods.RetrieveMany(System.Threading.CancellationToken)">
+            <summary>
+            Retrieves all backends.
+            </summary>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains a list of backends.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IBackendMethods.RetrieveAllHealth(System.Threading.CancellationToken)">
+            <summary>
+            Retrieves health status for all backends.
+            </summary>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains a list of backends with health status.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IBackendMethods.Retrieve(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves a specific backend by identifier.
+            </summary>
+            <param name="identifier">The backend identifier.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the backend.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IBackendMethods.RetrieveHealth(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves health status for a specific backend.
+            </summary>
+            <param name="identifier">The backend identifier.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the backend with health status.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IBackendMethods.Exists(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Checks if a backend exists.
+            </summary>
+            <param name="identifier">The backend identifier.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result indicates whether the backend exists.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IBackendMethods.Delete(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Deletes a backend.
+            </summary>
+            <param name="identifier">The backend identifier.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result indicates whether the deletion was successful.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IBackendMethods.Create(OllamaFlow.Core.Backend,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new backend.
+            </summary>
+            <param name="backend">The backend configuration.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the created backend with server-assigned properties.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IBackendMethods.Update(System.String,OllamaFlow.Core.Backend,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing backend.
+            </summary>
+            <param name="identifier">The backend identifier.</param>
+            <param name="backend">The updated backend configuration.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the updated backend with server-assigned properties.</returns>
+        </member>
+        <member name="T:OllamaFlow.Sdk.Interfaces.IFrontendMethods">
+            <summary>
+            Interface for Frontend management methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IFrontendMethods.RetrieveMany(System.Threading.CancellationToken)">
+            <summary>
+            Retrieve all frontends.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of frontends.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IFrontendMethods.Retrieve(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieve a specific frontend by identifier.
+            </summary>
+            <param name="identifier">Frontend identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Frontend object if found, null otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IFrontendMethods.Exists(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Check if a frontend exists by identifier.
+            </summary>
+            <param name="identifier">Frontend identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if frontend exists, false otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IFrontendMethods.Delete(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Delete a frontend by identifier.
+            </summary>
+            <param name="identifier">Frontend identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if deleted successfully, false otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IFrontendMethods.Create(OllamaFlow.Core.Frontend,System.Threading.CancellationToken)">
+            <summary>
+            Create a new frontend.
+            </summary>
+            <param name="frontend">Frontend object to create.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Created frontend object if successful, null otherwise.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IFrontendMethods.Update(System.String,OllamaFlow.Core.Frontend,System.Threading.CancellationToken)">
+            <summary>
+            Update an existing frontend.
+            </summary>
+            <param name="identifier">Frontend identifier.</param>
+            <param name="frontend">Frontend object with updated data.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Updated frontend object if successful, null otherwise.</returns>
+        </member>
+        <member name="T:OllamaFlow.Sdk.Interfaces.IOllamaMethods">
+            <summary>
+            Interface for Ollama API methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.PullModel(OllamaFlow.Core.Models.Ollama.OllamaPullModelRequest,System.Threading.CancellationToken)">
+            <summary>
+            Pulls a model from the Ollama registry.
+            </summary>
+            <param name="request">The pull model request containing model name and options.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>An async enumerable that yields pull model result messages.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.DeleteModel(OllamaFlow.Core.Models.Ollama.OllamaDeleteModelRequest,System.Threading.CancellationToken)">
+            <summary>
+            Deletes a model from the local Ollama installation.
+            </summary>
+            <param name="request">The delete model request containing the model name.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the delete response.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.ListLocalModels(System.Threading.CancellationToken)">
+            <summary>
+            Lists all locally available models.
+            </summary>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains a list of local models.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.ListRunningModels(System.Threading.CancellationToken)">
+            <summary>
+            Lists all currently running models.
+            </summary>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains a list of running models.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.ShowModelInfo(OllamaFlow.Core.Models.Ollama.OllamaShowModelInfoRequest,System.Threading.CancellationToken)">
+            <summary>
+            Shows detailed information about a specific model.
+            </summary>
+            <param name="request">The show model info request containing the model name.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the model information.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.GenerateEmbeddings(OllamaFlow.Core.Models.Ollama.OllamaGenerateEmbeddingsRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generates embeddings for the provided input text.
+            </summary>
+            <param name="request">The embeddings request containing the model and input text.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the generated embeddings.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.GenerateCompletion(OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion,System.Threading.CancellationToken)">
+            <summary>
+            Generates a text completion using the specified model.
+            </summary>
+            <param name="request">The completion request containing the model and prompt.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the generated completion.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.GenerateChatCompletion(OllamaFlow.Core.Models.Ollama.OllamaGenerateChatCompletionRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generates a chat completion using the specified model and messages.
+            </summary>
+            <param name="request">The chat completion request containing the model and messages.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the generated chat completion.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.GenerateChatCompletionStream(OllamaFlow.Core.Models.Ollama.OllamaGenerateChatCompletionRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generates a streaming chat completion using the specified model and messages.
+            </summary>
+            <param name="request">The chat completion request containing the model and messages.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>An async enumerable that yields chat completion chunks as they are generated.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOllamaMethods.GenerateCompletionStream(OllamaFlow.Core.Models.Ollama.OllamaGenerateCompletion,System.Threading.CancellationToken)">
+            <summary>
+            Generates a streaming text completion using the specified model.
+            </summary>
+            <param name="request">The completion request containing the model and prompt.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>An async enumerable that yields completion chunks as they are generated.</returns>
+        </member>
+        <member name="T:OllamaFlow.Sdk.Interfaces.IOpenAIMethods">
+            <summary>
+            Interface for OpenAI-compatible API methods.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOpenAIMethods.GenerateCompletion(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate text completion using OpenAI-compatible API.
+            </summary>
+            <param name="request">Completion request.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Completion result.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOpenAIMethods.GenerateChatCompletion(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateChatCompletionRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate chat completion using OpenAI-compatible API.
+            </summary>
+            <param name="request">Chat completion request.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Chat completion result.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOpenAIMethods.GenerateEmbeddings(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateEmbeddingsRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate embeddings using OpenAI-compatible API.
+            </summary>
+            <param name="request">Embeddings request.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Embeddings result.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOpenAIMethods.GenerateCompletionStream(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateCompletionRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate streaming text completion using OpenAI-compatible API.
+            </summary>
+            <param name="request">Completion request.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Async enumerable of streaming completion chunks.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.Interfaces.IOpenAIMethods.GenerateChatCompletionStream(OllamaFlow.Core.Models.OpenAI.OpenAIGenerateChatCompletionRequest,System.Threading.CancellationToken)">
+            <summary>
+            Generate streaming chat completion using OpenAI-compatible API.
+            </summary>
+            <param name="request">Chat completion request.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Async enumerable of streaming chat completion chunks.</returns>
+        </member>
+        <member name="T:OllamaFlow.Sdk.OllamaFlowSdk">
+            <summary>
+            OllamaFlow SDK for interacting with OllamaFlow server.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.LogRequests">
+            <summary>
+            Enable or disable logging of request bodies.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.LogResponses">
+            <summary>
+            Enable or disable logging of response bodies.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.Logger">
+            <summary>
+            Method to invoke to send log messages.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.Endpoint">
+            <summary>
+            Endpoint URL for the OllamaFlow server.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.TimeoutMs">
+            <summary>
+            Timeout in milliseconds for HTTP requests.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.BearerToken">
+            <summary>
+            Bearer token for authentication with admin API endpoints.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.Ollama">
+            <summary>
+            Ollama API methods.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.Backend">
+            <summary>
+            Backend API methods.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.Frontend">
+            <summary>
+            Frontend API methods.
+            </summary>
+        </member>
+        <member name="P:OllamaFlow.Sdk.OllamaFlowSdk.OpenAI">
+            <summary>
+            OpenAI-compatible API methods.
+            </summary>
+        </member>
+        <member name="F:OllamaFlow.Sdk.OllamaFlowSdk._JsonOptions">
+            <summary>
+            JSON serializer options for API requests and responses.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.#ctor(System.String)">
+            <summary>
+            Initialize the OllamaFlow SDK.
+            </summary>
+            <param name="endpoint">OllamaFlow server endpoint URL.</param>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.Dispose(System.Boolean)">
+            <summary>
+            Releases the unmanaged resources used by the OllamaFlowSdk and optionally releases the managed resources.
+            </summary>
+            <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.Log(System.String,System.String)">
+            <summary>
+            Logs a message with the specified level.
+            </summary>
+            <param name="level">The log level (e.g., DEBUG, INFO, WARN, ERROR).</param>
+            <param name="message">The message to log.</param>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.SetAuthorizationHeader(RestWrapper.RestRequest)">
+            <summary>
+            Sets the authorization header on a RestRequest if a BearerToken is configured.
+            </summary>
+            <param name="request">The RestRequest to set the authorization header on.</param>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.PostAsync``1(System.String,System.Object,System.Threading.CancellationToken)">
+            <summary>
+            Sends a POST request to the specified URL with the provided data.
+            </summary>
+            <typeparam name="T">The type of the response object.</typeparam>
+            <param name="url">The URL to send the POST request to.</param>
+            <param name="data">The data to send in the request body.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the deserialized response object.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.GetAllAsync``1(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Sends a GET request to the specified URL and returns a list of objects.
+            </summary>
+            <typeparam name="T">The type of objects in the list.</typeparam>
+            <param name="url">The URL to send the GET request to.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains a list of deserialized objects.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.GetAsync``1(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Sends a GET request to the specified URL.
+            </summary>
+            <typeparam name="T">The type of the response object.</typeparam>
+            <param name="url">The URL to send the GET request to.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the deserialized response object.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.DeleteAsync``1(System.String,System.Object,System.Threading.CancellationToken)">
+            <summary>
+            Sends a DELETE request to the specified URL with the provided data.
+            </summary>
+            <typeparam name="T">The type of the response object.</typeparam>
+            <param name="url">The URL to send the DELETE request to.</param>
+            <param name="data">The data to send in the request body.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the deserialized response object.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.GetRawResponse(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Sends a GET request to the specified URL and returns the raw response as a string.
+            </summary>
+            <param name="url">The URL to send the GET request to.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the raw response string.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.DeleteAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Sends a DELETE request to the specified URL.
+            </summary>
+            <param name="url">The URL to send the DELETE request to.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result indicates whether the deletion was successful.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.HeadAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Sends a HEAD request to the specified URL.
+            </summary>
+            <param name="url">The URL to send the HEAD request to.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result indicates whether the resource exists.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.PutAsync``1(System.String,System.Object,System.Threading.CancellationToken)">
+            <summary>
+            Sends a PUT request to the specified URL with the provided data.
+            </summary>
+            <typeparam name="T">The type of the response object.</typeparam>
+            <param name="url">The URL to send the PUT request to.</param>
+            <param name="data">The data to send in the request body.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the deserialized response object.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.GetRawPostResponse(System.String,System.Object,System.Threading.CancellationToken)">
+            <summary>
+            Sends a POST request to the specified URL with the provided data and returns the raw response as a string.
+            </summary>
+            <param name="url">The URL to send the POST request to.</param>
+            <param name="data">The data to send in the request body.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the raw response string.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.ReadResponse(RestWrapper.RestResponse,System.Threading.CancellationToken)">
+            <summary>
+            Reads the response from a RestResponse object, handling both chunked and non-chunked responses.
+            </summary>
+            <param name="resp">The RestResponse object to read from.</param>
+            <param name="token">A cancellation token that can be used to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the response content as a string.</returns>
+        </member>
+        <member name="M:OllamaFlow.Sdk.OllamaFlowSdk.PostStreamAsync``1(System.String,System.Object,System.Threading.CancellationToken,System.Func{System.String,System.String},System.Func{``0,System.Boolean})">
+            <summary>
+            Sends a POST request to the specified URL and returns a stream of deserialized objects.
+            </summary>
+            <typeparam name="T">The type of objects to deserialize from the stream.</typeparam>
+            <param name="url">The URL to send the POST request to.</param>
+            <param name="data">The data to send in the request body.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+            <param name="processLine">Optional function to process each line before deserialization.</param>
+            <param name="shouldStop">Optional function to determine if streaming should stop.</param>
+            <returns>An async enumerable that yields deserialized objects from the stream.</returns>
+        </member>
+    </members>
+</doc>

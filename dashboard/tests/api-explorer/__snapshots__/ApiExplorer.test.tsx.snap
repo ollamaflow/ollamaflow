@@ -1,0 +1,636 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ApiExplorerPage Basic Render Tests should render page container with correct title 1`] = `
+<div>
+  <main
+    class="ant-layout-content pageContainer css-dev-only-do-not-override-1vjf2v5"
+  >
+    <div
+      class="pageTitleContainer ant-flex css-dev-only-do-not-override-1vjf2v5 ant-flex-wrap-wrap ant-flex-align-center ant-flex-justify-space-between ant-flex-gap-small"
+    >
+      <span
+        class="ant-typography css-dev-only-do-not-override-1vjf2v5"
+        data-testid="heading"
+        style="font-weight: 600; font-size: 16px;"
+      >
+        <div
+          class="ant-flex css-dev-only-do-not-override-1vjf2v5 ant-flex-align-center"
+          style="gap: 10px;"
+        >
+          API Explorer
+        </div>
+      </span>
+    </div>
+    <div
+      class="pageContent"
+    >
+      <div
+        class="container"
+      >
+        <div
+          class="ant-collapse ant-collapse-icon-position-start configCard css-dev-only-do-not-override-1vjf2v5"
+        >
+          <div
+            class="ant-collapse-item ant-collapse-item-active"
+          >
+            <div
+              aria-disabled="false"
+              aria-expanded="true"
+              class="ant-collapse-header"
+              role="button"
+              tabindex="0"
+            >
+              <div
+                class="ant-collapse-expand-icon"
+              >
+                <span
+                  aria-label="expanded"
+                  class="anticon anticon-right ant-collapse-arrow"
+                  role="img"
+                >
+                  <svg
+                    aria-hidden="true"
+                    data-icon="right"
+                    fill="currentColor"
+                    focusable="false"
+                    height="1em"
+                    style="transform: rotate(90deg);"
+                    viewBox="64 64 896 896"
+                    width="1em"
+                  >
+                    <path
+                      d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <span
+                class="ant-collapse-header-text"
+              >
+                <span
+                  class="ant-typography css-dev-only-do-not-override-1vjf2v5"
+                  style="font-weight: 600;"
+                >
+                  Settings
+                </span>
+              </span>
+            </div>
+            <div
+              class="ant-collapse-content ant-collapse-content-active"
+            >
+              <div
+                class="ant-collapse-content-box"
+              >
+                <div
+                  class="configContent"
+                >
+                  <div
+                    class="ant-row configUrlRow css-dev-only-do-not-override-1vjf2v5"
+                    style="margin-left: -8px; margin-right: -8px; row-gap: 16px;"
+                  >
+                    <div
+                      class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-16 ant-col-lg-18 ant-col-xl-20 css-dev-only-do-not-override-1vjf2v5"
+                      style="padding-left: 8px; padding-right: 8px;"
+                    >
+                      <div
+                        class="ant-form-item configItem css-dev-only-do-not-override-1vjf2v5"
+                      >
+                        <div
+                          class="ant-row ant-form-item-row css-dev-only-do-not-override-1vjf2v5"
+                        >
+                          <div
+                            class="ant-col ant-form-item-label css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <label
+                              class=""
+                              title="Base URL"
+                            >
+                              Base URL
+                            </label>
+                          </div>
+                          <div
+                            class="ant-col ant-form-item-control css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <div
+                              class="ant-form-item-control-input"
+                            >
+                              <div
+                                class="ant-form-item-control-input-content"
+                              >
+                                <input
+                                  class="ant-input css-dev-only-do-not-override-1vjf2v5 ant-input-outlined"
+                                  placeholder="http://localhost:43411/api/chat"
+                                  type="text"
+                                  value="http://localhost:43411/api/chat"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-8 ant-col-lg-6 ant-col-xl-4 css-dev-only-do-not-override-1vjf2v5"
+                      style="padding-left: 8px; padding-right: 8px;"
+                    >
+                      <div
+                        class="ant-form-item configCheckbox css-dev-only-do-not-override-1vjf2v5"
+                      >
+                        <div
+                          class="ant-row ant-form-item-row css-dev-only-do-not-override-1vjf2v5"
+                        >
+                          <div
+                            class="ant-col ant-form-item-label css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <label
+                              class=""
+                              title="Streaming"
+                            >
+                              Streaming
+                            </label>
+                          </div>
+                          <div
+                            class="ant-col ant-form-item-control css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <div
+                              class="ant-form-item-control-input"
+                            >
+                              <div
+                                class="ant-form-item-control-input-content"
+                              >
+                                <label
+                                  class="ant-checkbox-wrapper ant-checkbox-wrapper-checked ant-checkbox-wrapper-in-form-item css-dev-only-do-not-override-1vjf2v5"
+                                >
+                                  <span
+                                    class="ant-checkbox ant-wave-target css-dev-only-do-not-override-1vjf2v5 ant-checkbox-checked"
+                                  >
+                                    <input
+                                      checked=""
+                                      class="ant-checkbox-input"
+                                      type="checkbox"
+                                    />
+                                    <span
+                                      class="ant-checkbox-inner"
+                                    />
+                                  </span>
+                                  <span
+                                    class="ant-checkbox-label"
+                                  >
+                                    Enable Streaming
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-row configGrid css-dev-only-do-not-override-1vjf2v5"
+                    style="margin-left: -8px; margin-right: -8px; row-gap: 16px;"
+                  >
+                    <div
+                      class="ant-col ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-8 ant-col-xl-8 css-dev-only-do-not-override-1vjf2v5"
+                      style="padding-left: 8px; padding-right: 8px;"
+                    >
+                      <div
+                        class="ant-form-item configItem css-dev-only-do-not-override-1vjf2v5"
+                      >
+                        <div
+                          class="ant-row ant-form-item-row css-dev-only-do-not-override-1vjf2v5"
+                        >
+                          <div
+                            class="ant-col ant-form-item-label css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <label
+                              class=""
+                              title="Request Format"
+                            >
+                              Request Format
+                            </label>
+                          </div>
+                          <div
+                            class="ant-col ant-form-item-control css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <div
+                              class="ant-form-item-control-input"
+                            >
+                              <div
+                                class="ant-form-item-control-input-content"
+                              >
+                                <select>
+                                  <option
+                                    value="ollama"
+                                  >
+                                    Ollama
+                                  </option>
+                                  <option
+                                    value="openai"
+                                  >
+                                    OpenAI
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-col ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-8 ant-col-xl-8 css-dev-only-do-not-override-1vjf2v5"
+                      style="padding-left: 8px; padding-right: 8px;"
+                    >
+                      <div
+                        class="ant-form-item configItem css-dev-only-do-not-override-1vjf2v5"
+                      >
+                        <div
+                          class="ant-row ant-form-item-row css-dev-only-do-not-override-1vjf2v5"
+                        >
+                          <div
+                            class="ant-col ant-form-item-label css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <label
+                              class=""
+                              title="Request Type"
+                            >
+                              Request Type
+                            </label>
+                          </div>
+                          <div
+                            class="ant-col ant-form-item-control css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <div
+                              class="ant-form-item-control-input"
+                            >
+                              <div
+                                class="ant-form-item-control-input-content"
+                              >
+                                <select>
+                                  <option
+                                    value="chat"
+                                  >
+                                    Generate chat completion
+                                  </option>
+                                  <option
+                                    value="generate"
+                                  >
+                                    Generate completion
+                                  </option>
+                                  <option
+                                    value="pull"
+                                  >
+                                    Pull model
+                                  </option>
+                                  <option
+                                    value="list"
+                                  >
+                                    List models
+                                  </option>
+                                  <option
+                                    value="delete"
+                                  >
+                                    Delete model
+                                  </option>
+                                  <option
+                                    value="ps"
+                                  >
+                                    List running models
+                                  </option>
+                                  <option
+                                    value="embeddings"
+                                  >
+                                    Generate embeddings (single)
+                                  </option>
+                                  <option
+                                    value="embed"
+                                  >
+                                    Generate embeddings (batch)
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-8 ant-col-lg-8 ant-col-xl-8 css-dev-only-do-not-override-1vjf2v5"
+                      style="padding-left: 8px; padding-right: 8px;"
+                    >
+                      <div
+                        class="ant-form-item configItem css-dev-only-do-not-override-1vjf2v5"
+                      >
+                        <div
+                          class="ant-row ant-form-item-row css-dev-only-do-not-override-1vjf2v5"
+                        >
+                          <div
+                            class="ant-col ant-form-item-label css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <label
+                              class=""
+                              title="Model"
+                            >
+                              Model
+                            </label>
+                          </div>
+                          <div
+                            class="ant-col ant-form-item-control css-dev-only-do-not-override-1vjf2v5"
+                          >
+                            <div
+                              class="ant-form-item-control-input"
+                            >
+                              <div
+                                class="ant-form-item-control-input-content"
+                              >
+                                <input
+                                  class="ant-input css-dev-only-do-not-override-1vjf2v5 ant-input-outlined"
+                                  placeholder="llama2"
+                                  type="text"
+                                  value="llama2"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="mainContent"
+        >
+          <div
+            class="leftPanel"
+          >
+            <div
+              class="ant-card ant-card-bordered requestCard css-dev-only-do-not-override-1vjf2v5"
+            >
+              <div
+                class="ant-card-head"
+              >
+                <div
+                  class="ant-card-head-wrapper"
+                >
+                  <div
+                    class="ant-card-head-title"
+                  >
+                    <div
+                      class="ant-flex css-dev-only-do-not-override-1vjf2v5 ant-flex-align-center ant-flex-justify-space-between"
+                    >
+                      <span
+                        class="ant-typography css-dev-only-do-not-override-1vjf2v5"
+                      >
+                        Request Body
+                      </span>
+                      <div
+                        class="buttonGroup"
+                      >
+                        <button
+                          class="ant-btn css-dev-only-do-not-override-1vjf2v5 ant-btn-primary ant-btn-color-primary ant-btn-variant-solid sendButton"
+                          id="send-button"
+                          type="button"
+                        >
+                          <span>
+                            Send
+                          </span>
+                        </button>
+                        <button
+                          class="ant-btn css-dev-only-do-not-override-1vjf2v5 ant-btn-default ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-outlined stopButton"
+                          disabled=""
+                          id="stop-button"
+                          type="button"
+                        >
+                          <span>
+                            Stop
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="ant-card-body"
+              >
+                <textarea
+                  class="ant-input css-dev-only-do-not-override-1vjf2v5 ant-input-outlined requestTextarea"
+                  id="request-body"
+                  placeholder="{ "model": "llama2", "messages": [ { "role": "user", "content": "Hello, how are you?" } ], "stream": true }"
+                  spellcheck="false"
+                  style="resize: none;"
+                >
+                  {
+  "model": "llama2",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello, how are you?"
+    }
+  ],
+  "stream": true,
+  "format": null,
+  "options": {
+    "num_predict": 128,
+    "temperature": 0.8,
+    "top_k": 40,
+    "top_p": 0.9,
+    "min_p": 0,
+    "tfs_z": 1,
+    "typical_p": 1,
+    "repeat_last_n": 64,
+    "repeat_penalty": 1.1,
+    "presence_penalty": 0,
+    "frequency_penalty": 0,
+    "mirostat": 0,
+    "mirostat_tau": 5,
+    "mirostat_eta": 0.1,
+    "penalize_newline": true,
+    "stop": [],
+    "numa": false,
+    "num_ctx": 2048,
+    "num_batch": 512,
+    "num_gpu": 1,
+    "main_gpu": 0,
+    "low_vram": false,
+    "vocab_only": false,
+    "use_mmap": true,
+    "use_mlock": false,
+    "num_thread": null
+  },
+  "keep_alive": "5m"
+}
+                </textarea>
+              </div>
+            </div>
+          </div>
+          <div
+            class="rightPanel"
+          >
+            <div
+              class="ant-card ant-card-bordered responseCard css-dev-only-do-not-override-1vjf2v5"
+            >
+              <div
+                class="ant-card-head"
+              >
+                <div
+                  class="ant-card-head-wrapper"
+                >
+                  <div
+                    class="ant-card-head-title"
+                  >
+                    Response
+                  </div>
+                </div>
+              </div>
+              <div
+                class="ant-card-body"
+              >
+                <div
+                  class="ant-tabs ant-tabs-top responseTabs css-dev-only-do-not-override-1vjf2v5"
+                >
+                  <div
+                    aria-orientation="horizontal"
+                    class="ant-tabs-nav"
+                    role="tablist"
+                  >
+                    <div
+                      class="ant-tabs-nav-wrap"
+                    >
+                      <div
+                        class="ant-tabs-nav-list"
+                        style="transform: translate(0px, 0px);"
+                      >
+                        <div
+                          class="ant-tabs-tab ant-tabs-tab-active"
+                          data-node-key="preview"
+                        >
+                          <div
+                            aria-controls="rc-tabs-test-panel-preview"
+                            aria-selected="true"
+                            class="ant-tabs-tab-btn"
+                            id="rc-tabs-test-tab-preview"
+                            role="tab"
+                            tabindex="0"
+                          >
+                            Preview
+                          </div>
+                        </div>
+                        <div
+                          class="ant-tabs-tab"
+                          data-node-key="body"
+                        >
+                          <div
+                            aria-controls="rc-tabs-test-panel-body"
+                            aria-selected="false"
+                            class="ant-tabs-tab-btn"
+                            id="rc-tabs-test-tab-body"
+                            role="tab"
+                            tabindex="-1"
+                          >
+                            Body
+                          </div>
+                        </div>
+                        <div
+                          class="ant-tabs-tab"
+                          data-node-key="headers"
+                        >
+                          <div
+                            aria-controls="rc-tabs-test-panel-headers"
+                            aria-selected="false"
+                            class="ant-tabs-tab-btn"
+                            id="rc-tabs-test-tab-headers"
+                            role="tab"
+                            tabindex="-1"
+                          >
+                            Headers
+                          </div>
+                        </div>
+                        <div
+                          class="ant-tabs-tab"
+                          data-node-key="status"
+                        >
+                          <div
+                            aria-controls="rc-tabs-test-panel-status"
+                            aria-selected="false"
+                            class="ant-tabs-tab-btn"
+                            id="rc-tabs-test-tab-status"
+                            role="tab"
+                            tabindex="-1"
+                          >
+                            Status
+                          </div>
+                        </div>
+                        <div
+                          class="ant-tabs-ink-bar ant-tabs-ink-bar-animated"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="ant-tabs-nav-operations ant-tabs-nav-operations-hidden"
+                    >
+                      <button
+                        aria-controls="rc-tabs-test-more-popup"
+                        aria-expanded="false"
+                        aria-haspopup="listbox"
+                        class="ant-tabs-nav-more"
+                        id="rc-tabs-test-more"
+                        style="visibility: hidden; order: 1;"
+                        type="button"
+                      >
+                        <span
+                          aria-label="ellipsis"
+                          class="anticon anticon-ellipsis"
+                          role="img"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            data-icon="ellipsis"
+                            fill="currentColor"
+                            focusable="false"
+                            height="1em"
+                            viewBox="64 64 896 896"
+                            width="1em"
+                          >
+                            <path
+                              d="M176 511a56 56 0 10112 0 56 56 0 10-112 0zm280 0a56 56 0 10112 0 56 56 0 10-112 0zm280 0a56 56 0 10112 0 56 56 0 10-112 0z"
+                            />
+                          </svg>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-tabs-content-holder"
+                  >
+                    <div
+                      class="ant-tabs-content ant-tabs-content-top"
+                    >
+                      <div
+                        aria-hidden="false"
+                        aria-labelledby="rc-tabs-test-tab-preview"
+                        class="ant-tabs-tabpane ant-tabs-tabpane-active"
+                        id="rc-tabs-test-panel-preview"
+                        role="tabpanel"
+                        tabindex="0"
+                      >
+                        <div
+                          class="responsePreview"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+`;

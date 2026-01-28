@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>OllamaFlow.Sdk</AssemblyName>
+    <RootNamespace>OllamaFlow.Sdk</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>OllamaFlow.Sdk.xml</DocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>OllamaFlow.Sdk</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Joel Christner</Authors>
+    <Description>C# SDK for OllamaFlow - Intelligent load balancing and API transformation for Ollama and OpenAI-compatible endpoints</Description>
+    <PackageProjectUrl>https://github.com/ollamaflow/sdk-csharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ollamaflow/sdk-csharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>ai;ollamaflow;ollama;openai;vllm;llm;chat;completion;embeddings;load-balancing</PackageTags>
+    <Title>OllamaFlow.Sdk</Title>
+    <Copyright>(c)2025 Joel Christner</Copyright>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OllamaFlow.Core" Version="1.1.3" />
+    <PackageReference Include="RestWrapper" Version="3.1.8" />
+    <PackageReference Include="System.Text.Json" Version="9.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="OllamaFlow.Sdk.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
+
+

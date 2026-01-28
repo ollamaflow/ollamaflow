@@ -25,4 +25,4 @@ docker run \
   -v ./ollamaflow.json:/app/ollamaflow.json \
   -v ./ollamaflow.db:/app/ollamaflow.db \
   -v ./logs/:/app/logs/ \
-  jchristn/ollamaflow:$IMG_TAG
+  jchristn77/ollamaflow:$IMG_TAG

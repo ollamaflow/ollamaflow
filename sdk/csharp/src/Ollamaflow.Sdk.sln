@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36603.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OllamaFlow.Sdk", "OllamaFlow.Sdk\OllamaFlow.Sdk.csproj", "{EEE88705-4C6B-6F71-D083-9E093A2014AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.OllamaFlow.Sdk", "Test.OllamaFlow.Sdk\Test.OllamaFlow.Sdk.csproj", "{2828758E-C9D5-ABD1-EE29-7B8D1F889C95}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEE88705-4C6B-6F71-D083-9E093A2014AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE88705-4C6B-6F71-D083-9E093A2014AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE88705-4C6B-6F71-D083-9E093A2014AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE88705-4C6B-6F71-D083-9E093A2014AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2828758E-C9D5-ABD1-EE29-7B8D1F889C95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2828758E-C9D5-ABD1-EE29-7B8D1F889C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2828758E-C9D5-ABD1-EE29-7B8D1F889C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2828758E-C9D5-ABD1-EE29-7B8D1F889C95}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0C4DFCB9-E136-422A-9077-A28179560CDF}
+	EndGlobalSection
+EndGlobal

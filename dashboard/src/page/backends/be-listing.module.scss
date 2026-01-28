@@ -1,0 +1,7 @@
+.tableContainer{
+    :global{
+        .in-active{
+            background-color: var(--ant-color-error-bg);
+        }
+    }
+}

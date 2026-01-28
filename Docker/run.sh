@@ -23,5 +23,5 @@ docker run \
   -e "TERM=xterm-256color" \
   -v ./ollamaflow.json:/app/ollamaflow.json \
   -v ./logs/:/app/logs/ \
-  jchristn/ollamaflow:$IMG_TAG
+  jchristn77/ollamaflow:$IMG_TAG
 

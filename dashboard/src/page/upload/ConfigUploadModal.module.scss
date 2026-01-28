@@ -1,0 +1,38 @@
+.configUploadModal {
+  &__tabs {
+    padding: 20px 0;
+  }
+
+  &__pasteSection {
+    padding: 20px 0;
+  }
+
+  &__uploadArea {
+    border: 2px dashed var(--ollamaflow-border-gray);
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    background: var(--ollamaflow-bg-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: var(--ollamaflow-primary);
+      background: var(--ollamaflow-primary) 05;
+    }
+  }
+
+  &__textarea {
+    min-height: 200px;
+    font-family: 'Courier New', monospace;
+  }
+
+  &__pasteCard {
+    margin-bottom: 16px;
+  }
+
+  &__pasteDescription {
+    color: var(--ollamaflow-sub-heading);
+    margin-bottom: 16px;
+  }
+}

@@ -1,0 +1,15 @@
+.backendHealthInfo {
+  border-radius: var(--ant-border-radius-sm);
+  border: 1px solid var(--ant-color-border);
+  .backendHealthInfoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px;
+    border-bottom: 1px solid var(--ant-color-border);
+    .key {
+      font-weight: 600;
+      padding-right: var(--ant-padding);
+    }
+  }
+}

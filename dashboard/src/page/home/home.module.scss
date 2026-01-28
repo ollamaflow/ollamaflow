@@ -1,0 +1,9 @@
+.card {
+  :global {
+    .ant-card-body {
+      text-align: center;
+      padding: var(--ant-padding-xl) !important;
+      height: 350px;
+    }
+  }
+}

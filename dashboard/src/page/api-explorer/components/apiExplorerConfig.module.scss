@@ -1,0 +1,42 @@
+.configCard {
+  margin-bottom: 20px !important;
+
+  :global(.ant-card-head) {
+    border-bottom: none;
+  }
+
+  :global(.ant-card-body) {
+    padding: 20px;
+  }
+}
+
+.configContent {
+  // Main content styling
+}
+
+.configUrlRow {
+  margin-bottom: 16px;
+  align-items: end;
+}
+
+.configGrid {
+  margin-top: 16px;
+}
+
+.configCheckbox {
+  margin-top: 8px;
+
+  :global(.ant-checkbox-wrapper) {
+    font-size: 14px;
+    color: #555;
+  }
+}
+
+.configItem {
+  margin-bottom: 0;
+
+  :global(.ant-form-item-label) {
+    font-weight: 500;
+    color: #555;
+  }
+}

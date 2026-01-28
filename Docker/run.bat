@@ -20,7 +20,7 @@ docker run ^
   -e "TERM=xterm-256color" ^
   -v .\ollamaflow.json:/app/ollamaflow.json ^
   -v .\logs\:/app/logs/ ^
-  jchristn/ollamaflow:%1
+  jchristn77/ollamaflow:%1
 
 GOTO :Done
 

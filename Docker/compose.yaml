@@ -2,13 +2,13 @@ services:
 
   #
   # OllamaFlow
-  # See https://hub.docker.com/r/jchristn/ollamaflow
+  # See https://hub.docker.com/r/jchristn77/ollamaflow
   # and https://github.com/jchristn/OllamaFlow
   #
 
   ollamaflow:
     container_name: 'ollamaflow'
-    image: 'jchristn/ollamaflow:v1.2.0'
+    image: 'jchristn77/ollamaflow:v1.2.0'
     ports:
       - "43411:43411"
     stdin_open: true

@@ -22,7 +22,7 @@ docker run ^
   -v .\ollamaflow.json:/app/ollamaflow.json ^
   -v .\ollamaflow.db:/app/ollamaflow.db ^
   -v .\logs\:/app/logs/ ^
-  jchristn/ollamaflow:%1
+  jchristn77/ollamaflow:%1
 
 GOTO :Done
 

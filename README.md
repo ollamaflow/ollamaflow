@@ -1,22 +1,23 @@
 # OllamaFlow
 
 <div align="center">
-  <img src="https://github.com/jchristn/ollamaflow/blob/main/assets/icon.png?raw=true" width="200" height="184" alt="OllamaFlow">
+  <img src="https://github.com/jchristn77/ollamaflow/blob/main/assets/icon.png?raw=true" width="200" height="184" alt="OllamaFlow">
   
   **Intelligent Load Balancing and Model Orchestration for Ollama and OpenAI Platforms**
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
   [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com)
-  [![Docker](https://img.shields.io/badge/Docker-available-blue.svg)](https://hub.docker.com/r/jchristn/ollamaflow)
+  [![Docker](https://img.shields.io/badge/Docker-available-blue.svg)](https://hub.docker.com/r/jchristn77/ollamaflow)
   [![Documentation](https://img.shields.io/badge/Documentation-Available-brightgreen.svg)](https://ollamaflow.readme.io/)
-  [![Web UI](https://img.shields.io/badge/Web%20UI-Dashboard-orange.svg)](https://github.com/ollamaflow/ui)
+  [![Web UI](https://img.shields.io/badge/Web%20UI-Dashboard-orange.svg)](dashboard/)
+  [![NuGet](https://img.shields.io/nuget/v/OllamaFlow.Sdk.svg?label=C%23%20SDK)](https://www.nuget.org/packages/OllamaFlow.Sdk/)
 </div>
 
 ## 🚀 Scale Your AI Infrastructure
 
 OllamaFlow is a lightweight, intelligent orchestration layer that unifies multiple AI backend instances into a high-availability inference cluster. Supporting both Ollama and OpenAI API formats on the frontend with native transformation capabilities, OllamaFlow delivers **scalability**, **high availability**, and **security control** - enabling you to scale AI workloads across multiple backends while ensuring zero-downtime model serving and fine-grained control over inference and embeddings deployments.
 
-> 📖 **[Complete Documentation](https://ollamaflow.readme.io/)** | 🎨 **[Web UI Dashboard](https://github.com/ollamaflow/ui)**
+> 📖 **[Complete Documentation](https://ollamaflow.readme.io/)** | 🎨 **[Web UI Dashboard](dashboard/)** | 📦 **[SDKs](sdk/)**
 
 ### Why OllamaFlow?
 
@@ -71,21 +72,21 @@ OllamaFlow is a lightweight, intelligent orchestration layer that unifies multip
 
 ```bash
 # Pull the image
-docker pull jchristn/ollamaflow:v1.2.0
+docker pull jchristn77/ollamaflow:v1.2.0
 
 # Run with default configuration
 docker run -d \
   -p 43411:43411 \
   -v $(pwd)/ollamaflow.json:/app/ollamaflow.json \
   -v $(pwd)/ollamaflow.db:/app/ollamaflow.db \
-  jchristn/ollamaflow:v1.2.0
+  jchristn77/ollamaflow:v1.2.0
 ```
 
 ### Using .NET
 
 ```bash
 # Clone the repository
-git clone https://github.com/jchristn/ollamaflow.git
+git clone https://github.com/jchristn77/ollamaflow.git
 cd ollamaflow/src
 
 # Build and run
@@ -341,7 +342,7 @@ A complete **Postman collection** (`OllamaFlow.postman_collection.json`) is incl
 
 For interactive API testing and experimentation, the **[OllamaFlow API Explorer](https://github.com/ollamaflow/apiexplorer)** provides a web-based dashboard for exploring and testing all OllamaFlow endpoints.
 
-For a visual interface, check out the **[OllamaFlow Web UI](https://github.com/ollamaflow/ui)** which provides a dashboard for cluster management and monitoring.
+For a visual interface, check out the **[OllamaFlow Web UI](dashboard/)** which provides a dashboard for cluster management and monitoring.
 
 ## 🤝 Contributing
 
@@ -360,10 +361,32 @@ Please check out our [Contributing Guidelines](CONTRIBUTING.md) and feel free to
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## 📁 Monorepo Structure
+
+This repository is organized as a monorepo containing the OllamaFlow server, web dashboard, and client SDKs:
+
+```
+ollamaflow/
+├── src/                    # OllamaFlow Server (.NET 8.0)
+│   ├── OllamaFlow.Core/    # Core orchestration library
+│   ├── OllamaFlow.Server/  # Console application & Docker entry point
+│   └── Test.*/             # Test projects
+├── dashboard/              # Web UI Dashboard (Next.js/React)
+├── sdk/                    # Client SDKs
+│   ├── csharp/             # C# SDK (NuGet: OllamaFlow.Sdk)
+│   ├── js/                 # JavaScript/TypeScript SDK
+│   └── python/             # Python SDK
+├── Docker/                 # Docker Compose configurations
+└── assets/                 # Project branding and logos
+```
+
 ## 📚 Documentation & Resources
 
 - **[Complete Documentation](https://ollamaflow.readme.io/)** - Comprehensive guides, API reference, and tutorials
-- **[Web UI Dashboard](https://github.com/ollamaflow/ui)** - Visual cluster management interface
+- **[Web UI Dashboard](dashboard/)** - Visual cluster management interface (included in this repo)
+- **[C# SDK](sdk/csharp/)** - .NET SDK for OllamaFlow ([NuGet](https://www.nuget.org/packages/OllamaFlow.Sdk/))
+- **[JavaScript SDK](sdk/js/)** - JavaScript/TypeScript SDK for OllamaFlow
+- **[Python SDK](sdk/python/)** - Python SDK for OllamaFlow
 - **[API Explorer](https://github.com/ollamaflow/apiexplorer)** - Interactive web-based API testing and experimentation
 - **[Postman Collection](OllamaFlow.postman_collection.json)** - API testing and examples
 
@@ -382,6 +405,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   <b>Ready to scale your AI infrastructure?</b><br>
   Get started with OllamaFlow today!<br><br>
   📖 <a href="https://ollamaflow.readme.io/"><b>Documentation</b></a> |
-  🎨 <a href="https://github.com/ollamaflow/ui"><b>Web Dashboard</b></a> |
+  🎨 <a href="dashboard/"><b>Web Dashboard</b></a> |
+  📦 <a href="sdk/"><b>SDKs</b></a> |
   🔬 <a href="https://github.com/ollamaflow/apiexplorer"><b>API Explorer</b></a>
 </div>
