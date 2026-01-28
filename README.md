@@ -1,7 +1,7 @@
 # OllamaFlow
 
 <div align="center">
-  <img src="https://github.com/jchristn77/ollamaflow/blob/main/assets/icon.png?raw=true" width="200" height="184" alt="OllamaFlow">
+  <img src="https://github.com/ollamaflow/ollamaflow/blob/main/assets/icon.png?raw=true" width="200" height="184" alt="OllamaFlow">
   
   **Intelligent Load Balancing and Model Orchestration for Ollama and OpenAI Platforms**
   
