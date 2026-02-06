@@ -640,6 +640,9 @@
 
                     #endregion
 
+                    // apply frontend timeout configuration
+                    restRequest.TimeoutMilliseconds = frontend.TimeoutMs;
+
                     #region Send
 
                     // _Logging.Debug($"{_Header}sending request to backend {backend.Identifier} for frontend {frontend.Identifier} using {method} {url}{Environment.NewLine}{requestBody}");
