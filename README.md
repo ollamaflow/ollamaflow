@@ -1,3 +1,7 @@
+# NOTICE
+
+This repository is being deprecated due to being superceded by [Conductor](https://github.com/jchristn/conductor)<br />
+
 # OllamaFlow
 
 <div align="center">
