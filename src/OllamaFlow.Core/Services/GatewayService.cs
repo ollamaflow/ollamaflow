@@ -699,20 +699,25 @@
 
                     if (restResponse.ServerSentEvents)
                     {
-                        _Logging.Debug($"{_Header}backend {backend.Identifier} responded using sse for {req.RequestType.ToString()}");
+                        _Logging.Debug($"{_Header}backend {backend.Identifier} responded using SSE for {req.RequestType.ToString()}");
 
                         while (true)
                         {
                             ServerSentEvent sse = await restResponse.ReadEventAsync(token).ConfigureAwait(false);
+
                             if (sse == null)
                             {
+                                // End of stream - properly terminate SSE
                                 await ctx.Response.SendEvent("", true, token).ConfigureAwait(false);
                                 break;
                             }
-                            else
-                            {
-                                await ctx.Response.SendEvent(sse.Event, false, token).ConfigureAwait(false);
-                            }
+
+                            // Forward the actual data payload (most important for Ollama/OpenAI SSE)
+                            string dataToSend = !string.IsNullOrEmpty(sse.Data) 
+                                ? sse.Data 
+                                : (sse.Event ?? "");
+
+                            await ctx.Response.SendEvent(dataToSend, false, token).ConfigureAwait(false);
                         }
                     }
                     else if (restResponse.ChunkedTransferEncoding)
